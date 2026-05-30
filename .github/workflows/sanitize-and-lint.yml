@@ -1,0 +1,32 @@
+name: sanitize-and-lint
+
+# Fail-closed gate for The Agent Foundry.
+# Runs on every pull request, including from forks. No repository secrets are
+# used or needed. If either script exits non-zero, the check fails and the PR
+# cannot merge until it is fixed.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sanitize-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Sanitization scan (fail-closed)
+        run: python3 gates/scripts/sanitize_scan.py .
+
+      - name: Format lint
+        run: python3 gates/scripts/format_lint.py .
