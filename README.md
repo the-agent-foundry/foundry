@@ -30,7 +30,7 @@ Community contributions are welcome into a namespaced area (see `community/` and
 - `field-guide/` : the Building Brit field guide (HTML and markdown) plus the why.
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
-- `skills/` : what a skill is, the canonical schema, a blank template, and examples.
+- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, writing, privacy routing, skillification, and repo sanitization.
 - `agents/` : why specialists beat a generalist, the agent role-spec schema, the profile operating model, and six expanded archetypes for orchestrator, engineer, call processor, briefer, writer, and mechanic.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `examples/` : sanitized examples of manifests and operating-pattern artifacts.

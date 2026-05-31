@@ -7,16 +7,15 @@ What it does
 Validates that contributed artifacts match the canonical schemas in the repo:
 
   * skills  : files under skills/ and community/*/skills/ must carry the
-              required SKILL frontmatter keys and the required body headings.
+              required SKILL frontmatter keys and required body headings.
   * agents  : files under agents/archetypes/ and community/*/agents/ must carry
               the required AGENT-SPEC frontmatter keys and headings.
   * tools   : files under tools/examples/ and community/*/tools/ must carry the
               required TOOL-SPEC frontmatter keys and headings.
 
-It is pragmatic on purpose. It checks that required frontmatter keys exist and
-that required section headings are present. It does not police prose. The point
-is a consistent shape so a human or an agent can read any artifact in the repo
-and know where to look.
+It is pragmatic on purpose. It checks the contract shape, not prose quality.
+The point is a consistent shape so a human or an agent can read any artifact in
+this repo and know where to look.
 
 Pure Python 3 standard library. No dependencies. Designed to run identically on
 a laptop and in CI.
@@ -33,29 +32,37 @@ Exit codes
     1   One or more violations. See the printed report.
     2   Usage / runtime error.
 """
-
 import os
 import re
 import sys
 
-# Schema files and README/template/schema files are not themselves artifacts.
 EXEMPT_BASENAMES = {
     "README.md", "SKILL.schema.md", "SKILL.template.md",
     "AGENT-SPEC.schema.md", "AGENTS.template.md", "SOUL.template.md",
-    "TOOL-SPEC.schema.md", "PRINCIPLES.template.md",
+    "TOOL-SPEC.schema.md", "TOOL.template.md", "PRINCIPLES.template.md",
 }
 
-# Required frontmatter keys and required headings per artifact kind.
 RULES = {
     "skill": {
-        "frontmatter": ["name", "description", "version", "owner"],
-        "headings": ["When to use", "Inputs", "Procedure",
-                     "What good looks like", "Landmines"],
+        "frontmatter": [
+            "name", "description", "version", "owner",
+            "data_sensitivity", "approval_required",
+        ],
+        "headings": [
+            "When to use", "Inputs", "Procedure", "What good looks like",
+            "Output contract", "Privacy and approval", "Verification",
+            "Maintenance", "Landmines",
+        ],
+        "allowed_values": {
+            "data_sensitivity": {"public", "internal", "confidential", "restricted"},
+            "approval_required": {"none", "before_write", "before_external_send", "before_live_change"},
+        },
     },
     "agent": {
         "frontmatter": ["role", "mission", "reports_to"],
         "headings": ["Mission", "Scope", "Skills and tools",
                      "What good looks like", "Approval boundaries"],
+        "allowed_values": {},
     },
     "tool": {
         "frontmatter": ["name", "problem"],
@@ -63,6 +70,7 @@ RULES = {
                      "Failure modes", "Privacy notes",
                      "Approval boundaries", "Freshness and state",
                      "Observability"],
+        "allowed_values": {},
     },
 }
 
@@ -76,34 +84,34 @@ def classify(path):
         return None
     if not path.endswith(".md"):
         return None
-    # core locations
-    if "agents/archetypes" in "/".join(parts):
+    joined = "/".join(parts)
+    if "agents/archetypes" in joined:
         return "agent"
-    if "tools/examples" in "/".join(parts):
+    if "tools/examples" in joined:
         return "tool"
-    if "skills/examples" in "/".join(parts):
+    if "skills/examples" in joined:
         return "skill"
-    # community namespace: community/<handle>/<kind>/...
     if "community" in parts:
         i = parts.index("community")
         if len(parts) > i + 2:
             kind_dir = parts[i + 2]
-            return {"skills": "skill", "agents": "agent",
-                    "tools": "tool"}.get(kind_dir)
+            return {"skills": "skill", "agents": "agent", "tools": "tool"}.get(kind_dir)
     return None
 
 
 def parse_frontmatter(text):
-    """Return a set of top-level keys found in YAML-ish frontmatter, or None."""
+    """Return a dict of top-level YAML-ish frontmatter keys to scalar values."""
     m = FRONTMATTER_RE.match(text)
     if not m:
         return None
-    keys = set()
+    values = {}
     for line in m.group(1).splitlines():
-        km = re.match(r"^([A-Za-z0-9_-]+)\s*:", line)
+        km = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*?)\s*$", line)
         if km:
-            keys.add(km.group(1).strip())
-    return keys
+            key = km.group(1).strip()
+            value = km.group(2).strip().strip('"\'')
+            values[key] = value
+    return values
 
 
 def find_headings(text):
@@ -127,13 +135,20 @@ def lint_file(path, kind):
 
     spec = RULES[kind]
 
-    keys = parse_frontmatter(text)
-    if keys is None:
+    fm = parse_frontmatter(text)
+    if fm is None:
         problems.append("missing YAML frontmatter block (--- ... ---)")
     else:
         for req in spec["frontmatter"]:
-            if req not in keys:
+            if req not in fm:
                 problems.append(f"missing frontmatter key: {req}")
+        for key, allowed in spec.get("allowed_values", {}).items():
+            if key in fm and fm[key] not in allowed:
+                allowed_list = ", ".join(sorted(allowed))
+                problems.append(
+                    f"invalid frontmatter value for {key}: {fm[key]!r} "
+                    f"(allowed: {allowed_list})"
+                )
 
     heads = find_headings(text)
     for req in spec["headings"]:
@@ -176,8 +191,7 @@ def main(argv):
     if total == 0:
         print(f"format_lint: CLEAN. {checked} artifact(s) conform to schema.")
         return 0
-    print(f"format_lint: FAILED. {total} violation(s) across "
-          f"{checked} checked artifact(s).")
+    print(f"format_lint: FAILED. {total} violation(s) across {checked} checked artifact(s).")
     print("Match the canonical schema in skills/, agents/, or tools/ and re-run.")
     return 1
 
