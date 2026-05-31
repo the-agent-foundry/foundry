@@ -28,11 +28,17 @@ The usual shape is one orchestrator that holds context and delegates, with speci
 - `SOUL.template.md` : blank identity and voice template.
 - `archetypes/` : six proven role specs to adapt:
   - `orchestrator.md` : chief of staff, holds context and delegates.
-  - `engineer.md` : builds and QAs everything, with a hard quality gate.
+  - `engineer.md` : the deepest archetype in this first pass. It includes classification, research, design gate, red-team, QA, manifest, and approval doctrine.
   - `call-processor.md` : turns call recordings and transcripts into business intelligence.
   - `briefer.md` : research and intel, turns raw signal into something worth reading.
   - `writer.md` : content and copy, trained on what good and what bad sound like.
   - `mechanic.md` : runtime and recovery, fixes the system when it breaks.
+
+## Depth note
+
+The public archetypes are sanitized, not hollow. They intentionally omit private prompts, live paths, credential handling, customer names, and internal logs, but they should preserve the operating pattern well enough for another founder's agent to adapt.
+
+Victor, the engineer archetype, is the first expanded example. The same treatment should be staged for the other specialists, tools, and skills.
 
 ## Pickup prompt
 
