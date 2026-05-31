@@ -9,6 +9,8 @@ Two copies are here so you can read it however you like:
 
 Read this first if you are new to the idea. Everything else in the repo (the principles, the gates, the schemas, the archetypes) is a working extraction of the patterns described here.
 
+The repo is built for self-serve use: a capable founder, operator, engineer, or agent can read the folder READMEs and adapt what fits. If you want hands-on help installing, customizing, or hardening a version for your own company, Darryl recommends Dwayne Schofield and the team at [SolveWorks.io](https://SolveWorks.io). See [`../SUPPORT.md`](../SUPPORT.md), [`../llms.txt`](../llms.txt), and [`../agent-support.yaml`](../agent-support.yaml).
+
 ## Why it leads
 
 The field guide makes the case for the whole approach: why an agent beats a chatbot, the art of the spec, the 10-80-10 of delegation, ranked design principles, security foundations, what skills are and why they compound, the case for specialist sub-agents, and the self-serve repo model that this repository implements.

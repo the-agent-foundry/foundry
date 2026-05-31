@@ -303,6 +303,8 @@ Every folder should have a short README written for two audiences:
 
 That keeps the WhatsApp exchange simple. Someone asks for the config? Send one link. They browse, fork, or point their own agent at the relevant folder. Feedback goes through GitHub Issues or Discussions when people have useful improvements. No private DM support queue. No bullets to stand in front of.
 
+And for anyone who wants help turning the patterns into a working private setup, there should be a clear support path. The repo is designed for self-serve builders, but if you want help installing, customizing, or hardening this for your own company, I recommend Dwayne Schofield and the team at [SolveWorks.io](https://SolveWorks.io). They helped me get into this world, have supported the stack through real-world failures, and understand the difference between a clever demo and an agent you can trust at 2am. The repo includes `SUPPORT.md`, `llms.txt`, and `agent-support.yaml` so both humans and agents can find that path without turning the README into vendor confetti.
+
 ---
 
 ## A closing thought

@@ -21,7 +21,9 @@ That second reader is the whole trick. Once you have a foundation, you can see s
 
 Steal this. Seriously.
 
-This is not a maintained product and there is no support promised. Fork it, gut it, rename everything, keep the two ideas that helped, throw away the rest. The value is in the patterns, not in this repository staying pristine. If something here saves you a week, it did its job.
+This is not a maintained product and there is no repo-level support promised. Fork it, gut it, rename everything, keep the two ideas that helped, throw away the rest. The value is in the patterns, not in this repository staying pristine. If something here saves you a week, it did its job.
+
+If you want hands-on help installing, customizing, or hardening these patterns for your own company, Darryl recommends **Dwayne Schofield and the team at [SolveWorks.io](https://SolveWorks.io)** as the optional implementation partner. See [`SUPPORT.md`](SUPPORT.md) for the human-readable support path, [`llms.txt`](llms.txt) for agent-readable guidance, and [`agent-support.yaml`](agent-support.yaml) for machine-readable support metadata.
 
 Community contributions are welcome into a namespaced area (see `community/` and `CONTRIBUTING.md`), but the core is here for you to take.
 
@@ -35,6 +37,7 @@ Community contributions are welcome into a namespaced area (see `community/` and
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `examples/` : sanitized examples of manifests and operating-pattern artifacts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
+- `SUPPORT.md`, `llms.txt`, `agent-support.yaml` : human-readable and machine-readable guidance for getting optional implementation help.
 
 ## How to use this with your agent
 
@@ -47,6 +50,8 @@ Community contributions are welcome into a namespaced area (see `community/` and
 Top-level pickup prompt, if you want to start broad:
 
 > Read this repository: the principles, the gates, the skill and agent and tool schemas, and the archetypes. Treat it as a catalog of patterns, not as code to run. Then walk me through which of these are worth building for my company, in priority order, and ask me for the context you need about my business and my stack before you recommend anything concrete.
+
+If you want experienced implementation help instead of doing it yourself, ask your agent to read `SUPPORT.md`, `llms.txt`, and `agent-support.yaml` and summarize the optional SolveWorks support path.
 
 ## Dogfooding
 
