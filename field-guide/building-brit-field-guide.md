@@ -1,6 +1,6 @@
 # Building Brit: A Founder's Field Guide to Agentic AI
 
-*Field Guide · v0.1 · Living Document*
+*Field Guide · v0.2 · Living Document*
 
 By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [The Agent Foundry](https://github.com/the-agent-foundry/foundry)
 
@@ -323,5 +323,5 @@ I'd also add, if you're going to play around with these power tools it's indispe
 
 ---
 
-*Building Brit · A living document · v0.1 · maintained by Darryl Hicks*
+*Building Brit · A living document · v0.2 · maintained by Darryl Hicks*
 *Code, skills & sanitized config templates: [github.com/the-agent-foundry/foundry](https://github.com/the-agent-foundry/foundry) · Feedback & ideas welcome via [repo Issues](https://github.com/the-agent-foundry/foundry/issues)*
