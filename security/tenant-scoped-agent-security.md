@@ -2,7 +2,7 @@
 
 *How to keep one agent from leaking another client's fleet.*
 
-This is a sanitized, public architecture note. It is not Darryl's live runtime, not a dump of private policy files, and not a promise that any specific framework implements this out of the box.
+This is a sanitized, public architecture note. It is not anyone's live runtime, not a dump of private policy files, and not a promise that any specific framework implements this out of the box.
 
 ## The problem
 

@@ -1,6 +1,6 @@
 # Security patterns
 
-This directory contains sanitized security patterns for agentic operating systems. These are architecture references, not production code and not Darryl's live configuration.
+This directory contains sanitized security patterns for agentic operating systems. These are architecture references, not production code and not anyone's live configuration.
 
 Start here:
 
