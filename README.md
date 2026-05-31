@@ -6,6 +6,8 @@ This is the open companion to the field guide **Building Brit**. It collects the
 
 It is framework-agnostic by design. Nothing here requires a particular stack. The patterns map onto whatever you run: OpenClaw, Codex / OpenAI, Hermes, a homegrown setup, or something that does not exist yet. Where a concrete implementation shows up, it is clearly labeled as a reference example, never as the required path.
 
+This repo is sanitized, but it should not be shallow. It omits private prompts, credentials, live paths, customer data, internal logs, and personal memory. It preserves the operating patterns: gates, schemas, role doctrine, review loops, and proof standards.
+
 ## Who this is for
 
 Two readers, on purpose.
@@ -29,8 +31,9 @@ Community contributions are welcome into a namespaced area (see `community/` and
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `skills/` : what a skill is, the canonical schema, a blank template, and examples.
-- `agents/` : why specialists beat a generalist, the agent role-spec schema, and six archetypes.
+- `agents/` : why specialists beat a generalist, the agent role-spec schema, and six archetypes. The engineer/Victor archetype includes the full engineering loop: classification, research, red-team, QA, and manifest.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
+- `examples/` : sanitized examples of manifests and operating-pattern artifacts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 
 ## How to use this with your agent
@@ -47,7 +50,7 @@ Top-level pickup prompt, if you want to start broad:
 
 ## Dogfooding
 
-This repo practices one of its own principles: enforcement lives in the plumbing, fail-closed. A sanitization gate (`gates/scripts/sanitize_scan.py`) and a format linter (`gates/scripts/format_lint.py`) run in CI on every pull request, including from forks, with no repository secrets. Nothing sensitive lands by accident, and contributions stay in a consistent shape.
+This repo practices one of its own principles: enforcement lives in the plumbing, fail-closed. A sanitization gate (`gates/scripts/sanitize_scan.py`) and a format linter (`gates/scripts/format_lint.py`) run in CI on every pull request, including from forks, with no repository secrets. The scanner blocks common high-signal sensitive patterns, and the linter keeps contributions in a consistent shape. The gate is a backstop, not a substitute for human judgment.
 
 ## License
 
