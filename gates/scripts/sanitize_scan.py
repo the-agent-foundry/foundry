@@ -2,82 +2,39 @@
 """
 sanitize_scan.py - The Agent Foundry fail-closed sanitization gate.
 
-What it does
-------------
-Recursively scans a directory (or a single file) for things that must never
-enter a public repo: credentials, private keys, .env-style secret assignments,
-real absolute home paths, mesh/Tailscale hostnames, email addresses, phone
-numbers, and long all-digit IDs that look like chat or user IDs.
+Scans a directory or single file for things that must never enter a public repo:
+credentials, private keys, secret assignments, credential-bearing connection
+strings, package-registry auth residue, real absolute home paths, mesh/Tailscale
+hostnames, email addresses, phone numbers, long all-digit IDs, sensitive path
+names, and risky binary/archive artifacts that need human review.
 
-It is pure Python 3 standard library. No dependencies, no network, no secrets
-of its own. It is meant to run identically on a contributor's laptop and in CI
-so the same answer comes back in both places.
+Pure Python 3 standard library. No dependencies, no network, no secrets.
 
-Posture
--------
-Fail closed. Exit code 0 means clean. Any finding returns a non-zero exit code
-and prints a report with file:line for every hit. CI is wired to block a merge
-on a non-zero exit, so nothing sensitive lands by accident.
-
-This is a backstop, not a guarantee. It catches the common, high-signal
-patterns. You are still responsible for scrubbing your own contribution before
-you ever open a pull request.
-
-Allowlisting
-------------
-Two mechanisms keep legitimate content passing without weakening the gate:
-
-1. Built-in placeholder awareness. Obvious placeholders are ignored on every
-   line: <YOUR_HANDLE>, <CHAT_ID>, <...> angle-bracket tokens generally,
-   example.com / example.org / example.net, /path/to/..., 0000000000, and
-   similar fill-in tokens used in templates and schemas.
-
-2. A .sanitize-allow file at the scan root. One regex per line. Any line of any
-   scanned file that matches an allow regex is skipped for that scan. Use it
-   sparingly and comment why (lines starting with # are ignored).
-
-Usage
------
-    python3 sanitize_scan.py [PATH]
-
-    PATH   File or directory to scan. Defaults to the current directory.
-
-Examples
---------
-    python3 gates/scripts/sanitize_scan.py .
-    python3 gates/scripts/sanitize_scan.py community/your-handle/
-
-Exit codes
-----------
-    0   Clean. Nothing sensitive found.
-    1   One or more findings. See the printed report.
-    2   Usage / runtime error (bad path, etc.).
+Posture: fail closed. Exit 0 means clean. Any finding returns non-zero and
+prints path/line/rule with redacted snippets. This is a backstop, not a
+complete DLP system.
 """
 
 import os
 import re
 import sys
 
-# Directories we never descend into.
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".venv", "venv",
     ".mypy_cache", ".pytest_cache", "dist", "build", ".idea", ".vscode",
 }
 
-# File extensions we treat as binary and skip outright.
-BINARY_EXTS = {
+RISKY_BINARY_EXTS = {
     ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf", ".zip",
-    ".gz", ".tar", ".tgz", ".woff", ".woff2", ".ttf", ".otf", ".eot",
-    ".mp3", ".mp4", ".mov", ".ogg", ".wav", ".bin", ".so", ".dylib",
-    ".dll", ".class", ".jar", ".pyc", ".lock",
+    ".gz", ".tar", ".tgz", ".7z", ".rar", ".woff", ".woff2", ".ttf",
+    ".otf", ".eot", ".mp3", ".mp4", ".mov", ".ogg", ".wav", ".bin",
+    ".so", ".dylib", ".dll", ".class", ".jar", ".pyc", ".sqlite",
+    ".sqlite3", ".db", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx",
 }
 
-# This scanner file and the allow file naturally contain pattern strings.
-# We skip them so the gate does not flag its own definitions.
+MAX_TEXT_BYTES = 2_000_000
 SELF_SKIP_NAMES = {"sanitize_scan.py", ".sanitize-allow"}
 
-# Tokens that mark a line as an intentional placeholder. If a candidate match
-# overlaps one of these on the same line, that match is excused.
 PLACEHOLDER_TOKENS = [
     "example.com", "example.org", "example.net", "example.edu",
     "/path/to/", "/Users/<", "/home/<",
@@ -85,14 +42,13 @@ PLACEHOLDER_TOKENS = [
     "name@example", "user@example", "you@example",
 ]
 
-# Regex placeholders: if a match string itself looks like one of these, excuse it.
 PLACEHOLDER_MATCH_RES = [
-    re.compile(r"^<[^>]+>$"),                 # <ANYTHING>
-    re.compile(r"^0+$"),                      # 0000000000
-    re.compile(r"^[Xx]+$"),                   # XXXXXXXX
+    re.compile(r"^<[^>]+>$"),
+    re.compile(r"^0+$"),
+    re.compile(r"^[Xx]+$"),
     re.compile(r"^1234567890$"),
     re.compile(r"^(?:123)+$"),
-    re.compile(r"(?i)^(your|my|the)[-_].+"),   # YOUR_TOKEN, my-handle, etc.
+    re.compile(r"(?i)^(your|my|the)[-_].+"),
     re.compile(r"(?i)placeholder"),
     re.compile(r"(?i)example"),
     re.compile(r"(?i)redacted"),
@@ -101,7 +57,6 @@ PLACEHOLDER_MATCH_RES = [
     re.compile(r"(?i)^<.*>$"),
 ]
 
-# (label, compiled regex). Order matters only for readability of the report.
 RULES = [
     ("Private key block",
      re.compile(r"-----BEGIN(?: [A-Z0-9]+)* PRIVATE KEY-----")),
@@ -117,13 +72,27 @@ RULES = [
      re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b")),
     ("Bearer token in header",
      re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._-]{20,}\b")),
+    ("Credential-bearing connection string",
+     re.compile(r"(?i)\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|amqps?|smtp|smtps)://[^\s:@/]+:[^\s@/]{8,}@[^\s]+")),
+    ("JDBC credential-bearing URL",
+     re.compile(r"(?i)\bjdbc:[A-Za-z0-9:+.-]+://[^\s;]+;[^\n]*(?:password|pwd)=[^\s;]{8,}")),
+    ("Webhook URL with embedded secret",
+     re.compile(r"https://(?:hooks\.slack\.com/services|discord(?:app)?\.com/api/webhooks|api\.telegram\.org/bot)[A-Za-z0-9_./:-]{20,}")),
+    ("Package registry auth token",
+     re.compile(r"(?i)\b(?:_authToken|npm_token|pypi_token|twine_password|poetry_pypi_token_[A-Za-z0-9_-]+)\b\s*[:=]\s*['\"]?([A-Za-z0-9._/+-]{12,})['\"]?")),
+    ("netrc-style credential",
+     re.compile(r"(?i)\bmachine\s+\S+\s+login\s+\S+\s+password\s+\S{8,}")),
+    ("Cloud/service-account private key marker",
+     re.compile(r"(?i)\b(?:private_key_id|client_secret|refresh_token)\b\s*[:=]\s*['\"]?([A-Za-z0-9._/+-]{12,})['\"]?")),
+    ("Kubeconfig credential marker",
+     re.compile(r"(?i)\b(?:client-certificate-data|client-key-data|token):\s*([A-Za-z0-9+/=._-]{20,})")),
     ("Generic API/secret/token assignment",
      re.compile(r"(?i)\b(?:api[_-]?key|secret|token|passwd|password|access[_-]?key)\b"
                 r"\s*[:=]\s*['\"]?([A-Za-z0-9._/+-]{12,})['\"]?")),
     ("Long base64-ish secret (40+ chars)",
      re.compile(r"\b[A-Za-z0-9+/]{40,}={0,2}\b")),
-    (".env-style KEY=VALUE secret",
-     re.compile(r"(?m)^\s*[A-Z][A-Z0-9_]{2,}\s*=\s*['\"]?[^\s'\"#]{8,}['\"]?\s*$")),
+    (".env-style sensitive KEY=VALUE secret",
+     re.compile(r"(?m)^\s*[A-Z][A-Z0-9_]*(?:SECRET|TOKEN|KEY|PASSWORD|PASSWD|AUTH|CREDENTIAL|PRIVATE)[A-Z0-9_]*\s*=\s*['\"]?[^\s'\"#]{8,}['\"]?\s*$")),
     ("Absolute home path (/Users/<name> or /home/<name>)",
      re.compile(r"/(?:Users|home)/[A-Za-z0-9._-]+")),
     ("Tailscale / mesh hostname (*.ts.net)",
@@ -136,36 +105,82 @@ RULES = [
      re.compile(r"(?<![\w.])-?\d{9,}(?![\w.])")),
 ]
 
+BROAD_ALLOWLIST_PATTERNS = {".*", "^.*$", ".+", "^.+$", "(.*)", "^.*", ".*$"}
+
+
+def is_broad_allow_pattern(pattern):
+    stripped = pattern.strip()
+    if stripped in BROAD_ALLOWLIST_PATTERNS:
+        return True
+    # Tiny unanchored fragments are usually lazy bypasses, not real exceptions.
+    if len(stripped) < 4 and not stripped.startswith("^"):
+        return True
+    return False
+
 
 def load_allowlist(root):
-    """Read .sanitize-allow at the scan root: one regex per line, # for comments."""
-    allow = []
-    candidate = os.path.join(root, ".sanitize-allow") if os.path.isdir(root) \
-        else os.path.join(os.path.dirname(root) or ".", ".sanitize-allow")
-    if os.path.isfile(candidate):
-        with open(candidate, "r", encoding="utf-8", errors="replace") as fh:
-            for raw in fh:
-                line = raw.strip()
-                if not line or line.startswith("#"):
-                    continue
-                try:
-                    allow.append(re.compile(line))
-                except re.error:
-                    # A bad allow regex must never silently weaken the gate.
-                    sys.stderr.write(f"warning: bad allow regex skipped: {line}\n")
-    return allow
+    """Read .sanitize-allow. Supports line:<regex> and path:<regex> entries."""
+    line_allow = []
+    path_allow = []
+    errors = []
+    candidate = os.path.join(root, ".sanitize-allow") if os.path.isdir(root) else os.path.join(os.path.dirname(root) or ".", ".sanitize-allow")
+    if not os.path.isfile(candidate):
+        return line_allow, path_allow, errors
+
+    with open(candidate, "r", encoding="utf-8", errors="replace") as fh:
+        for lineno, raw in enumerate(fh, start=1):
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            kind = "line"
+            pattern = line
+            if line.startswith("line:"):
+                pattern = line[len("line:"):].strip()
+            elif line.startswith("path:"):
+                kind = "path"
+                pattern = line[len("path:"):].strip()
+
+            if is_broad_allow_pattern(pattern):
+                errors.append((candidate, lineno, "Dangerously broad sanitize allowlist regex", "[allowlist entry redacted]"))
+                continue
+            if kind == "path" and not (pattern.startswith("^") or "/" in pattern):
+                errors.append((candidate, lineno, "Path allowlist entry must be anchored or repo-relative", "[allowlist entry redacted]"))
+                continue
+            try:
+                compiled = re.compile(pattern)
+            except re.error:
+                errors.append((candidate, lineno, "Invalid sanitize allowlist regex", "[allowlist entry redacted]"))
+                continue
+            if kind == "path":
+                path_allow.append(compiled)
+            else:
+                line_allow.append(compiled)
+    return line_allow, path_allow, errors
 
 
-def is_placeholder(matched_text, line_text):
-    """True if a candidate match is clearly an intentional placeholder."""
-    low_line = line_text.lower()
-    for tok in PLACEHOLDER_TOKENS:
-        if tok.lower() in low_line:
-            return True
+def spans_overlap(a, b):
+    return max(a[0], b[0]) < min(a[1], b[1])
+
+
+def is_placeholder(matched_text, line_text, span=None):
+    """True only when the matched value itself is a placeholder."""
     for rx in PLACEHOLDER_MATCH_RES:
         if rx.search(matched_text):
             return True
-    # Angle-bracket templating wrapping the match, e.g. <CHAT_ID>.
+
+    if span is not None:
+        low_line = line_text.lower()
+        for tok in PLACEHOLDER_TOKENS:
+            low_tok = tok.lower()
+            start = 0
+            while True:
+                idx = low_line.find(low_tok, start)
+                if idx == -1:
+                    break
+                if spans_overlap(span, (idx, idx + len(tok))):
+                    return True
+                start = idx + 1
+
     if "<" in line_text and ">" in line_text:
         wrapped = re.search(r"<[^>]*" + re.escape(matched_text) + r"[^>]*>", line_text)
         if wrapped:
@@ -174,7 +189,6 @@ def is_placeholder(matched_text, line_text):
 
 
 def iter_files(root):
-    """Yield scannable file paths under root, skipping junk and binaries."""
     if os.path.isfile(root):
         yield root
         return
@@ -183,15 +197,92 @@ def iter_files(root):
         for name in filenames:
             if name in SELF_SKIP_NAMES:
                 continue
-            ext = os.path.splitext(name)[1].lower()
-            if ext in BINARY_EXTS:
-                continue
             yield os.path.join(dirpath, name)
 
 
-def scan_file(path, allow):
-    """Return a list of (lineno, label, snippet) findings for one file."""
+def redacted_snippet(line, match):
+    line = line.rstrip("\n")
+    spans = []
+    if match.lastindex:
+        for i in range(1, match.lastindex + 1):
+            span = match.span(i)
+            if span != (-1, -1):
+                spans.append(span)
+    if not spans:
+        spans = [match.span(0)]
+    redacted = line
+    for start, end in sorted(spans, reverse=True):
+        redacted = redacted[:start] + "[REDACTED]" + redacted[end:]
+    snippet = redacted.strip()
+    return snippet[:157] + "..." if len(snippet) > 160 else snippet
+
+
+def redact_text(text):
+    redacted = text
+    for label, rule in RULES:
+        if label == "Long base64-ish secret (40+ chars)" and "://" in redacted:
+            continue
+        redacted = rule.sub("[REDACTED]", redacted)
+    return redacted
+
+
+def match_span(match):
+    if match.lastindex and match.group(1):
+        return match.span(1)
+    return match.span(0)
+
+
+def match_text(match):
+    if match.lastindex and match.group(1):
+        return match.group(1).strip()
+    return match.group(0).strip()
+
+
+def artifact_finding(path):
+    ext = os.path.splitext(path)[1].lower()
+    if ext in RISKY_BINARY_EXTS:
+        return (0, "Risky binary/archive artifact requires explicit review", "[artifact filename redacted]")
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return None
+    if size > MAX_TEXT_BYTES:
+        return (0, "Large text artifact requires explicit review", "[large filename redacted]")
+    return None
+
+
+def path_findings(rel_path):
     findings = []
+    for label, rule in RULES:
+        if label == "Long base64-ish secret (40+ chars)" and "://" in rel_path:
+            continue
+        for m in rule.finditer(rel_path):
+            matched = match_text(m)
+            if not matched:
+                continue
+            if is_placeholder(matched, rel_path, match_span(m)):
+                continue
+            findings.append((0, f"Sensitive value in file path: {label}", "[path segment redacted]"))
+            break
+    return findings
+
+
+def scan_file(path, line_allow, path_allow=None, root=None):
+    path_allow = path_allow or []
+    rel_path = os.path.relpath(path, root) if root else path
+    rel_path = rel_path.replace(os.sep, "/")
+    findings = []
+
+    if any(rx.search(rel_path) for rx in path_allow):
+        return findings
+
+    findings.extend(path_findings(rel_path))
+
+    artifact = artifact_finding(path)
+    if artifact:
+        findings.append(artifact)
+        return findings
+
     try:
         with open(path, "r", encoding="utf-8", errors="replace") as fh:
             lines = fh.readlines()
@@ -199,20 +290,19 @@ def scan_file(path, allow):
         return findings
 
     for lineno, line in enumerate(lines, start=1):
-        if any(rx.search(line) for rx in allow):
+        if any(rx.search(line) for rx in line_allow):
             continue
         for label, rule in RULES:
+            if label == "Long base64-ish secret (40+ chars)" and "://" in line:
+                continue
             for m in rule.finditer(line):
-                matched = m.group(0).strip()
+                matched = match_text(m)
                 if not matched:
                     continue
-                if is_placeholder(matched, line):
+                if is_placeholder(matched, line, match_span(m)):
                     continue
-                snippet = line.strip()
-                if len(snippet) > 160:
-                    snippet = snippet[:157] + "..."
-                findings.append((lineno, label, snippet))
-                break  # one finding per rule per line is enough signal
+                findings.append((lineno, label, redacted_snippet(line, m)))
+                break
     return findings
 
 
@@ -222,17 +312,27 @@ def main(argv):
         sys.stderr.write(f"error: path not found: {target}\n")
         return 2
 
-    allow = load_allowlist(target)
+    line_allow, path_allow, allow_errors = load_allowlist(target)
     total = 0
     flagged_files = 0
+    root = target if os.path.isdir(target) else "."
+
+    for allow_path, lineno, label, snippet in allow_errors:
+        rel = os.path.relpath(allow_path, root).replace(os.sep, "/")
+        print(f"{redact_text(rel)}:{lineno}: {label}")
+        print(f"    | {snippet}")
+        total += 1
+        flagged_files += 1
 
     for path in sorted(iter_files(target)):
-        findings = scan_file(path, allow)
+        findings = scan_file(path, line_allow, path_allow, root=root)
         if findings:
             flagged_files += 1
-            rel = os.path.relpath(path, target if os.path.isdir(target) else ".")
+            rel = os.path.relpath(path, root).replace(os.sep, "/")
+            safe_rel = redact_text(rel)
             for lineno, label, snippet in findings:
-                print(f"{rel}:{lineno}: {label}")
+                loc = f"{safe_rel}:{lineno}" if lineno else safe_rel
+                print(f"{loc}: {label}")
                 print(f"    | {snippet}")
                 total += 1
 
@@ -242,8 +342,7 @@ def main(argv):
         return 0
 
     print(f"sanitize_scan: FAILED. {total} finding(s) in {flagged_files} file(s).")
-    print("Scrub the items above before submitting. Use .sanitize-allow only for "
-          "genuine placeholders, and document why.")
+    print("Scrub the items above before submitting. Use .sanitize-allow only for narrow, documented placeholders or reviewed artifacts.")
     return 1
 
 

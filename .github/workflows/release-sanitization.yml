@@ -1,26 +1,23 @@
-name: sanitize-and-lint
+name: release-sanitization
 
-# Fail-closed gate for The Agent Foundry.
-# Runs on every pull request, including from forks. No repository secrets are
-# used or needed. If any step exits non-zero, the check fails and the PR cannot
-# merge until it is fixed.
+# Maintainer-run deeper scan before public release tags, major announcements, or
+# large community imports. This is intentionally manual so public fork PRs do not
+# trigger heavier history scans.
 
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  sanitize-and-lint:
+  release-sanitization:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Check out full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,7 +27,7 @@ jobs:
       - name: Sanitizer unit tests
         run: python3 -m unittest discover -s gates/tests -v
 
-      - name: Sanitization scan (Foundry-specific, fail-closed)
+      - name: Foundry sanitization scan
         run: python3 gates/scripts/sanitize_scan.py .
 
       - name: Format lint
@@ -50,5 +47,5 @@ jobs:
           sudo install /tmp/gitleaks /usr/local/bin/gitleaks
           gitleaks version
 
-      - name: Gitleaks current-tree scan (redacted)
-        run: gitleaks detect --source . --no-git --redact
+      - name: Gitleaks full-history scan (redacted)
+        run: gitleaks detect --source . --redact

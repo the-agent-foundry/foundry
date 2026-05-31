@@ -68,14 +68,17 @@ This is not optional. Before you stage a single file, scrub the artifact:
 - Remove customer, vendor, and partner specifics. Generalize the pattern.
 - Replace your real handle only where intended; use `<YOUR_HANDLE>` in shared examples.
 
-Then run the repo's own gate against your contribution and fix anything it flags:
+Then run the repo's own gates against your contribution and fix anything they flag:
 
 ```
 python3 gates/scripts/sanitize_scan.py community/<YOUR_HANDLE>/
 python3 gates/scripts/format_lint.py .
+gitleaks detect --source . --no-git --redact  # if installed
 ```
 
-Both must exit 0. If `sanitize_scan.py` flags something real, scrub it and re-run. Do not add an allowlist entry to silence a real secret. Allowlist entries are for genuine placeholders only, and you must explain why in a comment.
+Both Python gates must exit 0. Gitleaks must also be clean before you submit when installed locally, and it is required in CI. If `sanitize_scan.py` or Gitleaks flags something real, scrub it and re-run. Do not add an allowlist entry to silence a real secret. Allowlist entries are only for synthetic placeholders or reviewed non-text artifacts; they must be narrow, repo-relative, path-specific where applicable, anchored when possible, and documented with a comment explaining why the entry is safe.
+
+Never commit env files, logs, exports, screenshots with private data, PDFs with metadata, archives, database files, local agent profiles, memory dumps, or generated artifacts you have not reviewed.
 
 ### 3. The exact git flow (Tier 1)
 
@@ -94,6 +97,7 @@ git checkout -b contrib/<YOUR_HANDLE>-<short-name>
 # 4. Run the gates locally. Both must exit 0.
 python3 gates/scripts/sanitize_scan.py community/<YOUR_HANDLE>/
 python3 gates/scripts/format_lint.py .
+gitleaks detect --source . --no-git --redact  # if installed
 
 # 5. Commit with the DCO line in the body, then push and open the PR.
 git add community/<YOUR_HANDLE>/
@@ -114,12 +118,13 @@ A founder can hand you this directly:
 
 ## What the gate checks
 
-Every pull request, including from forks, runs two scripts in CI with no repository secrets:
+Every pull request, including from forks, runs sanitization, format lint, and Gitleaks in CI with no repository secrets:
 
-- `gates/scripts/sanitize_scan.py` : scans for credentials, private keys, secret assignments, real home paths, mesh hostnames, emails, phone numbers, and long numeric IDs. Fails closed on any finding.
+- `gates/scripts/sanitize_scan.py` : scans for credentials, private keys, secret assignments, credential-bearing connection strings, package auth residue, real home paths, mesh hostnames, emails, phone numbers, long numeric IDs, and risky artifacts. Fails closed on any finding.
 - `gates/scripts/format_lint.py` : checks that your artifact carries the required frontmatter keys and section headings for its kind.
+- Gitleaks : scans for maintained provider-token patterns in CI with redacted output.
 
-If either script exits non-zero, the check fails and the PR cannot merge until you fix it.
+If any required check exits non-zero, the PR cannot merge until you fix it.
 
 ## The disclaimer, said plainly
 
