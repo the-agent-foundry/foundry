@@ -315,7 +315,11 @@ If I had to give a peer one takeaway beyond the architecture: the work is never 
 
 ## About the author {#about}
 
-I'm a serial entrepreneur who never stopped being an engineer. I taught myself to code in the '90s, and that instinct has run through everything I've built since: international e-commerce, performance sales call centers, cybersecurity, network infrastructure, and the card-payment technology that defines my work today. Across seven companies I've founded or co-founded and two exits, I've sold to tens of millions of customers on four continents. Now I'm CEO of Revaly, where I'm tackling the global payment authorization and acceptance-rate problem, drawing on a depth of trust and connection inside the payments world that took more than two decades to earn. I still write code. The agentic AI systems my company runs on, I build myself.
+I'm a serial entrepreneur who never stopped being hands-on with technology. I taught myself to code in the '90s, and that instinct has run through everything I've built since: international e-commerce, performance sales call centers, cybersecurity, network infrastructure, and the card-payment technology that defines my work today. Across seven companies I've founded or co-founded and two exits, I've sold to tens of millions of customers on four continents. Now I'm CEO of Revaly, where I'm tackling the global payment authorization and acceptance-rate problem, drawing on a depth of trust and connection inside the payments world that took more than two decades to earn.
+
+I never would have gotten my start into this world of agentic AI if it wasn’t for my dear friend, Dwayne Schofield and the team at his company SolveWorks.io.  This space moves faster than any one person can keep up with, but Dwayne is one of the smartest people I know on these tools so I regularly turn to him for advice.
+
+I'd also add, if you're going to play around with these power tools it's indispensable to have someone you can call at 2am to say "My system is down again, can you and your fleet SSH in and check on her?" and know they'll always be there to get you back online.  Thank you Dwayne for the countless hours you supported me as I've fumbled my way around.
 
 ---
 
