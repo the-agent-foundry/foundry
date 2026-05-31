@@ -59,7 +59,10 @@ RULES = {
     },
     "tool": {
         "frontmatter": ["name", "problem"],
-        "headings": ["Problem", "Interface", "What good looks like"],
+        "headings": ["Problem", "Interface", "What good looks like",
+                     "Failure modes", "Privacy notes",
+                     "Approval boundaries", "Freshness and state",
+                     "Observability"],
     },
 }
 
