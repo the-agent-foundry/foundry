@@ -26,19 +26,31 @@ The usual shape is one orchestrator that holds context and delegates, with speci
 - `AGENT-SPEC.schema.md` : canonical agent role-spec schema. The format archetypes and community agents must match.
 - `AGENTS.template.md` : blank operating-instructions template.
 - `SOUL.template.md` : blank identity and voice template.
-- `archetypes/` : six proven role specs to adapt:
-  - `orchestrator.md` : chief of staff, holds context and delegates.
-  - `engineer.md` : the deepest archetype in this first pass. It includes classification, research, design gate, red-team, QA, manifest, and approval doctrine.
-  - `call-processor.md` : turns call recordings and transcripts into business intelligence.
-  - `briefer.md` : research and intel, turns raw signal into something worth reading.
-  - `writer.md` : content and copy, trained on what good and what bad sound like.
-  - `mechanic.md` : runtime and recovery, fixes the system when it breaks.
+- `profile-operating-model.md` : how to decide what stays with the orchestrator, what becomes a specialist profile, and what graduates to an autonomous loop.
+- `archetypes/` : six field-tested role specs to adapt:
+  - `archetypes/orchestrator.md` : chief of staff, routes work, verifies specialists, and synthesizes decisions.
+  - `archetypes/engineer.md` : builds and QAs systems with classification, research, design gate, red-team, QA, manifest, and approval doctrine.
+  - `archetypes/call-processor.md` : turns recordings and transcripts into corrected business intelligence, memory, and routed actions.
+  - `archetypes/briefer.md` : monitors sources, filters signal, verifies claims, and composes decision-useful briefings.
+  - `archetypes/writer.md` : drafts in founder voice using a voice corpus, anti-slop corpus, recursive revision, and human final approval.
+  - `archetypes/mechanic.md` : monitors runtime health, diagnoses outages, and recovers through tested paths.
+
+## Common name mapping
+
+The field guide uses named specialists. In this repo, the generic role names are the portable pattern:
+
+- Brit: orchestrator / chief of staff
+- Victor: engineer
+- Nora: call processor
+- Dex: briefer
+- Ivy: writer
+- Greg: mechanic
 
 ## Depth note
 
-The public archetypes are sanitized, not hollow. They intentionally omit private prompts, live paths, credential handling, customer names, and internal logs, but they should preserve the operating pattern well enough for another founder's agent to adapt.
+The public archetypes are sanitized, not hollow. They intentionally omit private prompts, live paths, credential handling, customer names, and internal logs, but they preserve the operating pattern well enough for another founder's agent to adapt.
 
-Victor, the engineer archetype, is the first expanded example. The same treatment should be staged for the other specialists, tools, and skills.
+The first pass expanded the engineer archetype, represented by the sanitized Victor example. This pass brings the rest of the specialist profiles up to the same public-useful standard.
 
 ## Pickup prompt
 
