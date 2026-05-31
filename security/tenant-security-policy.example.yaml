@@ -1,0 +1,102 @@
+version: "1.0"
+name: "tenant-scoped-agent-security-example"
+description: "Sanitized example policy for one agent serving multiple tenants/resources. Fake IDs only."
+default_decision: "hold"
+classifications:
+  order: ["public", "internal", "confidential", "restricted"]
+  hard_denial_categories:
+    - "credential_secret"
+    - "private_key"
+    - "cross_tenant_identifier"
+    - "raw_unapproved_logs"
+    - "unapproved_personal_data"
+subjects:
+  - id: "user_alpha_viewer"
+    type: "human"
+    display_name: "Example Alpha Viewer"
+    tenants: ["tenant_alpha"]
+    roles: ["support_viewer"]
+    transport_routes:
+      telegram:
+        allowed_chats: ["example_alpha_support_chat"]
+  - id: "user_beta_operator"
+    type: "human"
+    display_name: "Example Beta Operator"
+    tenants: ["tenant_beta"]
+    roles: ["support_operator"]
+    transport_routes:
+      telegram:
+        allowed_chats: ["example_beta_support_chat"]
+  - id: "admin_internal"
+    type: "human"
+    display_name: "Example Internal Admin"
+    tenants: ["tenant_alpha", "tenant_beta"]
+    roles: ["admin"]
+    override_requires:
+      approval: true
+      reason: true
+      expiry: true
+tenants:
+  - id: "tenant_alpha"
+    display_name: "Example Tenant Alpha"
+    default_classification: "confidential"
+  - id: "tenant_beta"
+    display_name: "Example Tenant Beta"
+    default_classification: "confidential"
+resources:
+  - resource_id: "machine_alpha_web_01"
+    tenant: "tenant_alpha"
+    type: "machine"
+    classification: "confidential"
+    labels: ["web", "production"]
+    provenance:
+      source_type: "asset_inventory"
+      source_id: "example_inventory_alpha"
+      created_at: "2026-01-01T00:00:00Z"
+    allowed_capabilities:
+      support_viewer: ["read_status", "read_sanitized_logs", "send_report"]
+      support_operator: ["read_status", "read_sanitized_logs", "restart_service", "send_report"]
+      admin: ["read_status", "read_sanitized_logs", "send_report"]
+  - resource_id: "machine_beta_db_01"
+    tenant: "tenant_beta"
+    type: "machine"
+    classification: "restricted"
+    labels: ["database", "production"]
+    provenance:
+      source_type: "asset_inventory"
+      source_id: "example_inventory_beta"
+      created_at: "2026-01-01T00:00:00Z"
+    allowed_capabilities:
+      support_viewer: ["read_status"]
+      support_operator: ["read_status", "read_sanitized_logs", "send_report"]
+      admin: ["read_status", "read_sanitized_logs", "send_report"]
+surfaces:
+  retrieval_context:
+    guard: "filter_before_model_context"
+    fail_on_missing_provenance: true
+  tool_dispatch:
+    guard: "authorize_before_network_or_shell"
+    fail_on_cross_tenant_result: true
+  tool_result:
+    guard: "assert_results_within_authorized_scope_before_model"
+  final_answer:
+    guard: "egress_check_before_send"
+    redact_when_possible: true
+  attachment:
+    guard: "artifact_sidecar_and_content_check_before_send"
+    missing_sidecar_decision: "hold"
+  error_notice:
+    guard: "safe_template_no_raw_stack_or_resource_leak"
+audit:
+  log_raw_payloads: false
+  required_fields:
+    - "decision_id"
+    - "timestamp"
+    - "subject_id"
+    - "tenant_scope"
+    - "resource_scope"
+    - "surface"
+    - "capability"
+    - "decision"
+    - "reason_codes"
+    - "payload_hash"

@@ -1,0 +1,190 @@
+version: "1.0"
+name: "tenant-egress-surface-test-matrix-example"
+fixtures:
+  subjects:
+    alpha_viewer: "user_alpha_viewer"
+    beta_operator: "user_beta_operator"
+    admin: "admin_internal"
+  tenants:
+    alpha: "tenant_alpha"
+    beta: "tenant_beta"
+  resources:
+    alpha_machine: "machine_alpha_web_01"
+    beta_machine: "machine_beta_db_01"
+tests:
+  - id: "allow_retrieval_alpha_context"
+    surface: "retrieval_context"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    context_tenant_scope: ["tenant_alpha"]
+    expected_decision: "allow"
+    required_reason_codes: ["subject_tenant_match", "context_scope_authorized"]
+  - id: "block_retrieval_cross_tenant_context"
+    surface: "retrieval_context"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine", "beta_machine"]
+    capability: "read_status"
+    context_tenant_scope: ["tenant_alpha", "tenant_beta"]
+    expected_decision: "block"
+    required_reason_codes: ["cross_tenant_context"]
+  - id: "allow_tool_dispatch_alpha_status"
+    surface: "tool_dispatch"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    expected_decision: "allow"
+    required_reason_codes: ["subject_tenant_match", "resource_tenant_match", "capability_allowed"]
+  - id: "block_tool_dispatch_alpha_to_beta_machine"
+    surface: "tool_dispatch"
+    subject: "alpha_viewer"
+    tenant: "beta"
+    resources: ["beta_machine"]
+    capability: "read_status"
+    expected_decision: "block"
+    required_reason_codes: ["subject_not_in_tenant"]
+  - id: "allow_tool_result_authorized_scope"
+    surface: "tool_result"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    backend_return_tenant_scope: ["tenant_alpha"]
+    expected_decision: "allow"
+    required_reason_codes: ["tool_result_scope_authorized"]
+  - id: "block_tool_result_mixed_tenant_rows"
+    surface: "tool_result"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine", "beta_machine"]
+    capability: "read_status"
+    backend_return_tenant_scope: ["tenant_alpha", "tenant_beta"]
+    expected_decision: "block"
+    required_reason_codes: ["cross_tenant_result"]
+  - id: "allow_final_answer_alpha_only"
+    surface: "final_answer"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    simulated_output_contains: ["machine_alpha_web_01"]
+    expected_decision: "allow"
+    required_reason_codes: ["egress_scope_authorized"]
+  - id: "block_final_answer_cross_tenant_identifier"
+    surface: "final_answer"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    simulated_output_contains: ["machine_beta_db_01"]
+    expected_decision: "block"
+    required_reason_codes: ["cross_tenant_identifier_in_egress"]
+  - id: "allow_attachment_with_matching_sidecar"
+    surface: "attachment"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "send_report"
+    artifact_sidecar_present: true
+    attachment_tenant_scope: ["tenant_alpha"]
+    expected_decision: "allow"
+    required_reason_codes: ["artifact_sidecar_scope_authorized"]
+  - id: "hold_attachment_missing_sidecar"
+    surface: "attachment"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "send_report"
+    artifact_sidecar_present: false
+    expected_decision: "hold"
+    required_reason_codes: ["missing_artifact_sidecar"]
+  - id: "allow_error_notice_safe_template"
+    surface: "error_notice"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_sanitized_logs"
+    simulated_output_contains: ["I could not complete that request safely."]
+    expected_decision: "allow"
+    required_reason_codes: ["safe_error_template"]
+  - id: "block_error_notice_raw_secret"
+    surface: "error_notice"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_sanitized_logs"
+    simulated_output_contains: ["EXAMPLE_PRIVATE_KEY_DO_NOT_USE"]
+    expected_decision: "block"
+    required_reason_codes: ["credential_secret_in_egress"]
+  - id: "allow_status_update_generic"
+    surface: "status_update"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    simulated_output_contains: ["Checking authorized resources…"]
+    expected_decision: "allow"
+    required_reason_codes: ["safe_status_template"]
+  - id: "block_status_update_cross_tenant_name"
+    surface: "status_update"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    simulated_output_contains: ["Checking machine_beta_db_01…"]
+    expected_decision: "block"
+    required_reason_codes: ["cross_tenant_identifier_in_egress"]
+  - id: "allow_fallback_same_guard_clean"
+    surface: "fallback_send"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    fallback_uses_same_policy_decision: true
+    simulated_output_contains: ["The authorized machine is responding."]
+    expected_decision: "allow"
+    required_reason_codes: ["fallback_guard_reused", "egress_scope_authorized"]
+  - id: "block_fallback_bypass_attempt"
+    surface: "fallback_send"
+    subject: "alpha_viewer"
+    tenant: "alpha"
+    resources: ["alpha_machine"]
+    capability: "read_status"
+    fallback_uses_same_policy_decision: false
+    simulated_output_contains: ["machine_beta_db_01"]
+    expected_decision: "block"
+    required_reason_codes: ["fallback_guard_missing", "cross_tenant_identifier_in_egress"]
+  - id: "allow_admin_override_scoped_expiring"
+    surface: "admin_override"
+    subject: "admin"
+    tenant: "beta"
+    resources: ["beta_machine"]
+    capability: "restart_service"
+    override:
+      approved: true
+      scope: "tenant_beta:machine_beta_db_01:restart_service"
+      expires_at: "2030-01-01T00:00:00Z"
+      reason_present: true
+    expected_decision: "allow"
+    required_reason_codes: ["admin_override_valid", "scope_matches", "expiry_valid"]
+  - id: "block_admin_override_missing_expiry"
+    surface: "admin_override"
+    subject: "admin"
+    tenant: "beta"
+    resources: ["beta_machine"]
+    capability: "restart_service"
+    override:
+      approved: true
+      scope: "tenant_beta:machine_beta_db_01:restart_service"
+      expires_at: null
+      reason_present: true
+    expected_decision: "block"
+    required_reason_codes: ["admin_override_missing_expiry"]
+acceptance:
+  zero_silent_blocks: true
+  zero_cross_tenant_allows: true
+  every_surface_has_positive_and_negative_fixture: true
+  audit_records_safe_metadata_only: true

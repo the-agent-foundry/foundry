@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://the-agent-foundry.example/schemas/resource-acl.schema.json",
+  "title": "Tenant-scoped resource ACL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "resource_id",
+    "tenant",
+    "type",
+    "classification",
+    "provenance",
+    "allowed_capabilities"
+  ],
+  "properties": {
+    "resource_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "machine",
+        "log",
+        "ticket",
+        "document",
+        "artifact",
+        "memory",
+        "credential_reference",
+        "repository",
+        "conversation"
+      ]
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ]
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "source_id",
+        "created_at"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generated_by": {
+          "type": "string"
+        },
+        "derived_from": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "allowed_capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true
+      }
+    },
+    "hard_denial_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "expires_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "review_required": {
+      "type": "boolean"
+    }
+  }
+}
