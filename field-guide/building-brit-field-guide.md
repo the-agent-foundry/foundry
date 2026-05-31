@@ -2,7 +2,7 @@
 
 *Field Guide · v0.1 · Living Document*
 
-By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [repo link - TBD]
+By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [The Agent Foundry](https://github.com/the-agent-foundry/foundry)
 
 > A founder's field guide to building an AI agent that actually runs your operating system, not a chatbot that forgets you by Tuesday.
 
@@ -320,4 +320,4 @@ I'm a serial entrepreneur who never stopped being an engineer. I taught myself t
 ---
 
 *Building Brit · A living document · v0.1 · maintained by Darryl Hicks*
-*Code, skills & sanitized config templates: [repo link - TBD] · Feedback & ideas welcome via repo Issues*
+*Code, skills & sanitized config templates: [github.com/the-agent-foundry/foundry](https://github.com/the-agent-foundry/foundry) · Feedback & ideas welcome via [repo Issues](https://github.com/the-agent-foundry/foundry/issues)*
