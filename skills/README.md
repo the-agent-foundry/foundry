@@ -63,6 +63,7 @@ Every skill in this repo follows one canonical schema so a human or an agent can
 - `examples/call-intelligence-skill.md` : converting transcripts into useful decisions, actions, risks, and memory candidates.
 - `examples/recurring-briefing-skill.md` : turning standing signal sources into an executive briefing that is useful every time.
 - `examples/content-voice-skill.md` : writing from a voice corpus and an anti-slop corpus without faking claims.
+- `examples/writing-content-eval-loop-skill.md` : evaluating writing drafts with a versioned rubric, synthetic pass/fail fixtures, deterministic content-QA gate, advisory judge checks, and human-review warnings.
 - `examples/privacy-routing-skill.md` : deciding where sensitive outputs may go, and what must be blocked.
 - `examples/skillify-loop-skill.md` : turning repeated wins and failures into durable skills.
 - `examples/repo-sanitization-skill.md` : publishing useful public repo material without leaking private implementation.

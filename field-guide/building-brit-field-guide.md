@@ -276,6 +276,8 @@ Ivy was trained on two things. First, **250,000 words of my favorite and best co
 
 She also runs **recursive processing**: drafting, then critiquing and revising her own work in passes. That loop takes content from roughly 60% good to about 85%, not publishable on its own, but most of the way there, fast. A human still does the final polish, but Ivy collapses the hardest, slowest part of the work.
 
+The newer lesson is that a writing agent needs an **executable eval loop**, not just a good voice prompt. Ivy's private setup uses the public pattern in this repo: a versioned rubric, synthetic positive and negative fixtures, a deterministic content-QA gate, warning-only outputs that require human review, advisory judge checks until calibrated, failure intake, and health telemetry. Translation: teach taste with examples, then put the non-negotiables in plumbing.
+
 And she's not just on-demand. Ivy maintains a **backlog of content ideas**: she processes my podcast recordings to mine evergreen content, and her daily research jobs surface fresh angles I can publish on. So I never face a blank page. I face a stocked one. Each day I receive a rich briefing of research across my industry, competitors, and partners, with a button I can push for "Have Ivy draft an X post or LinkedIn post on this topic," and seconds later I have a piece written in my voice that's 85-90% ready to publish.
 
 ---
