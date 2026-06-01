@@ -1,6 +1,6 @@
 # Building Brit: A Founder's Field Guide to Agentic AI
 
-*Field Guide · v0.2 · Living Document*
+*Field Guide · v0.3 · Living Document*
 
 By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [The Agent Foundry](https://github.com/the-agent-foundry/foundry)
 
@@ -164,7 +164,7 @@ Never depend on a single model or a single provider for your main brain. I run a
 
 ### 3 · A second agent instance as your "mechanic"
 
-I run a second agent instance on the same machine whose entire job is fixing the first one. When you inevitably break your main agent (and you will), this saves you from hammering away at the terminal with CLI commands. The mechanic gets her back up and running in about two minutes. It's the difference between a five-minute hiccup and a lost afternoon.
+I run a second agent instance on the same machine whose entire job is fixing the first one. This idea came from Dwayne at SolveWorks, and it has been one of the biggest practical unlocks in the whole setup. When you inevitably break your main agent (and you will), it saves you from hammering away at the terminal with CLI commands. The mechanic gets her back up and running in about two minutes. It's the difference between a five-minute hiccup and a lost afternoon.
 
 ### 4 · A real memory system
 

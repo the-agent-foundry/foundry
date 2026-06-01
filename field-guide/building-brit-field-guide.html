@@ -163,7 +163,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="kicker">Field Guide · v0.2 · Living Document</span>
+    <span class="kicker">Field Guide · v0.3 · Living Document</span>
     <h1>Building Brit</h1>
     <p class="lede">A founder's field guide to building an AI agent that actually runs your operating system, not a chatbot that forgets you by Tuesday.</p>
     <p class="byline">By <b>Darryl Hicks</b> · for my YPO peers · <a href="#about">About the author</a> · code &amp; templates: <a href="https://github.com/the-agent-foundry/foundry">The Agent Foundry</a></p>
@@ -351,7 +351,7 @@
     <p>Never depend on a single model or a single provider for your main brain. I run a minimum of three, across redundant connections and providers, so an outage or a bad model day never takes the whole system down. My current default leans on a top-tier reasoning model with thinking set to high, with independent fallbacks behind it. Reliability is principle #2 for a reason.</p>
 
     <h3>3 · A second agent instance as your "mechanic"</h3>
-    <p>I run a second agent instance on the same machine whose entire job is fixing the first one. When you inevitably break your main agent (and you will), this saves you from hammering away at the terminal with CLI commands. The mechanic gets her back up and running in about two minutes. It's the difference between a five-minute hiccup and a lost afternoon.</p>
+    <p>I run a second agent instance on the same machine whose entire job is fixing the first one. This idea came from Dwayne at SolveWorks, and it has been one of the biggest practical unlocks in the whole setup. When you inevitably break your main agent (and you will), it saves you from hammering away at the terminal with CLI commands. The mechanic gets her back up and running in about two minutes. It's the difference between a five-minute hiccup and a lost afternoon.</p>
 
     <h3>4 · A real memory system</h3>
     <p>Built on the principles from Karpathy's writing on LLM-driven memory: a vector database (LanceDB) for indexed memory, with an LLM sitting in front of it as the retrieval brain. Every memory and reference file is organized into a structured Obsidian vault, so anything the agent has ever processed is retrievable in milliseconds. The result: the agent always has the right context for the job at hand. Ask for anything it's ever seen, and it surfaces instantly.</p>
