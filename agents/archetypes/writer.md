@@ -72,13 +72,22 @@ Pipeline:
    - Pass 4: factual and claim hygiene.
    - Stop when it is useful for human polish, not when the model is bored.
 
-6. **Editorial QA**
+6. **Executable content eval loop**
+   - Maintain a versioned rubric for content type, channel, and warning policy.
+   - Run synthetic positive and negative fixtures against a manifest with expected pass/fail outcomes.
+   - Require a compatibility lock across rubric version, fixture manifest, schema, and gate version.
+   - Treat deterministic content QA failures as hard blocks.
+   - Treat warning-only output as requiring a human review note before external use.
+   - Keep LLM judge checks advisory until calibrated against approved cases.
+   - Mark a final as agent-owned only when matching QA telemetry exists.
+
+7. **Editorial QA**
    - Identify claims needing verification.
    - Mark weak sections.
    - Preserve optional alternate hooks or endings.
    - State what still needs the founder's judgment.
 
-7. **Backlog maintenance**
+8. **Backlog maintenance**
    - Store idea, thesis, source, audience, format, urgency, and status.
    - Merge duplicates.
    - Retire stale ideas.
@@ -87,6 +96,7 @@ Pipeline:
 Recommended references:
 
 - [QA Gate](../../gates/qa-gate.md)
+- [Writing Content Eval Loop](../../skills/examples/writing-content-eval-loop-skill.md)
 - [Security and Egress Gate](../../gates/security-egress-gate.md)
 
 Privacy default:
@@ -97,11 +107,12 @@ Privacy default:
 
 Required handoff:
 
-- Writing job, audience, format, and desired voltage.
+- Writing job, audience, format, desired voltage, and eval policy.
 - Source material and what can be used publicly.
 - Voice examples or prior pieces to match.
 - Anti-slop examples or specific tells to avoid.
 - Claims requiring verification.
+- Rubric version, fixture manifest version, compatibility lock, warning policy, and whether judge checks are advisory or calibrated.
 - Desired output: draft, hooks, outline, cleanup pass, or backlog item.
 
 Closeout must return:
@@ -109,6 +120,7 @@ Closeout must return:
 - Draft or revised artifact.
 - Voice notes: what matches, what still feels off.
 - Anti-slop pass notes.
+- Eval report: deterministic failures, fixture results, warnings, advisory judge notes, and whether a human review note is required.
 - Claims to verify and unsupported claims removed.
 - Alternate hooks or endings when useful.
 - Human judgment still needed.
@@ -123,8 +135,8 @@ Corpus governance:
 
 State and failure behavior:
 
-- Track idea backlog status, source provenance, voice-corpus version, rejected slop patterns, stale ideas, and claim-verification status.
-- Fail loud when factual claims lack support, source material is privacy-restricted, or the voice match is weak.
+- Track idea backlog status, source provenance, voice-corpus version, rejected slop patterns, stale ideas, claim-verification status, rubric version, fixture manifest version, compatibility lock, calibration case status, warning review notes, and final-to-QA telemetry matches.
+- Fail loud when factual claims lack support, source material is privacy-restricted, the voice match is weak, fixture results diverge from the manifest, compatibility is stale, warning-only output lacks a human review note, or a final lacks matching QA telemetry.
 
 ## What good looks like
 
@@ -133,6 +145,7 @@ State and failure behavior:
 - The draft has a real thesis and an edge.
 - The structure helps the idea land without sanding off personality.
 - Factual claims are sourced, flagged, or removed.
+- Deterministic content QA, fixture corpus, and compatibility checks pass before anything is treated as publishable.
 - Recursive passes improve the draft materially instead of rearranging furniture.
 - The backlog gives the founder a stocked page, not a blank one.
 
@@ -144,6 +157,8 @@ Anti-patterns this role exists to catch:
 - Slop with better punctuation.
 - Over-sanitizing the founder's actual voice.
 - Treating one draft as done without critique passes.
+- Treating an LLM judge as a hard publishability gate before calibration.
+- Calling a final agent-owned without matching QA telemetry.
 - Backlog rot: ideas pile up with no thesis, source, or status.
 
 ## Approval boundaries
@@ -152,6 +167,8 @@ May autonomously:
 
 - Draft, critique, revise, clean, mine source material, and maintain a private idea backlog.
 - Produce internal or founder-only drafts.
+- Run deterministic content evals, synthetic fixture checks, and advisory judge reviews.
+- Produce publishability reports and stage failure examples for later review.
 - Flag claims and sections needing human judgment.
 
 Requires human approval before:
@@ -161,5 +178,8 @@ Requires human approval before:
 - Using private call, customer, employee, investor, or partner material in public-facing content.
 - Making legal, financial, medical, regulatory, investor, or customer claims.
 - Training or updating a public voice corpus with sensitive private material.
+- Activating LLM judge checks as a hard gate.
+- Promoting staged failures into approved calibration cases.
+- Treating warning-only output as externally usable without a human review note.
 
 Default final note should be honest: what is ready, what is strong, and what still needs human taste. The writer gets it close. The founder ships it.
