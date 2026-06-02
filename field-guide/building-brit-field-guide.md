@@ -1,6 +1,6 @@
 # Building Brit: A Founder's Field Guide to Agentic AI
 
-*Field Guide · v0.3 · Living Document*
+*Field Guide · v0.4 · Living Document*
 
 By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [The Agent Foundry](https://github.com/the-agent-foundry/foundry)
 
@@ -90,7 +90,9 @@ These are the foundation of everything that comes later. The reason it matters: 
 5. **Cost:** avoid waste, but never cut quality to save tokens on foundation work.
 6. **Speed:** speed alone never justifies skipping a quality gate.
 
-Think hard about your own order, because the tradeoffs are real. Some people only trust Azure to host their data. Others want full sovereignty on a private device even if it costs them reliability. Both positions are valid. But you have to *tell your agent what matters to you*, and have something concrete to point back to when you say *"check my design principles before you make this call."*
+The Design Principles also apply to the platform you build on. OpenAI and Anthropic are working hard to make building inside their walls easy, and the upside is real: scale, enterprise security, support. But easy buys you a lockup. For me the deciding factors were sovereignty, reliability, and quality, and the last two are connected to a single fact: the best model today is rarely the best model in thirty days. Reliability means I can switch providers when one has an outage or changes its compute. Quality means when a better model ships next month, I move to it, instead of waiting for the platform I started on to offer it. That ability to switch is not theoretical, it's how you stay running. My data sits on my own Mac Mini, so I keep complete control, but I also own security, redundancy, and the dozen things an enterprise would handle for me. It's a bit like holding your own Bitcoin instead of trusting a bank. Sovereignty has a price, and I'd rather pay it than hand someone else the keys.
+
+That does not mean building on an enterprise solution is wrong. It is entirely valid. So is building on an open source platform. It really comes down to what matters most to you, which is why I emphasize thinking deeply about design principles *before* you begin.
 
 ---
 
@@ -327,5 +329,5 @@ I'd also add, if you're going to play around with these power tools it's indispe
 
 ---
 
-*Building Brit · A living document · v0.2 · maintained by Darryl Hicks*
+*Building Brit · A living document · v0.4 · maintained by Darryl Hicks*
 *Code, skills & sanitized config templates: [github.com/the-agent-foundry/foundry](https://github.com/the-agent-foundry/foundry) · Feedback & ideas welcome via [repo Issues](https://github.com/the-agent-foundry/foundry/issues)*
