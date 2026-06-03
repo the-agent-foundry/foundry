@@ -1,0 +1,18 @@
+{
+  "packet_version": "research-packet-v1",
+  "status": "fixture_clean",
+  "validator_version": "public-example-v1",
+  "privacy_ceiling": "public_fixture",
+  "required_files": [
+    "README.md",
+    "source-ledger.jsonl",
+    "claim-ledger.jsonl",
+    "contradictions.md",
+    "brief.md",
+    "recommendation.md",
+    "handoff.json",
+    "packet_manifest.json",
+    "errors.jsonl"
+  ],
+  "notes": "Synthetic public-safe fixture. Replace placeholders only in a private workspace."
+}
