@@ -1,0 +1,19 @@
+{
+  "route_owner": "orchestrator",
+  "route_version": "research-routing-v1",
+  "route": "orchestrator",
+  "needs_triage": false,
+  "task_type": "technical",
+  "confidence": "likely",
+  "artifacts": [
+    "README.md",
+    "source-ledger.jsonl",
+    "claim-ledger.jsonl",
+    "contradictions.md",
+    "brief.md",
+    "recommendation.md"
+  ],
+  "sources_used": ["S1", "S2", "S3"],
+  "errors": [],
+  "approval_needed": ["Run production-facing test before live dependency"]
+}
