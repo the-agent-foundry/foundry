@@ -27,12 +27,14 @@ The usual shape is one orchestrator that holds context and delegates, with speci
 - `AGENTS.template.md` : blank operating-instructions template.
 - `SOUL.template.md` : blank identity and voice template.
 - `profile-operating-model.md` : how to decide what stays with the orchestrator, what becomes a specialist profile, and what graduates to an autonomous loop.
-- `archetypes/` : seven field-tested role specs to adapt:
+- `archetypes/` : nine field-tested role specs to adapt:
   - `archetypes/orchestrator.md` : chief of staff, routes work, verifies specialists, and synthesizes decisions.
   - `archetypes/engineer.md` : builds and QAs systems with classification, research, design gate, red-team, QA, manifest, and approval doctrine.
   - `archetypes/call-processor.md` : turns recordings and transcripts into corrected business intelligence, memory, and routed actions.
   - `archetypes/briefer.md` : monitors sources, filters signal, verifies claims, and composes decision-useful briefings.
   - `archetypes/analyst-researcher.md` : produces decision-grade research packets with source ledgers, claim ledgers, contradictions, confidence labels, and orchestrator-owned handoff routing.
+  - `archetypes/finance-control.md` : handles scoped finance operations with evidence-backed actions, approval classes, mutation ledgers, verification, and undo paths.
+  - `archetypes/revenue-gtm.md` : supports GTM and sales enablement while separating internal strategy from externally approved claims.
   - `archetypes/writer.md` : drafts in founder voice using a voice corpus, anti-slop corpus, recursive revision, and human final approval.
   - `archetypes/mechanic.md` : monitors runtime health, diagnoses outages, and recovers through tested paths.
 
@@ -44,6 +46,8 @@ The field guide uses named specialists. In this repo, the generic role names are
 - Victor: engineer
 - Nora: call processor
 - Dex: analyst researcher / briefer
+- Finance-control specialist: finance control agent
+- Revenue specialist: revenue GTM agent
 - Ivy: writer
 - Greg: mechanic
 

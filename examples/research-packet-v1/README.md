@@ -10,7 +10,7 @@ Use this as a shape to copy into your own private workspace. Replace placeholder
 - **Answer:** The basic workflow appears supported, but the edge-case behavior needs a targeted test before production reliance.
 - **Confidence:** likely overall; verified only for the narrower documented-workflow claim.
 - **Status:** `fixture_clean`.
-- **Artifact map:** source ledger, claim ledger, contradictions, brief, recommendation, handoff, manifest, and errors.
+- **Artifact map:** source ledger, claim ledger, contradictions, brief, human-facing companion, recommendation, handoff, manifest, and errors.
 
 ## Required files
 
@@ -19,11 +19,14 @@ Use this as a shape to copy into your own private workspace. Replace placeholder
 - `claim-ledger.jsonl`: one JSON object per material claim.
 - `contradictions.md`: credible disagreements and resolution criteria.
 - `brief.md`: decision-useful analyst brief.
+- `brief.html`: optional or conditional human-facing companion for founder or chat delivery.
 - `recommendation.md`: recommendation, risks, alternatives, assumptions, and change triggers.
 - `handoff.json`: orchestrator-owned routing metadata.
 - `packet_manifest.json`: manifest and validation status.
 - `errors.jsonl`: failures and blocked lookups.
 
+This fixture demonstrates both machine-audit packet files and a separate human-facing companion. In private workspaces, the HTML path is recorded in `handoff.json`; in this public fixture it is a relative synthetic file.
+
 ## Pickup prompt
 
-> Use this Research Packet v1 fixture as the output contract for a substantive research task. Before researching, define the source plan and privacy ceiling. During research, maintain the source ledger and claim ledger. Before final delivery, validate packet structure, conservative confidence labels, contradictions, and orchestrator-owned handoff routing.
+> Use this Research Packet v1 fixture as the output contract for a substantive research task. Before researching, define the source plan and privacy ceiling. During research, maintain the source ledger and claim ledger. Before final delivery, validate packet structure, conservative confidence labels, contradictions, human-facing companion metadata, and orchestrator-owned handoff routing.

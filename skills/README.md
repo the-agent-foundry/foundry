@@ -67,6 +67,7 @@ Every skill in this repo follows one canonical schema so a human or an agent can
 - `examples/privacy-routing-skill.md` : deciding where sensitive outputs may go, and what must be blocked.
 - `examples/skillify-loop-skill.md` : turning repeated wins and failures into durable skills.
 - `examples/repo-sanitization-skill.md` : publishing useful public repo material without leaking private implementation.
+- `examples/research-packet-skill.md` : creating evidence-backed research packets with ledgers, confidence labels, human-facing companions, and orchestrator-owned handoff.
 
 ## How to use this with your agent
 

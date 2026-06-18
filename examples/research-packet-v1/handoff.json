@@ -1,16 +1,21 @@
 {
   "route_owner": "orchestrator",
   "route_version": "research-routing-v1",
+  "last_reviewed": "2026-06-18",
+  "review_cadence": "quarterly_or_on_role_change",
   "route": "orchestrator",
   "needs_triage": false,
-  "task_type": "technical",
+  "task_type": "technical_bug_community",
   "confidence": "likely",
+  "human_deliverable_format": "html",
+  "html_path": "brief.html",
   "artifacts": [
     "README.md",
     "source-ledger.jsonl",
     "claim-ledger.jsonl",
     "contradictions.md",
     "brief.md",
+    "brief.html",
     "recommendation.md"
   ],
   "sources_used": ["S1", "S2", "S3"],

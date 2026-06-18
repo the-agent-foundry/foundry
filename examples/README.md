@@ -6,7 +6,7 @@ These are not private run records. They are shapes your own agent can copy into 
 
 ## Current fixtures
 
-- `research-packet-v1/` : packet structure for decision-grade analyst research: source ledger, claim ledger, contradictions, brief, recommendation, orchestrator handoff, manifest, and errors.
+- `research-packet-v1/` : packet structure for decision-grade analyst research: source ledger, claim ledger, contradictions, brief, human-facing companion, recommendation, orchestrator handoff, manifest, and errors.
 
 ## Pickup prompt
 
