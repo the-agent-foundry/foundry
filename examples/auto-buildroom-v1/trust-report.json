@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "artifact_type": "trust-report",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T10:25:00Z",
+  "verification_delta": "confirmed",
+  "trust_state": "watch",
+  "summary": "Fixture-backed repair passed and protected surfaces were untouched. Keep watch until the next natural scheduled run proves the live cadence.",
+  "retention_recommendation": "keep",
+  "human_needed_decisions": ["Decide after the next natural run whether to promote the health contract from watch to clean."]
+}

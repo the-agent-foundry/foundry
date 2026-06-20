@@ -33,7 +33,7 @@ Community contributions are welcome into a namespaced area (see `community/` and
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `security/` : tenant-scoped authorization patterns, machine-readable ACL examples, and egress-surface test matrices for multi-client agents.
-- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, skillification, and repo sanitization.
+- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, skillification, and repo sanitization.
 - `agents/` : why specialists beat a generalist, the agent role-spec schema, the profile operating model, and nine expanded archetypes for orchestrator, engineer, call processor, briefer, analyst researcher, finance control, revenue GTM, writer, and mechanic.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `examples/` : sanitized examples of manifests and operating-pattern artifacts.

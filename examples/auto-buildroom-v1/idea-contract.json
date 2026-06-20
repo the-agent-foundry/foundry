@@ -1,0 +1,151 @@
+{
+  "schema_version": "1",
+  "artifact_type": "idea-contract",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T09:00:00Z",
+  "created_by_role": "scout",
+  "proposal_only": true,
+  "approval_state": "proposed",
+  "title": "Repair stale recurring briefing health check",
+  "source_signals": [
+    {
+      "source_type": "local_health_metadata",
+      "signal": "briefing health artifact stale beyond configured cadence",
+      "observed_at": "2026-01-15T08:55:00Z",
+      "destination_safety": "internal_only"
+    }
+  ],
+  "question_storm": {
+    "schema_version": "1",
+    "artifact_type": "question_storm",
+    "task_class": "auto_buildroom_proposal",
+    "mode": "auto_buildroom_proposal",
+    "classification": "MODERATE",
+    "depth": "compact",
+    "personas_used": [
+      "authority_gate_reviewer",
+      "detector_analyst",
+      "protected_surface_reviewer",
+      "verification_owner"
+    ],
+    "questions": [
+      {
+        "id": "qs-auto-buildroom-001",
+        "persona": "authority_gate_reviewer",
+        "question": "Does this proposal preserve proposal-only status until an authorized build review exists?",
+        "why_it_matters": "A scout may detect work, not approve work.",
+        "affects": [
+          "approval_boundary",
+          "acceptance_criteria"
+        ],
+        "priority": "high",
+        "status": "open"
+      },
+      {
+        "id": "qs-auto-buildroom-002",
+        "persona": "detector_analyst",
+        "question": "Which current local health signal proves the briefing check is stale rather than merely quiet?",
+        "why_it_matters": "Build candidates should rest on current metadata, not vibes.",
+        "affects": [
+          "retrieval",
+          "source_ledger"
+        ],
+        "priority": "high",
+        "status": "open"
+      },
+      {
+        "id": "qs-auto-buildroom-003",
+        "persona": "protected_surface_reviewer",
+        "question": "Could the repair touch external delivery, scheduler activation, credentials, or source-of-truth records?",
+        "why_it_matters": "Protected surfaces require approval boundaries before implementation.",
+        "affects": [
+          "risk",
+          "approval_boundary"
+        ],
+        "priority": "high",
+        "status": "open"
+      },
+      {
+        "id": "qs-auto-buildroom-004",
+        "persona": "verification_owner",
+        "question": "Which stale and fresh fixtures prove the health checker fails loud and clears cleanly?",
+        "why_it_matters": "Trust state needs deterministic evidence, not a builder summary.",
+        "affects": [
+          "tests",
+          "acceptance_criteria"
+        ],
+        "priority": "high",
+        "status": "open"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "approval_boundary",
+        "question_ids": [
+          "qs-auto-buildroom-001",
+          "qs-auto-buildroom-003"
+        ]
+      },
+      {
+        "id": "retrieval",
+        "question_ids": [
+          "qs-auto-buildroom-002"
+        ]
+      },
+      {
+        "id": "tests",
+        "question_ids": [
+          "qs-auto-buildroom-004"
+        ]
+      }
+    ],
+    "assumptions": [
+      "The fixture uses synthetic health metadata and does not represent a live scheduler row."
+    ],
+    "retrieval_or_probe_plan": [
+      "Read current health metadata",
+      "Compare stale and fresh synthetic fixtures",
+      "Inspect diff for protected-surface changes"
+    ],
+    "missing_evidence": [
+      "Current scheduler status and validator output are required before build planning in a real system."
+    ],
+    "accepted_proxies": [
+      "Synthetic stale/fresh fixture files stand in for live scheduler artifacts in this public example."
+    ],
+    "questions_intentionally_deferred": [
+      "Live delivery proof remains deferred until a separate approved activation."
+    ],
+    "revisit_triggers": [
+      "The repair requires external send, credential access, service restart, destructive change, or source-of-truth mutation."
+    ],
+    "mode_outputs": {
+      "proposal_only": true,
+      "approval_state_required": "proposed",
+      "reject_or_plan_recommendation": "plan only after bounded approval review"
+    }
+  },
+  "who_benefits": "Founder and operator who rely on the recurring briefing",
+  "why_now": "The latest health metadata is stale and the next briefing depends on fresh source checks.",
+  "proposed_scope": [
+    "Inspect the recurring briefing health contract",
+    "Patch stale-source detection if confirmed",
+    "Add a regression fixture"
+  ],
+  "protected_surfaces": [
+    "external delivery",
+    "scheduler activation",
+    "credentials"
+  ],
+  "verification_ideas": [
+    "Run health checker on stale and fresh fixtures",
+    "Run no-send render validation",
+    "Confirm scheduler state was not changed"
+  ],
+  "out_of_scope": [
+    "Live delivery",
+    "Credential changes",
+    "Disabling old jobs",
+    "Source-of-truth mutation"
+  ]
+}

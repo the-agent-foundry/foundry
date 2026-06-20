@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "artifact_type": "build-plan",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T09:20:00Z",
+  "allowed_surfaces": [
+    "recurring-briefing health checker",
+    "synthetic stale/fresh fixtures",
+    "local documentation"
+  ],
+  "protected_surfaces": [
+    "live delivery routes",
+    "credential stores",
+    "scheduler enablement",
+    "source-of-truth records"
+  ],
+  "steps": [
+    "Reproduce stale-health detection with a synthetic stale fixture.",
+    "Patch the health checker or contract if the stale state is misclassified.",
+    "Add fresh and stale regression fixtures.",
+    "Run validator and no-send render checks."
+  ],
+  "verification_commands": [
+    "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/stale-health.json  # expected exit 2",
+    "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/fresh-health.json  # expected exit 0",
+    "python3 gates/scripts/format_lint.py .",
+    "git diff --name-only"
+  ],
+  "stop_conditions": [
+    "credential access required",
+    "live service restart required",
+    "external send required",
+    "source-of-truth mutation required",
+    "scope expands beyond named surfaces"
+  ]
+}
