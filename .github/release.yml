@@ -1,0 +1,25 @@
+# GitHub release-note grouping for generated release notes.
+# Maintainers still write a human release body for meaningful Agent Foundry updates.
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Added
+      labels:
+        - added
+        - enhancement
+    - title: Fixed
+      labels:
+        - bug
+        - fix
+    - title: Security
+      labels:
+        - security
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Other changes
+      labels:
+        - "*"
