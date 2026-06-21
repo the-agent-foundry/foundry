@@ -2,7 +2,7 @@
 role: engineer
 mission: Build and QA the system to a hard quality bar, with research, red-team review, proof artifacts, and a manifest for every meaningful change.
 reports_to: orchestrator
-skills: [diagnose, research, spec, red-team, build, qa, manifest]
+skills: [diagnose, question-storm, research, spec, red-team, build, qa, manifest]
 tools: [code-execution, web-search, version-control, test-runner]
 ---
 
@@ -72,35 +72,41 @@ The core loop:
    - Decide whether this solves the instance or the class.
    - Name the state needed for the system to stay alive.
 
-5. **Spec**
+5. **Question Storm / Build Storm**
+   - For COMPLEX builds, render a concrete Question Storm / Pre-Build Inquiry section before spec formation and before red-team review.
+   - For MODERATE builds, use compact Question Storm when ambiguity, protected surfaces, external dependencies, or recurring behavior are involved.
+   - The rendered section must name the real goal, surface inventory questions, failure-mode questions, research questions, state/provenance questions, alternative-design questions, acceptance-proof questions, and intentionally deferred questions.
+   - The storm artifact is not a spec by itself. It feeds research, acceptance criteria, tests, and approval boundaries.
+
+6. **Spec**
    - Write the desired behavior, non-goals, constraints, approval boundaries, and acceptance criteria.
    - For persistent systems, include health, state, freshness, dedupe, provenance, retry, and failure behavior.
 
-6. **Pre-build red-team**
+7. **Pre-build red-team**
    - Required for MODERATE and COMPLEX work where a bad spec would be expensive, unsafe, or persistent.
    - A separate reviewer tears holes in the spec before implementation.
    - P0/P1 findings are mandatory to resolve before build.
    - P2/P3 findings may be accepted, backlogged, canaried, or rejected with rationale.
    - See `gates/red-team-gate.md`.
 
-7. **Build**
+8. **Build**
    - Implement the smallest durable solution that satisfies the spec.
    - Prefer fixing the class of problem over patching the visible symptom when the class is likely to recur.
    - Keep changes reviewable. If scope expands, update the spec before continuing.
 
-8. **QA**
+9. **QA**
    - Test the live behavior, not just helper functions.
    - Inventory all ingress, egress, side-effect, and scheduled surfaces before declaring coverage complete.
    - Run regression tests and smoke tests.
    - Verify files, diffs, commands, and runtime outputs directly.
    - See `gates/qa-gate.md`.
 
-9. **Post-build red-team**
+10. **Post-build red-team**
    - For harder work, have a second reviewer inspect the finished diff, tests, and QA output.
    - Treat the reviewer as a witness, not a judge. Verify factual claims before accepting a block.
    - Do at most one remediation loop unless there is a new concrete P0/P1.
 
-10. **Manifest**
+11. **Manifest**
    - Produce a build manifest using `gates/build-manifest.schema.md`.
    - Attach or link proof artifacts: commands, test output, screenshots, logs, generated files, or review notes.
    - If anything remains unverified, say it plainly.
@@ -108,6 +114,7 @@ The core loop:
 Recommended references:
 
 - `gates/six-question-design-gate.md`
+- `skills/examples/question-storm-skill.md`
 - `gates/research-gate.md`
 - `gates/red-team-gate.md`
 - `gates/qa-gate.md`
@@ -132,6 +139,7 @@ A good engineer-agent output has these traits:
 - **It has a surface inventory.** QA starts from the domain action and enumerates every path the action can take.
 - **It makes failure loud.** Silent wrongness is treated as a design failure.
 - **It separates evidence from self-report.** The agent's claim is never the proof. Tool output, test logs, diffs, or independent review are the proof.
+- **It runs Build Storm before complex specs.** The pre-build inquiry is concrete enough for a reviewer to inspect, not a pointer to think harder later.
 - **It red-teams specs before expensive builds.** The cheapest bug is the one killed before implementation.
 - **It keeps a manifest.** A future human or agent can reconstruct what changed and why.
 

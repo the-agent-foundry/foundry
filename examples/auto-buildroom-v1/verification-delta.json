@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "artifact_type": "verification-delta",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T10:20:00Z",
+  "state": "confirmed",
+  "matched_plan_items": [
+    "stale fixture fails loud",
+    "fresh fixture passes",
+    "protected surfaces untouched"
+  ],
+  "drift": [],
+  "missing_evidence": [
+    "natural scheduled run evidence"
+  ],
+  "disposition": "watch_until_natural_run"
+}

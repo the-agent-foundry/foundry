@@ -66,7 +66,10 @@ Every skill in this repo follows one canonical schema so a human or an agent can
 - `examples/writing-content-eval-loop-skill.md` : evaluating writing drafts with a versioned rubric, synthetic pass/fail fixtures, deterministic content-QA gate, advisory judge checks, and human-review warnings.
 - `examples/privacy-routing-skill.md` : deciding where sensitive outputs may go, and what must be blocked.
 - `examples/skillify-loop-skill.md` : turning repeated wins and failures into durable skills.
+- `examples/question-storm-skill.md` : generating mode-specific pre-build or pre-research inquiry artifacts before retrieval, spec, synthesis, or proposal promotion.
+- `examples/auto-buildroom-skill.md` : governing autonomous build candidates from signal through approval, bounded build, QA, trust, and retention.
 - `examples/repo-sanitization-skill.md` : publishing useful public repo material without leaking private implementation.
+- `examples/research-packet-skill.md` : creating evidence-backed research packets with ledgers, confidence labels, human-facing companions, and orchestrator-owned handoff.
 
 ## How to use this with your agent
 

@@ -4,9 +4,9 @@ These are worked specs, not implementations. They are meant to be copied, edited
 
 ## Example map
 
-- `company-context-tool.md` : quick company and diligence context.
+- `company-context-tool.md` : company-level evidence packets for meeting prep, diligence, vendor review, investor context, and sales context.
 - `travel-logistics-tool.md` : travel options and leave-by math.
-- `meeting-prep-tool.md` : pre-meeting context from calendar, notes, memory, and approved sources.
+- `meeting-prep-tool.md` : purpose-spine meeting prep that collects wide, writes narrow, and verifies the final rendered card before delivery.
 - `call-action-ledger-tool.md` : decisions, commitments, and follow-up candidates from call notes or transcripts.
 - `memory-search-tool.md` : retrieval over long-term operating memory.
 - `recurring-briefing-tool.md` : daily or weekly ranked operating brief.

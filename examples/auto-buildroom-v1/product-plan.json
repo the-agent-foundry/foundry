@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "artifact_type": "product-plan",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T09:15:00Z",
+  "beneficiary": "Founder and operator who rely on the recurring briefing",
+  "problem": "A stale health artifact can make a recurring briefing look healthy while source checks are no longer fresh.",
+  "non_goals": [
+    "send a live briefing",
+    "change credentials",
+    "enable or disable scheduled jobs",
+    "mutate source-of-truth records"
+  ],
+  "acceptance_criteria": [
+    "stale fixture returns unhealthy status",
+    "fresh fixture returns healthy status",
+    "QA receipt records command, exit code, fixture, and observed output",
+    "diff contains no protected-surface changes"
+  ],
+  "risk_band": "moderate",
+  "protected_surfaces": [
+    "external delivery",
+    "scheduler activation",
+    "credentials",
+    "source-of-truth records"
+  ],
+  "expected_artifacts": [
+    "build-plan",
+    "coder-verification",
+    "qa-verification",
+    "verification-delta",
+    "trust-report",
+    "retention-review",
+    "operator-summary"
+  ]
+}

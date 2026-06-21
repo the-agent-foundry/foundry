@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "artifact_type": "intent-review",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T09:05:00Z",
+  "reviewer_role": "orchestrator",
+  "decision": "advance_to_bounded_review",
+  "reason": "Current synthetic fixture models a stale health signal with a narrow local repair path.",
+  "rejected_alternatives": [
+    "live delivery replay",
+    "scheduler activation",
+    "credential investigation"
+  ],
+  "duplicate_check": {
+    "status": "no_active_duplicate_found",
+    "method": "synthetic proposal registry lookup"
+  },
+  "required_next_artifacts": [
+    "main-review",
+    "product-plan",
+    "build-plan"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1",
+  "artifact_type": "coder-verification",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T10:00:00Z",
+  "changed_surfaces": [
+    "recurring-briefing health checker",
+    "synthetic stale/fresh fixtures"
+  ],
+  "protected_surfaces_touched": [],
+  "commands": [
+    {
+      "command": "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/stale-health.json",
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "observed_output": "status=unhealthy reason=stale_source"
+    },
+    {
+      "command": "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/fresh-health.json",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "observed_output": "status=healthy reason=fresh_source"
+    }
+  ],
+  "known_gaps": [
+    "Natural scheduled run is not represented by this public fixture."
+  ]
+}

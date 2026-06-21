@@ -43,3 +43,12 @@ Use this before broad sharing, release tags, community imports, or turning priva
 - [ ] Any allowlist entry is narrow, repo-relative, path-specific where applicable, commented, and justified.
 - [ ] CI logs do not expose raw matched values.
 - [ ] If history was rewritten, maintainers recloned before further work.
+
+## 6. Release and notification
+
+- [ ] `CHANGELOG.md` includes the meaningful update batch.
+- [ ] `MIGRATION.md` says either "no migration required" or gives concrete steps for breaking changes.
+- [ ] The GitHub Release body includes what changed, who should care, action needed, breaking changes, and safety checks.
+- [ ] The release tag uses the date-based format `YYYY.MM.DD` unless this is a deliberate pre-release or hotfix suffix.
+- [ ] The release targets `main` after merge; feature-branch releases are marked pre-release.
+- [ ] README subscription instructions still point readers to GitHub Releases and the releases Atom feed.

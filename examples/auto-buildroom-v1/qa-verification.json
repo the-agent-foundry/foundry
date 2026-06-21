@@ -1,0 +1,38 @@
+{
+  "schema_version": "1",
+  "artifact_type": "qa-verification",
+  "job_id": "br-20260115-090000-stale-briefing-health-example",
+  "created_at": "2026-01-15T10:15:00Z",
+  "qa_role": "independent_reviewer",
+  "checks": [
+    {
+      "name": "stale fixture fails loud",
+      "status": "pass",
+      "command": "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/stale-health.json",
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "fixture": "fixtures/stale-health.json",
+      "observed_output": "status=unhealthy reason=stale_source"
+    },
+    {
+      "name": "fresh fixture passes",
+      "status": "pass",
+      "command": "python3 examples/auto-buildroom-v1/check_fixture_health.py examples/auto-buildroom-v1/fixtures/fresh-health.json",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "fixture": "fixtures/fresh-health.json",
+      "observed_output": "status=healthy reason=fresh_source"
+    },
+    {
+      "name": "protected surfaces untouched",
+      "status": "pass",
+      "command": "git diff --name-only",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "reviewer_notes": "Synthetic fixture diff contains no live delivery, credential, scheduler activation, or source-of-truth surfaces."
+    }
+  ],
+  "known_gaps": [
+    "Natural scheduled run still needs observation before autonomy level changes."
+  ]
+}

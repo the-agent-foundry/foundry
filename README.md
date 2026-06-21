@@ -27,17 +27,39 @@ If you want hands-on help installing, customizing, or hardening these patterns f
 
 Community contributions are welcome into a namespaced area (see `community/` and `CONTRIBUTING.md`), but the core is here for you to take.
 
+
+## Stay updated
+
+Important upload batches and public updates are announced through GitHub Releases.
+
+To get notified:
+
+1. Click **Watch** at the top of this repository.
+2. Choose **Custom**.
+3. Select **Releases**.
+4. Click **Apply**.
+
+You can also subscribe by RSS/Atom:
+
+```text
+https://github.com/the-agent-foundry/foundry/releases.atom
+```
+
+See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`](MIGRATION.md) for breaking-change notes, and [`docs/release-process.md`](docs/release-process.md) for the maintainer release standard.
+
 ## Repo map
 
 - `field-guide/` : the Building Brit field guide (HTML and markdown) plus the why.
+- `docs/` : release/update notes and maintainer process docs.
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `security/` : tenant-scoped authorization patterns, machine-readable ACL examples, and egress-surface test matrices for multi-client agents.
-- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, skillification, and repo sanitization.
-- `agents/` : why specialists beat a generalist, the agent role-spec schema, the profile operating model, and seven expanded archetypes for orchestrator, engineer, call processor, briefer, analyst researcher, writer, and mechanic.
+- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, skillification, and repo sanitization.
+- `agents/` : why specialists beat a generalist, the agent role-spec schema, the profile operating model, and nine expanded archetypes for orchestrator, engineer, call processor, briefer, analyst researcher, finance control, revenue GTM, writer, and mechanic.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `examples/` : sanitized examples of manifests and operating-pattern artifacts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
+- `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
 - `SUPPORT.md`, `llms.txt`, `agent-support.yaml` : human-readable and machine-readable guidance for getting optional implementation help.
 
 ## How to use this with your agent
