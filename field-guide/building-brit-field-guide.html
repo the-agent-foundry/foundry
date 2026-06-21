@@ -163,7 +163,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="kicker">Field Guide · v0.4 · Living Document</span>
+    <span class="kicker">Field Guide · v0.5 · Living Document</span>
     <h1>Building Brit</h1>
     <p class="lede">A founder's field guide to building an AI agent that actually runs your operating system, not a chatbot that forgets you by Tuesday.</p>
     <p class="byline">By <b>Darryl Hicks</b> · for my YPO peers · <a href="#about">About the author</a> · code &amp; templates: <a href="https://github.com/the-agent-foundry/foundry">The Agent Foundry</a></p>
@@ -179,17 +179,18 @@
       <li><a href="#why-doc">Why I'm writing this</a></li>
       <li><a href="#why-agents">1 · Why agents, not a chatbot</a></li>
       <li><a href="#specs">2 · The art of the spec</a></li>
-      <li><a href="#principles">3 · Design principles, ranked</a></li>
-      <li><a href="#security">4 · Security foundations</a></li>
-      <li><a href="#signal">5 · Sources of signal</a></li>
-      <li><a href="#skills">6 · What skills are</a></li>
-      <li><a href="#builds">7 · Other builds worth stealing</a></li>
-      <li><a href="#subagents">8 · Why sub-agents</a></li>
+      <li><a href="#question-storm">3 · Question Storm</a></li>
+      <li><a href="#principles">4 · Design principles, ranked</a></li>
+      <li><a href="#security">5 · Security foundations</a></li>
+      <li><a href="#signal">6 · Sources of signal</a></li>
+      <li><a href="#skills">7 · What skills are</a></li>
+      <li><a href="#builds">8 · Other builds worth stealing</a></li>
+      <li><a href="#subagents">9 · Why sub-agents</a></li>
       <li><a href="#victor" class="sub">· Victor (engineer)</a></li>
       <li><a href="#nora" class="sub">· Nora (calls)</a></li>
       <li><a href="#dex" class="sub">· Dex (briefings)</a></li>
       <li><a href="#ivy" class="sub">· Ivy (writing)</a></li>
-      <li><a href="#repo">9 · Self-serve repo model</a></li>
+      <li><a href="#repo">10 · Self-serve repo model</a></li>
       <li><a href="#closing">A closing thought</a></li>
       <li><a href="#about">About the author</a></li>
     </ol>
@@ -252,9 +253,26 @@
     <div class="pull">My first daily briefing is the perfect example. I kept specifying everything: the colored boxes, the intro text, exactly how to describe who was on my calls. It turned into soulless, milquetoast garbage that added nothing to my day. So I asked my agent how <b>it</b> would rebuild the briefing from scratch, given what it knew I was trying to accomplish. It blew my mind. <b>Tight specs, light touch on execution.</b> That's a key that unlocks real value.</div>
   </section>
 
-  <!-- 3. PRINCIPLES -->
+  <!-- 3. QUESTION STORM -->
+  <section id="question-storm">
+    <h2><span class="num">SECTION 3</span>Question Storm: ask better before you build</h2>
+    <p class="dek">The answer is downstream of the questions.</p>
+    <p>A recent unlock came from the Stanford STORM method, <strong>Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking</strong>, which I first saw through <a href="https://x.com/heynavtoor/status/2067194761446920264?s=20">this X thread</a>. The lesson is obvious once you see it: if you ask a model one broad question, you usually get one broad answer. If you first force the system to ask the dozen questions a sharp journalist, engineer, buyer, skeptic, and operator would ask, the final output gets deeper before it gets longer.</p>
+    <p>I adapted that idea into what I call <strong>Question Storm</strong>. It is not a fancy prompt. It is a pre-writing and pre-build gate: before the agent researches, writes, or builds, it generates the question map that should drive the work.</p>
+    <ul class="clean">
+      <li><strong>Dex:</strong> What should we know before advising Darryl? Company briefs and meeting prep start with the missing questions, not the first search result.</li>
+      <li><strong>Victor:</strong> What must be true before we build? Complex builds now get a pre-build inquiry before the spec, so we catch the hidden surfaces, state, rollback, tests, and failure modes earlier.</li>
+      <li><strong>Auto-buildroom:</strong> Is this a real build candidate, or repeated noise? The system can scout improvement opportunities, but it has to interrogate the idea before proposing work.</li>
+    </ul>
+    <p>The key distinction: Question Storm is upstream of research. The research gate asks, <em>"what do the sources say?"</em> Question Storm asks, <em>"what should we be trying to find out?"</em></p>
+    <div class="pull">If the questions are shallow, the brief, spec, and build will all be shallow with citations.</div>
+    <p>This is also why I now think the best specs are not written in one pass. They are discovered. First principles define the target. Question Storm exposes the blind spots. Research fills the evidence. Then the spec gets written.</p>
+  </section>
+
+
+  <!-- 4. PRINCIPLES -->
   <section id="principles">
-    <h2><span class="num">SECTION 3</span>Design principles, ranked</h2>
+    <h2><span class="num">SECTION 4</span>Design principles, ranked</h2>
     <p class="dek">Before you build a single cron job, skill, or sub-agent, rank-order your principles.</p>
     <p>These are the foundation of everything that comes later. The reason it matters: your rank order <em>guides every future decision the agent makes on its own.</em> Should we spend a few more dollars on tokens for this task if it buys more reliability? When two skills both work but one is more private, which wins? The rank order answers it, for the agent, and honestly, for you.</p>
 
@@ -280,11 +298,19 @@
     </ul>
     <p>The Design Principles also apply to the platform you build on. OpenAI and Anthropic are working hard to make building inside their walls easy, and the upside is real: scale, enterprise security, support. But easy buys you a lockup. For me the deciding factors were sovereignty, reliability, and quality, and the last two are connected to a single fact: the best model today is rarely the best model in thirty days. Reliability means I can switch providers when one has an outage or changes its compute. Quality means when a better model ships next month, I move to it, instead of waiting for the platform I started on to offer it. That ability to switch is not theoretical, it's how you stay running. My data sits on my own Mac Mini, so I keep complete control, but I also own security, redundancy, and the dozen things an enterprise would handle for me. It's a bit like holding your own Bitcoin instead of trusting a bank. Sovereignty has a price, and I'd rather pay it than hand someone else the keys.</p>
     <p>That does not mean building on an enterprise solution is wrong. It is entirely valid. So is building on an open source platform. It really comes down to what matters most to you, which is why I emphasize thinking deeply about design principles <em>before</em> you begin.</p>
+    <p>The rank order stays the same, but the last few builds added a handful of operating corollaries:</p>
+    <ul class="clean">
+      <li><strong>Questions before answers.</strong> For important work, generate the inquiry map before retrieval, writing, or build.</li>
+      <li><strong>Artifacts beat narration.</strong> A build is not done because the agent says it is done. It is done when tests, manifests, commits, PR state, release notes, and QA artifacts prove it.</li>
+      <li><strong>Proposal is not permission.</strong> A scouting agent can discover and recommend. It cannot approve itself.</li>
+      <li><strong>Public value, private boringness.</strong> A public repo should be useful enough for another founder's agent to build from, but boring from an attacker's perspective.</li>
+      <li><strong>Release the learning.</strong> If people depend on the repo, publish meaningful update batches through releases, changelogs, and migration notes. Otherwise your public repo becomes a junk drawer with stars.</li>
+    </ul>
   </section>
 
-  <!-- 4. SECURITY -->
+  <!-- 5. SECURITY -->
   <section id="security">
-    <h2><span class="num">SECTION 4</span>Security foundations</h2>
+    <h2><span class="num">SECTION 5</span>Security foundations</h2>
     <p class="dek">An agent with memory, tools, and write-access is a real attack surface. Treat it like one.</p>
     <p>My non-negotiables:</p>
     <ul class="clean">
@@ -303,9 +329,9 @@
     </ul>
   </section>
 
-  <!-- 5. SIGNAL -->
+  <!-- 6. SIGNAL -->
   <section id="signal">
-    <h2><span class="num">SECTION 5</span>Sources of signal</h2>
+    <h2><span class="num">SECTION 6</span>Sources of signal</h2>
     <p class="dek">Read-only access to everything that matters. The agent is only as good as what it can see.</p>
     <ul class="clean">
       <li><strong>Calendar:</strong> O365 via the Graph API.</li>
@@ -313,7 +339,7 @@
       <li><strong>iMessage:</strong> processed for VIP contacts only.</li>
       <li><strong>A dedicated bot email address:</strong> I BCC or forward anything I want it aware of. <em>Send is disabled at the server level</em>, so it physically cannot leak data outbound.</li>
       <li><strong>Asana:</strong> used for signal, and the <em>only</em> write-access I grant. It has a skill that writes genuinely beautiful, well-structured tasks.</li>
-      <li><strong>Call recordings:</strong> Fathom for Zoom/Teams, Plaud for in-person and phone. An ultra-VIP source, arguably the single highest-value input for training your agents. (More in Section 8.)</li>
+      <li><strong>Call recordings:</strong> Fathom for Zoom/Teams, Plaud for in-person and phone. An ultra-VIP source, arguably the single highest-value input for training your agents. (More in Section 9.)</li>
       <li><strong>X / Twitter:</strong> API access. Technically can post; I use it read-only for research.</li>
       <li><strong>Confluence:</strong> the company knowledge repository.</li>
       <li><strong>Brave Search:</strong> advanced web search.</li>
@@ -321,9 +347,9 @@
     <p>The pattern: maximize the signal flowing <em>in</em>, minimize the paths flowing <em>out</em>. Write-access is a privilege you grant deliberately, one integration at a time.</p>
   </section>
 
-  <!-- 6. SKILLS -->
+  <!-- 7. SKILLS -->
   <section id="skills">
-    <h2><span class="num">SECTION 6</span>What skills are, and why they matter</h2>
+    <h2><span class="num">SECTION 7</span>What skills are, and why they matter</h2>
     <p>A <strong>skill</strong> is a procedure you teach the agent once, that it never forgets. Think of it as a written playbook the agent pulls off the shelf the moment a matching task shows up: the exact steps, the right tools, the definition of "good," and the specific landmines to avoid.</p>
     <p>Without skills, you re-explain the same thing forever, and the agent re-makes the same mistakes forever. With skills, every correction becomes permanent. You fix something once, codify it, and it's fixed for good. This is where the compounding happens. Your agent literally gets more capable every week, because its hard-won lessons are written down instead of re-learned.</p>
     <p>Two examples of my 25+ skills that earn their keep daily:</p>
@@ -341,10 +367,10 @@
     <p>And the loop gets even better when you automate it. Garry Tan's <em>Skillify</em> (and the pattern behind it) closes the most important loop of all: turning a one-time success or a painful failure into a permanent, reusable skill, automatically. That's the flywheel. Every hard-won lesson becomes scar tissue the agent carries forward, without me having to remember to write it down. It's how the system stops being something I maintain and starts being something that compounds.</p>
   </section>
 
-  <!-- 7. OTHER BUILDS -->
+  <!-- 8. OTHER BUILDS -->
   <section id="builds">
-    <h2><span class="num">SECTION 7</span>Other builds worth stealing</h2>
-    <p class="dek">Five smaller builds that punch above their weight.</p>
+    <h2><span class="num">SECTION 8</span>Other builds worth stealing</h2>
+    <p class="dek">Six smaller builds that punch above their weight.</p>
     <h3>1 · A living map of every LLM provider</h3>
     <p>A maintained table of every major provider, their current models, and each model's strengths and weaknesses, then mapped to where each one should be used: cron jobs, skills, sub-agents, main brain. A weekly cron job keeps it current, because this space moves fast and stale routing decisions quietly cost you quality.</p>
 
@@ -359,11 +385,17 @@
 
     <h3>5 · A tool belt of small, purpose-built tools</h3>
     <p>Once the foundation is solid, the highest-value move is bolting on small, purpose-built tools that each remove a recurring annoyance, things like <em>company-goat</em> (instant company and diligence context) and <em>flight-goat</em> (travel logistics handled). None is a moonshot on its own; collectively they're the difference between an agent that talks and one that quietly handles the friction of my week. The lesson worth sharing: start a "tool belt" the moment your foundation is stable, and add a tool every time you catch yourself doing the same annoying thing twice.</p>
+
+    <h3>6 · Auto-buildroom, with training wheels</h3>
+    <p>The next frontier is an agent that does not just wait for instructions, but scouts for ways the system should improve itself. Mine now has an <strong>Auto-buildroom</strong> pattern: it watches for repeated friction, stale automation, recurring failures, and obvious hardening opportunities, then turns those into proposal-only build candidates.</p>
+    <p>The training wheels are deliberate. Auto-buildroom can scout, question, and propose. It cannot approve its own work. Main/Brit still reviews the candidate. Victor still builds. Grok and local tests still QA. That may sound cautious, but that is the point: autonomy earns trust in stages.</p>
+    <p>The eventual goal is to remove more of those training wheels after a careful rollout, so the buildroom can ship high-confidence upgrades and hardening on its own. Question Storm is a major part of getting there. If the system can prove it asked the right questions, found the right surfaces, understood the approval boundary, and produced the right tests before building, then confidence stops being a vibe and starts becoming an artifact.</p>
+    <div class="pull">Autonomy should discover opportunities before it earns authority to act on them.</div>
   </section>
 
-  <!-- 8. SUBAGENTS -->
+  <!-- 9. SUBAGENTS -->
   <section id="subagents">
-    <h2><span class="num">SECTION 8</span>Why sub-agents</h2>
+    <h2><span class="num">SECTION 9</span>Why sub-agents</h2>
     <p class="dek">Specialists beat a generalist.</p>
     <p>Pile too many skills and tools onto one agent and you get confusion. It's like asking one employee to do six different jobs and keep every detail of each straight in their head. It gets messy, and quality slips across the board.</p>
     <p>A purpose-built sub-agent does one thing and becomes an expert at it. It loads only the skills and tools relevant to its role, so its context stays clean and focused, and you can go incredibly deep on spec'ing exactly what "good" looks like for that one job.</p>
@@ -377,12 +409,21 @@
         <div class="kids">
           <div class="kid"><b>Victor</b><span>Engineer: builds &amp; QA's everything</span></div>
           <div class="kid"><b>Nora</b><span>Calls: transcript intelligence</span></div>
-          <div class="kid"><b>Dex</b><span>Briefings: research &amp; intel</span></div>
+          <div class="kid"><b>Dex</b><span>Analyst: research, company context, and executive briefs</span></div>
           <div class="kid"><b>Ivy</b><span>Writing: content &amp; copy</span></div>
           <div class="kid"><b>Greg</b><span>Mechanic: runtime &amp; recovery</span></div>
         </div>
       </div>
     </div>
+
+    <h3>The second wave of specialists</h3>
+    <p>Once the core team works, the next agents emerge from domain boundaries, not cute names:</p>
+    <ul class="clean">
+      <li><strong>Finance Control:</strong> approvals, reconciliation, auditability, and money-movement guardrails.</li>
+      <li><strong>Revenue GTM:</strong> account context, objection patterns, partner signals, and seller-ready proof.</li>
+      <li><strong>Analyst Researcher:</strong> evidence-backed packets with source ledgers, claim ledgers, and missing-evidence discipline.</li>
+    </ul>
+    <p>Don't spawn agents because the org chart looks fun. Spawn them when the context, tools, approval rules, and definition of good are different enough that one generalist will get sloppy.</p>
 
     <!-- VICTOR -->
     <h3 id="victor">Victor, the engineer</h3>
@@ -391,28 +432,29 @@
     <p>Victor classifies every problem as <strong>TRIVIAL, MODERATE, or COMPLEX</strong>, then runs a rigorous loop:</p>
 
     <div class="fig">
-      <p class="cap">Victor's build loop: research, red-team, build, QA, gate</p>
+      <p class="cap">Victor's build loop: question, research, red-team, build, QA, gate</p>
       <div class="flow">
         <div class="node"><b>1 · Diagnose</b><span>Pin down the actual problem.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>2 · Research</b><span>Search X, Reddit, forums, docs. Who else hit this, what worked.</span></div>
+        <div class="node"><b>2 · Question Storm</b><span>Surface hidden state, dependencies, rollback, tests, and failure modes.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>3 · Spec</b><span>Synthesize diagnosis + research into a spec.</span></div>
+        <div class="node"><b>3 · Research / probes</b><span>Search sources and inspect what the current system actually does.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>4 · Red-team</b><span>MODERATE/COMPLEX: Grok tears holes in the spec.</span></div>
+        <div class="node"><b>4 · Spec</b><span>Synthesize diagnosis + questions + research into a spec.</span></div>
       </div>
       <div class="flow" style="margin-top:4px">
-        <div class="node"><b>5 · Build</b><span>Fold red-team feedback into a final spec, then build.</span></div>
+        <div class="node"><b>5 · Red-team</b><span>MODERATE/COMPLEX: Grok tears holes in the spec.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>6 · QA</b><span>Test vs. spec, hunt edge cases, dry-run. Grok runs a second-set-of-eyes QA on harder work.</span></div>
+        <div class="node"><b>6 · Build</b><span>Fold feedback into a final spec, then build.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>7 · Hard gate</b><span>Any QA failure &rarr; revise spec, back to build. Only clear when everything is green.</span></div>
+        <div class="node"><b>7 · QA / hard gate</b><span>Test, dry-run, and loop until green.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>8 · Manifest</b><span>Document what was done, the feedback, the QA, the fixes. Log it for audit.</span></div>
+        <div class="node"><b>8 · Manifest</b><span>Document what was done, the feedback, the QA, and the fixes.</span></div>
       </div>
     </div>
 
     <div class="pull">This process alone cut my coding time and bugs by roughly <b>90%</b> and massively hardened the whole system.</div>
+    <p>The newer lesson is that the pre-build inquiry matters as much as the QA. A brilliant builder can still build the wrong rigorous thing if the spec skipped the hidden question. Question Storm gives Victor a structured way to ask, <em>"what must be true before we build?"</em> before he opens the editor.</p>
 
     <details>
       <summary>Victor's six-question design gate</summary>
@@ -443,6 +485,8 @@
       </ul>
       <p class="pull" style="margin-top:14px">In plain English: build the durable system, not the cute patch. Make failure loud. Protect privacy. Keep the cockpit legible. Prove done with artifacts, not vibes.</p>
     </details>
+    <h4>When red-team becomes theater</h4>
+    <p>Red-team gates are useful because they catch missing thinking. But a gate can become a law professor if you let it: demanding ever more prose when the remaining questions are actually testable implementation details. When that happens, switch lanes. Build the smallest safe artifact, run the deterministic tests, and let QA review reality instead of another memo.</p>
 
     <!-- NORA -->
     <h3 id="nora">Nora, the call processor</h3>
@@ -482,9 +526,10 @@
     </ol>
 
     <!-- DEX -->
-    <h3 id="dex">Dex, the briefer</h3>
-    <p>Dex is the simplest of the specialists, and that's the point: a clean, focused agent that turns raw signal into something I actually want to read.</p>
-    <p>Two capabilities carry it. First, best-of-breed research tools. Brave Search for the web, plus the <strong>X tool</strong>: Dex monitors the accounts and topics I care about, pulls what's genuinely relevant, and filters out the noise, so I get the signal from X without the doomscroll. Dex keeps a list of the top sources of valuable information for my business, never forgets to check them, never forgets which tools to use, and always compiles research in the context of me and my business. Second, <strong>branded briefs</strong>: Dex composes its output as clean, on-brand documents using the branded-document skill, so a morning briefing or a research roundup arrives looking like a finished product, not a wall of text. Tight inputs, polished output, zero ceremony.</p>
+    <h3 id="dex">Dex, the analyst</h3>
+    <p>Dex started as the simplest of the specialists: a clean, focused agent that turned raw signal into something I actually wanted to read. It has since become more than a briefer. Dex is the analyst that decides what questions must be answered before I should trust the brief.</p>
+    <p>Two capabilities still carry it. First, best-of-breed research tools. Brave Search for the web, plus the <strong>X tool</strong>: Dex monitors the accounts and topics I care about, pulls what's genuinely relevant, and filters out the noise, so I get the signal from X without the doomscroll. Second, <strong>branded briefs</strong>: Dex composes output as clean, on-brand documents, so a morning briefing or research roundup arrives looking like a finished product, not a wall of text.</p>
+    <p>The newer layer is evidence discipline. Company context and meeting prep now use source ledgers, claim ledgers, missing-evidence flags, and Question Storm before synthesis. Generated questions are not claims. A missing field stays missing until evidence supports it. That sounds bureaucratic until you see the alternative: a confident briefing that quietly made up the part you most needed to trust.</p>
 
     <!-- IVY -->
     <h3 id="ivy">Ivy, the writer</h3>
@@ -495,9 +540,9 @@
     <p>And she's not just on-demand. Ivy maintains a <strong>backlog of content ideas</strong>: she processes my podcast recordings to mine evergreen content, and her daily research jobs surface fresh angles I can publish on. So I never face a blank page. I face a stocked one. Each day I receive a rich briefing of research across my industry, competitors, and partners, with a button I can push for "Have Ivy draft an X post or LinkedIn post on this topic," and seconds later I have a piece written in my voice that's 85-90% ready to publish.</p>
   </section>
 
-  <!-- 9. REPO MODEL -->
+  <!-- 10. REPO MODEL -->
   <section id="repo">
-    <h2><span class="num">SECTION 9</span>The self-serve repo model</h2>
+    <h2><span class="num">SECTION 10</span>The self-serve repo model</h2>
     <p class="dek">If you want people to build from this, don't put yourself in the middle of every request.</p>
     <p>The easiest way to turn this from a show-and-tell into something useful is a sanitized public repo. Not my live system. Not my secrets. Not a giant support burden. A repo of high-level specs, redacted templates, sample skills, gates, and operating principles that another founder can point their own agent at and ask: <em>"Should we build this too?"</em></p>
     <p>The security model is simple: <strong>don't gate access; gate content.</strong> If nothing sensitive is in the repo by design, then it can be self-serve without becoming dangerous. That means no credentials, no personal data, no customer/vendor specifics, no private endpoints, no chat IDs, no real internal paths, and no raw logs. Just reusable patterns.</p>
@@ -513,7 +558,7 @@
         <div class="arrow">&rarr;</div>
         <div class="node"><b>/agents</b><span>Role specs for Victor, Nora, Dex, Ivy, etc.</span></div>
         <div class="arrow">&rarr;</div>
-        <div class="node"><b>/tools</b><span>High-level tool belt specs, not live credentials</span></div>
+        <div class="node"><b>/tools</b><span>High-level tool belt specs, not live credentials</span></div><div class="arrow">&rarr;</div><div class="node"><b>/docs</b><span>Release notes, update process, and migration guidance</span></div>
       </div>
     </div>
 
@@ -523,6 +568,8 @@
       <li><strong>Their agent:</strong> the exact prompt: <em>"Review this folder and tell me whether we should build a version of it for my company. Ask me for missing context before implementation."</em></li>
     </ul>
     <p>That keeps the WhatsApp exchange simple. Someone asks for the config? Send one link. They browse, fork, or point their own agent at the relevant folder. Feedback goes through GitHub Issues or Discussions when people have useful improvements. No private DM support queue. No bullets to stand in front of.</p>
+    <p>If the repo is meant to be used by other people and their agents, treat updates like a product surface. A changelog is memory. A release is notification. A migration note is respect. The public Agent Foundry repo now uses GitHub Releases for meaningful update batches, <code>CHANGELOG.md</code> for durable history, <code>MIGRATION.md</code> for breaking-change notes, and a README section that tells readers how to subscribe.</p>
+    <p>The 2026.06.20 release was the first real expansion beyond the original Brit architecture: finance-control and revenue-GTM archetypes, richer research-packet patterns, Question Storm, Auto-buildroom governance, and the release-notification workflow itself.</p>
     <p>And for anyone who wants help turning the patterns into a working private setup, there should be a clear support path. The repo is designed for self-serve builders, but if you want help installing, customizing, or hardening this for your own company, I recommend Dwayne Schofield and the team at <a href="https://SolveWorks.io">SolveWorks.io</a>. They helped me get into this world, have supported the stack through real-world failures, and understand the difference between a clever demo and an agent you can trust at 2am. The repo includes <code>SUPPORT.md</code>, <code>llms.txt</code>, and <code>agent-support.yaml</code> so both humans and agents can find that path without turning the README into vendor confetti.</p>
   </section>
 
@@ -530,6 +577,7 @@
   <section class="lead" id="closing">
     <h2>A closing thought</h2>
     <p>If I had to give a peer one takeaway beyond the architecture: the work is never "done," and that's the feature, not the bug. The agent gets a little sharper every week: a new skill here, a hardened gate there, one more tool on the belt. The compounding is the whole point. You're not buying a product. You're growing an asset.</p>
+    <p>The deeper shift is this: once the agent works, the job becomes building a system that can safely improve itself. Brit was the operating system. Victor made building reliable. Dex made intelligence useful. Question Storm made thinking upstream. Auto-buildroom made improvement discoverable. Agent Foundry releases made the learning transferable.</p>
     <div class="pull">Tight specs, light touch, loud failures, and a relentless habit of writing down every lesson. Do that, and in a year you won't have a chatbot. You'll have a team.</div>
   </section>
 
@@ -542,7 +590,7 @@
   </section>
 
   <footer>
-    <p>Building Brit · A living document · v0.4 · maintained by Darryl Hicks</p>
+    <p>Building Brit · A living document · v0.5 · maintained by Darryl Hicks</p>
     <div class="repo">Code, skills &amp; sanitized config templates: <a href="https://github.com/the-agent-foundry/foundry">github.com/the-agent-foundry/foundry</a> · Feedback &amp; ideas welcome via <a href="https://github.com/the-agent-foundry/foundry/issues">repo Issues</a></div>
   </footer>
 

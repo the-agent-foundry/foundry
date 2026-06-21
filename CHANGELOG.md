@@ -15,6 +15,25 @@ This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 - Maintainers should publish a GitHub Release after merging a meaningful update batch to `main`.
 - Readers who want update notifications should subscribe to repository releases.
 
+## 2026.06.20-2
+
+### Added
+- Field Guide v0.5 framing: Question Storm, Auto-buildroom training wheels, second-wave specialists, Dex as analyst, and release-notification doctrine.
+- Hat tip to the Stanford STORM method via the X thread that sparked the Question Storm adaptation.
+
+### Updated
+- Field Guide markdown and browser HTML versions are kept in sync.
+- Field Guide README now points readers to Question Storm and Auto-buildroom as core concepts.
+
+### Breaking changes
+- None.
+
+### Migration notes
+- No migration is required. This is a narrative/documentation update.
+
+### Action needed
+- Pull the latest `main` and re-read `field-guide/` if you use Agent Foundry as an agent-pattern catalog.
+
 ## 2026.06.20
 
 ### Added

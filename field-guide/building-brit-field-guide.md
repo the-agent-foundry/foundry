@@ -1,6 +1,6 @@
 # Building Brit: A Founder's Field Guide to Agentic AI
 
-*Field Guide · v0.4 · Living Document*
+*Field Guide · v0.5 · Living Document*
 
 By **Darryl Hicks** · for my YPO peers · [About the author](#about) · code & templates: [The Agent Foundry](https://github.com/the-agent-foundry/foundry)
 
@@ -75,7 +75,27 @@ The lesson: know when to impose a **hard gate** versus when to let the LLM's rea
 
 ---
 
-## Section 3: Design principles, ranked
+## Section 3: Question Storm: ask better before you build
+
+*The answer is downstream of the questions.*
+
+A recent unlock came from the Stanford STORM method, **Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking**, which I first saw through [this X thread](https://x.com/heynavtoor/status/2067194761446920264?s=20). The lesson is obvious once you see it: if you ask a model one broad question, you usually get one broad answer. If you first force the system to ask the dozen questions a sharp journalist, engineer, buyer, skeptic, and operator would ask, the final output gets deeper before it gets longer.
+
+I adapted that idea into what I call **Question Storm**. It is not a fancy prompt. It is a pre-writing and pre-build gate: before the agent researches, writes, or builds, it generates the question map that should drive the work.
+
+That changed three parts of my system:
+
+- **Dex:** What should we know before advising Darryl? Company briefs and meeting prep start with the missing questions, not the first search result.
+- **Victor:** What must be true before we build? Complex builds now get a pre-build inquiry before the spec, so we catch the hidden surfaces, state, rollback, tests, and failure modes earlier.
+- **Auto-buildroom:** Is this a real build candidate, or repeated noise? The system can scout improvement opportunities, but it has to interrogate the idea before proposing work.
+
+The key distinction: Question Storm is upstream of research. The research gate asks, *"what do the sources say?"* Question Storm asks, *"what should we be trying to find out?"*
+
+> If the questions are shallow, the brief, spec, and build will all be shallow with citations.
+
+This is also why I now think the best specs are not written in one pass. They are discovered. First principles define the target. Question Storm exposes the blind spots. Research fills the evidence. Then the spec gets written.
+
+## Section 4: Design principles, ranked
 
 *Before you build a single cron job, skill, or sub-agent, rank-order your principles.*
 
@@ -94,9 +114,17 @@ The Design Principles also apply to the platform you build on. OpenAI and Anthro
 
 That does not mean building on an enterprise solution is wrong. It is entirely valid. So is building on an open source platform. It really comes down to what matters most to you, which is why I emphasize thinking deeply about design principles *before* you begin.
 
+The rank order stays the same, but the last few builds added a handful of operating corollaries:
+
+- **Questions before answers.** For important work, generate the inquiry map before retrieval, writing, or build.
+- **Artifacts beat narration.** A build is not done because the agent says it is done. It is done when tests, manifests, commits, PR state, release notes, and QA artifacts prove it.
+- **Proposal is not permission.** A scouting agent can discover and recommend. It cannot approve itself.
+- **Public value, private boringness.** A public repo should be useful enough for another founder's agent to build from, but boring from an attacker's perspective.
+- **Release the learning.** If people depend on the repo, publish meaningful update batches through releases, changelogs, and migration notes. Otherwise your public repo becomes a junk drawer with stars.
+
 ---
 
-## Section 4: Security foundations
+## Section 5: Security foundations
 
 *An agent with memory, tools, and write-access is a real attack surface. Treat it like one.*
 
@@ -117,7 +145,7 @@ Those are the obvious ones. Here's the deeper layer most people skip until it bi
 
 ---
 
-## Section 5: Sources of signal
+## Section 6: Sources of signal
 
 *Read-only access to everything that matters. The agent is only as good as what it can see.*
 
@@ -126,7 +154,7 @@ Those are the obvious ones. Here's the deeper layer most people skip until it bi
 - **iMessage:** processed for VIP contacts only.
 - **A dedicated bot email address:** I BCC or forward anything I want it aware of. *Send is disabled at the server level*, so it physically cannot leak data outbound.
 - **Asana:** used for signal, and the *only* write-access I grant. It has a skill that writes genuinely beautiful, well-structured tasks.
-- **Call recordings:** Fathom for Zoom/Teams, Plaud for in-person and phone. An ultra-VIP source, arguably the single highest-value input for training your agents. (More in Section 8.)
+- **Call recordings:** Fathom for Zoom/Teams, Plaud for in-person and phone. An ultra-VIP source, arguably the single highest-value input for training your agents. (More in Section 9.)
 - **X / Twitter:** API access. Technically can post; I use it read-only for research.
 - **Confluence:** the company knowledge repository.
 - **Brave Search:** advanced web search.
@@ -135,7 +163,7 @@ The pattern: maximize the signal flowing *in*, minimize the paths flowing *out*.
 
 ---
 
-## Section 6: What skills are, and why they matter
+## Section 7: What skills are, and why they matter
 
 A **skill** is a procedure you teach the agent once, that it never forgets. Think of it as a written playbook the agent pulls off the shelf the moment a matching task shows up: the exact steps, the right tools, the definition of "good," and the specific landmines to avoid.
 
@@ -152,9 +180,9 @@ And the loop gets even better when you automate it. Garry Tan's *Skillify* (and 
 
 ---
 
-## Section 7: Other builds worth stealing
+## Section 8: Other builds worth stealing
 
-*Five smaller builds that punch above their weight.*
+*Six smaller builds that punch above their weight.*
 
 ### 1 · A living map of every LLM provider
 
@@ -176,9 +204,19 @@ Built on the principles from Karpathy's writing on LLM-driven memory: a vector d
 
 Once the foundation is solid, the highest-value move is bolting on small, purpose-built tools that each remove a recurring annoyance, things like *company-goat* (instant company and diligence context) and *flight-goat* (travel logistics handled). None is a moonshot on its own; collectively they're the difference between an agent that talks and one that quietly handles the friction of my week. The lesson worth sharing: start a "tool belt" the moment your foundation is stable, and add a tool every time you catch yourself doing the same annoying thing twice.
 
+### 6 · Auto-buildroom, with training wheels
+
+The next frontier is an agent that does not just wait for instructions, but scouts for ways the system should improve itself. Mine now has an **Auto-buildroom** pattern: it watches for repeated friction, stale automation, recurring failures, and obvious hardening opportunities, then turns those into proposal-only build candidates.
+
+The training wheels are deliberate. Auto-buildroom can scout, question, and propose. It cannot approve its own work. Main/Brit still reviews the candidate. Victor still builds. Grok and local tests still QA. That may sound cautious, but that is the point: autonomy earns trust in stages.
+
+The eventual goal is to remove more of those training wheels after a careful rollout, so the buildroom can ship high-confidence upgrades and hardening on its own. Question Storm is a major part of getting there. If the system can prove it asked the right questions, found the right surfaces, understood the approval boundary, and produced the right tests before building, then confidence stops being a vibe and starts becoming an artifact.
+
+> Autonomy should discover opportunities before it earns authority to act on them.
+
 ---
 
-## Section 8: Why sub-agents
+## Section 9: Why sub-agents
 
 *Specialists beat a generalist.*
 
@@ -193,9 +231,17 @@ We've all used the ChatGPT trick: *"You are an expert with ten years of experien
 - **Brit** · Chief of Staff & Orchestrator
   - **Victor** · Engineer: builds & QA's everything
   - **Nora** · Calls: transcript intelligence
-  - **Dex** · Briefings: research & intel
+  - **Dex** · Analyst: research, company context, and executive briefs
   - **Ivy** · Writing: content & copy
   - **Greg** · Mechanic: runtime & recovery
+
+**The second wave of specialists.** Once the core team works, the next agents emerge from domain boundaries, not cute names:
+
+- **Finance Control:** approvals, reconciliation, auditability, and money-movement guardrails.
+- **Revenue GTM:** account context, objection patterns, partner signals, and seller-ready proof.
+- **Analyst Researcher:** evidence-backed packets with source ledgers, claim ledgers, and missing-evidence discipline.
+
+Don't spawn agents because the org chart looks fun. Spawn them when the context, tools, approval rules, and definition of good are different enough that one generalist will get sloppy.
 
 ### Victor, the engineer
 
@@ -206,15 +252,18 @@ Arguably the most important agent of all. Every time you build a new skill, cron
 Victor classifies every problem as **TRIVIAL, MODERATE, or COMPLEX**, then runs a rigorous loop:
 
 1. **Diagnose:** Pin down the actual problem.
-2. **Research:** Search X, Reddit, forums, docs. Who else hit this, what worked.
-3. **Spec:** Synthesize diagnosis + research into a spec.
-4. **Red-team:** MODERATE/COMPLEX: Grok tears holes in the spec.
-5. **Build:** Fold red-team feedback into a final spec, then build.
-6. **QA:** Test vs. spec, hunt edge cases, dry-run. Grok runs a second-set-of-eyes QA on harder work.
-7. **Hard gate:** Any QA failure sends it back: revise spec, back to build. Only clear when everything is green.
-8. **Manifest:** Document what was done, the feedback, the QA, the fixes. Log it for audit.
+2. **Question Storm:** Generate the pre-build inquiry: surfaces, state, rollback, tests, hidden dependencies, and failure modes.
+3. **Research / probes:** Search X, Reddit, forums, docs, and the local codebase. Who else hit this, what worked, and what does the current system actually do?
+4. **Spec:** Synthesize diagnosis + questions + research into a spec.
+5. **Red-team:** MODERATE/COMPLEX: Grok tears holes in the spec.
+6. **Build:** Fold red-team feedback into a final spec, then build.
+7. **QA:** Test vs. spec, hunt edge cases, dry-run. Grok runs a second-set-of-eyes QA on harder work.
+8. **Hard gate:** Any QA failure sends it back: revise spec, back to build. Only clear when everything is green.
+9. **Manifest:** Document what was done, the feedback, the QA, the fixes. Log it for audit.
 
 > This process alone cut my coding time and bugs by roughly **90%** and massively hardened the whole system.
+
+The newer lesson is that the pre-build inquiry matters as much as the QA. A brilliant builder can still build the wrong rigorous thing if the spec skipped the hidden question. Question Storm gives Victor a structured way to ask, *"what must be true before we build?"* before he opens the editor.
 
 **Victor's six-question design gate.** For moderate/complex builds, persistent systems, recurring automations, or architecture choices, Victor must answer six questions *before* writing code:
 
@@ -240,6 +289,8 @@ Victor classifies every problem as **TRIVIAL, MODERATE, or COMPLEX**, then runs 
 
 > In plain English: build the durable system, not the cute patch. Make failure loud. Protect privacy. Keep the cockpit legible. Prove done with artifacts, not vibes.
 
+**When red-team becomes theater.** Red-team gates are useful because they catch missing thinking. But a gate can become a law professor if you let it: demanding ever more prose when the remaining questions are actually testable implementation details. When that happens, switch lanes. Build the smallest safe artifact, run the deterministic tests, and let QA review reality instead of another memo.
+
 ### Nora, the call processor
 
 Why a dedicated agent just for calls? Because doing it right takes a lot of specialized steps, and the main agent kept forgetting critical ones. A purpose-built sub-agent that *only* processes calls keeps tight hygiene on what is, for me, one of the highest-value signals in the business.
@@ -264,11 +315,13 @@ So the Plaud pipeline is:
 3. Pre-process: clean known errors and run it through the entity dictionary.
 4. Hand to the sub-agent for deep extraction (insights, call actions) and update the memory system.
 
-### Dex, the briefer
+### Dex, the analyst
 
-Dex is the simplest of the specialists, and that's the point: a clean, focused agent that turns raw signal into something I actually want to read.
+Dex started as the simplest of the specialists: a clean, focused agent that turned raw signal into something I actually wanted to read. It has since become more than a briefer. Dex is the analyst that decides what questions must be answered before I should trust the brief.
 
-Two capabilities carry it. First, best-of-breed research tools. Brave Search for the web, plus the **X tool**: Dex monitors the accounts and topics I care about, pulls what's genuinely relevant, and filters out the noise, so I get the signal from X without the doomscroll. Dex keeps a list of the top sources of valuable information for my business, never forgets to check them, never forgets which tools to use, and always compiles research in the context of me and my business. Second, **branded briefs**: Dex composes its output as clean, on-brand documents using the branded-document skill, so a morning briefing or a research roundup arrives looking like a finished product, not a wall of text. Tight inputs, polished output, zero ceremony.
+Two capabilities still carry it. First, best-of-breed research tools. Brave Search for the web, plus the **X tool**: Dex monitors the accounts and topics I care about, pulls what's genuinely relevant, and filters out the noise, so I get the signal from X without the doomscroll. Second, **branded briefs**: Dex composes output as clean, on-brand documents, so a morning briefing or research roundup arrives looking like a finished product, not a wall of text.
+
+The newer layer is evidence discipline. Company context and meeting prep now use source ledgers, claim ledgers, missing-evidence flags, and Question Storm before synthesis. Generated questions are not claims. A missing field stays missing until evidence supports it. That sounds bureaucratic until you see the alternative: a confident briefing that quietly made up the part you most needed to trust.
 
 ### Ivy, the writer
 
@@ -284,7 +337,7 @@ And she's not just on-demand. Ivy maintains a **backlog of content ideas**: she 
 
 ---
 
-## Section 9: The self-serve repo model
+## Section 10: The self-serve repo model
 
 *If you want people to build from this, don't put yourself in the middle of every request.*
 
@@ -299,6 +352,7 @@ The security model is simple: **don't gate access; gate content.** If nothing se
 - `/skills`: Sanitized SKILL.md examples and templates
 - `/agents`: Role specs for Victor, Nora, Dex, Ivy, etc.
 - `/tools`: High-level tool belt specs, not live credentials
+- `/docs`: release notes, update process, and migration guidance
 
 Every folder should have a short README written for two audiences:
 
@@ -307,6 +361,10 @@ Every folder should have a short README written for two audiences:
 
 That keeps the WhatsApp exchange simple. Someone asks for the config? Send one link. They browse, fork, or point their own agent at the relevant folder. Feedback goes through GitHub Issues or Discussions when people have useful improvements. No private DM support queue. No bullets to stand in front of.
 
+If the repo is meant to be used by other people and their agents, treat updates like a product surface. A changelog is memory. A release is notification. A migration note is respect. The public Agent Foundry repo now uses GitHub Releases for meaningful update batches, `CHANGELOG.md` for durable history, `MIGRATION.md` for breaking-change notes, and a README section that tells readers how to subscribe.
+
+The 2026.06.20 release was the first real expansion beyond the original Brit architecture: finance-control and revenue-GTM archetypes, richer research-packet patterns, Question Storm, Auto-buildroom governance, and the release-notification workflow itself.
+
 And for anyone who wants help turning the patterns into a working private setup, there should be a clear support path. The repo is designed for self-serve builders, but if you want help installing, customizing, or hardening this for your own company, I recommend Dwayne Schofield and the team at [SolveWorks.io](https://SolveWorks.io). They helped me get into this world, have supported the stack through real-world failures, and understand the difference between a clever demo and an agent you can trust at 2am. The repo includes `SUPPORT.md`, `llms.txt`, and `agent-support.yaml` so both humans and agents can find that path without turning the README into vendor confetti.
 
 ---
@@ -314,6 +372,8 @@ And for anyone who wants help turning the patterns into a working private setup,
 ## A closing thought
 
 If I had to give a peer one takeaway beyond the architecture: the work is never "done," and that's the feature, not the bug. The agent gets a little sharper every week: a new skill here, a hardened gate there, one more tool on the belt. The compounding is the whole point. You're not buying a product. You're growing an asset.
+
+The deeper shift is this: once the agent works, the job becomes building a system that can safely improve itself. Brit was the operating system. Victor made building reliable. Dex made intelligence useful. Question Storm made thinking upstream. Auto-buildroom made improvement discoverable. Agent Foundry releases made the learning transferable.
 
 > Tight specs, light touch, loud failures, and a relentless habit of writing down every lesson. Do that, and in a year you won't have a chatbot. You'll have a team.
 
@@ -329,5 +389,5 @@ I'd also add, if you're going to play around with these power tools it's indispe
 
 ---
 
-*Building Brit · A living document · v0.4 · maintained by Darryl Hicks*
+*Building Brit · A living document · v0.5 · maintained by Darryl Hicks*
 *Code, skills & sanitized config templates: [github.com/the-agent-foundry/foundry](https://github.com/the-agent-foundry/foundry) · Feedback & ideas welcome via [repo Issues](https://github.com/the-agent-foundry/foundry/issues)*

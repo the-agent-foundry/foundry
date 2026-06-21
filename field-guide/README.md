@@ -13,7 +13,7 @@ The repo is built for self-serve use: a capable founder, operator, engineer, or 
 
 ## Why it leads
 
-The field guide makes the case for the whole approach: why an agent beats a chatbot, the art of the spec, the 10-80-10 of delegation, ranked design principles, security foundations, what skills are and why they compound, the case for specialist sub-agents, and the self-serve repo model that this repository implements.
+The field guide makes the case for the whole approach: why an agent beats a chatbot, the art of the spec, the 10-80-10 of delegation, Question Storm, ranked design principles, security foundations, what skills are and why they compound, the case for specialist sub-agents, Auto-buildroom, and the self-serve repo model that this repository implements.
 
 It is written for humans, but it is also meant to be handed to an agent. That is the point of this repo.
 
