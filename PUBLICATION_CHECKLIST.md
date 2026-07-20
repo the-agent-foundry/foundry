@@ -7,6 +7,7 @@ Use this before broad sharing, release tags, community imports, or turning priva
 - [ ] The public repo was built from a clean public-safe tree, not a casual private-to-public visibility flip.
 - [ ] Current tree scan is clean: `python3 gates/scripts/sanitize_scan.py .`.
 - [ ] Format lint is clean: `python3 gates/scripts/format_lint.py .`.
+- [ ] Synthetic fixture smoke test is clean: `python3 gates/scripts/fixture_smoke.py .`.
 - [ ] Gitleaks current-tree scan is clean: `gitleaks detect --source . --no-git --redact`.
 - [ ] Full-history provider-token scan is clean before major release: run the manual `release-sanitization` workflow or `gitleaks detect --source . --redact` locally. Separately review history and diffs for privacy/context leaks such as paths, emails, customer names, screenshots, transcripts, and IDs.
 - [ ] If any real credential ever touched GitHub, it was revoked/rotated before cleanup was treated as complete.
@@ -15,7 +16,7 @@ Use this before broad sharing, release tags, community imports, or turning priva
 
 - [ ] GitHub secret scanning is enabled.
 - [ ] GitHub push protection is enabled where available.
-- [ ] Required branch checks include sanitization, format lint, and Gitleaks.
+- [ ] Required branch checks include sanitization, format lint, synthetic fixture validation, and Gitleaks.
 - [ ] Security alerts are monitored by maintainers.
 - [ ] Public issues/PRs are not used to report live secrets.
 

@@ -27,7 +27,8 @@ The usual shape is one orchestrator that holds context and delegates, with speci
 - `AGENTS.template.md` : blank operating-instructions template.
 - `SOUL.template.md` : blank identity and voice template.
 - `profile-operating-model.md` : how to decide what stays with the orchestrator, what becomes a specialist profile, and what graduates to an autonomous loop.
-- `archetypes/` : nine field-tested role specs to adapt:
+- `model-calibrated-engineering.md` : one engineering governance core with different steering for completion-capable and hesitant models.
+- `archetypes/` : ten field-tested role specs to adapt:
   - `archetypes/orchestrator.md` : chief of staff, routes work, verifies specialists, and synthesizes decisions.
   - `archetypes/engineer.md` : builds and QAs systems with classification, research, design gate, red-team, QA, manifest, and approval doctrine.
   - `archetypes/call-processor.md` : turns recordings and transcripts into corrected business intelligence, memory, and routed actions.
@@ -35,6 +36,7 @@ The usual shape is one orchestrator that holds context and delegates, with speci
   - `archetypes/analyst-researcher.md` : produces decision-grade research packets with source ledgers, claim ledgers, contradictions, confidence labels, and orchestrator-owned handoff routing.
   - `archetypes/finance-control.md` : handles scoped finance operations with evidence-backed actions, approval classes, mutation ledgers, verification, and undo paths.
   - `archetypes/revenue-gtm.md` : supports GTM and sales enablement while separating internal strategy from externally approved claims.
+  - `archetypes/legal-operator.md` : internal legal operator / executive counsel desk with positive duties, matter isolation, primary-source rigor, and no external-action authority.
   - `archetypes/writer.md` : drafts in founder voice using a voice corpus, anti-slop corpus, recursive revision, and human final approval.
   - `archetypes/mechanic.md` : monitors runtime health, diagnoses outages, and recovers through tested paths.
 
@@ -48,6 +50,7 @@ The field guide uses named specialists. In this repo, the generic role names are
 - Dex: analyst researcher / briefer
 - Finance-control specialist: finance control agent
 - Revenue specialist: revenue GTM agent
+- Gideon: legal operator / executive counsel desk
 - Ivy: writer
 - Greg: mechanic
 
@@ -55,7 +58,7 @@ The field guide uses named specialists. In this repo, the generic role names are
 
 The public archetypes are sanitized, not hollow. They intentionally omit private prompts, live paths, credential handling, customer names, and internal logs, but they preserve the operating pattern well enough for another founder's agent to adapt.
 
-The first pass expanded the engineer archetype, represented by the sanitized Victor example. Later passes bring the rest of the specialist profiles up to the same public-useful standard, including the research-packet pattern behind a decision-grade analyst.
+The engineer archetype now includes model-calibrated completion and scope control: one governance core, bounded completion support for hesitant models, and tighter scope ceilings for more agentic models. The legal-operator archetype adds the positive-duty, matter-isolated pattern behind a useful internal counsel desk without publishing private runtime config.
 
 ## Pickup prompt
 

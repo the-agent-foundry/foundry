@@ -8,6 +8,9 @@ These are not private run records. They are shapes your own agent can copy into 
 
 - `research-packet-v1/` : packet structure for decision-grade analyst research: source ledger, claim ledger, contradictions, brief, human-facing companion, recommendation, orchestrator handoff, manifest, and errors.
 - `auto-buildroom-v1/` : proposal-only build governance fixture: idea contract, approval review, build plan, QA receipt, trust report, and operator summary.
+- `engineering-governance-v2/` : frozen acceptance, direct/adjacent/machinery finding taxonomy, retained checkpoints, and parent follow-through.
+- `model-onboarding-v1/` : exact-route source ledger, fixed evals, completion/restraint scoring, activation rehearsal, rollback, and drift detection.
+- `legal-operator-v1/` : matter-scoped legal-operator profile, request/handoff contracts, and safety plus over-conservatism evaluations.
 
 ## Pickup prompt
 

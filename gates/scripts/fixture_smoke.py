@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+"""Fail-closed validation for Agent Foundry's synthetic operating-pattern fixtures."""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+from typing import Any
+
+
+class FixtureError(ValueError):
+    pass
+
+
+def load_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise FixtureError(f"{path}: invalid JSON: {exc}") from exc
+
+
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        raise FixtureError(f"{path}: cannot read JSONL: {exc}") from exc
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise FixtureError(f"{path}:{line_number}: invalid JSONL row: {exc}") from exc
+        if not isinstance(value, dict):
+            raise FixtureError(f"{path}:{line_number}: JSONL row must be an object")
+        rows.append(value)
+    return rows
+
+
+def require(errors: list[str], condition: bool, message: str) -> None:
+    if not condition:
+        errors.append(message)
+
+
+def require_synthetic(errors: list[str], label: str, value: dict[str, Any]) -> None:
+    require(errors, value.get("synthetic") is True, f"{label}: fixture must declare synthetic true")
+    require(errors, value.get("authorizing") is False, f"{label}: fixture must declare authorizing false")
+
+
+def validate_engineering(examples: Path, errors: list[str]) -> None:
+    label = "engineering-governance-v2"
+    folder = examples / label
+    try:
+        acceptance = load_json(folder / "acceptance-contract.json")
+        findings = load_json(folder / "finding-ledger.json")
+        checkpoint = load_json(folder / "retained-checkpoint.json")
+        followthrough = load_json(folder / "parent-followthrough.json")
+        artifacts = [acceptance, findings, checkpoint, followthrough]
+        for name, artifact in zip(
+            ["acceptance-contract", "finding-ledger", "retained-checkpoint", "parent-followthrough"],
+            artifacts,
+        ):
+            require_synthetic(errors, f"{label}/{name}", artifact)
+
+        require(errors, {item.get("contract_id") for item in artifacts} == {"eng-demo-001"}, f"{label}: contract IDs do not match")
+        require(errors, acceptance.get("approval_state") == "synthetic_scenario_approved", f"{label}: approval state must be explicitly synthetic")
+        require(errors, acceptance.get("authoritative") is False, f"{label}: public fixture cannot claim authoritative state")
+        require(errors, acceptance.get("live_runtime_affected") is False, f"{label}: acceptance fixture cannot claim live runtime effect")
+        require(errors, findings.get("open_direct_p0_p1") == 0, f"{label}: direct P0/P1 remains open")
+        require(errors, findings.get("adjacent_activation_authority") is False, f"{label}: adjacent findings cannot authorize activation")
+        relationships = {"direct", "adjacent", "review_machinery"}
+        require(
+            errors,
+            all(item.get("relationship") in relationships for item in findings.get("findings", [])),
+            f"{label}: unknown finding relationship",
+        )
+        require(errors, checkpoint.get("work_abandoned") is False, f"{label}: retained checkpoint cannot abandon accepted work")
+        require(errors, followthrough.get("terminal_state") == "DONE_VERIFIED", f"{label}: parent follow-through is not terminal")
+        require(errors, followthrough.get("live_runtime_affected") is False, f"{label}: synthetic follow-through cannot claim live runtime effect")
+        require(errors, followthrough.get("external_send") is False, f"{label}: synthetic follow-through cannot claim external send")
+        require(errors, followthrough.get("service_restart") is False, f"{label}: synthetic follow-through cannot claim service restart")
+        require(errors, followthrough.get("rollback", {}).get("state") == "exercised", f"{label}: rollback witness is missing")
+    except (FixtureError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(f"{label}: malformed contract chain: {exc}")
+
+
+def validate_onboarding(examples: Path, errors: list[str]) -> None:
+    label = "model-onboarding-v1"
+    folder = examples / label
+    try:
+        sources = load_jsonl(folder / "source-ledger.jsonl")
+        matrix = load_json(folder / "route-matrix.json")
+        manifest = load_json(folder / "eval-manifest.json")
+        comparison = load_json(folder / "comparison-report.json")
+        activation = load_json(folder / "activation-receipt.json")
+        drift = load_json(folder / "drift-report.json")
+        for name, artifact in [
+            ("route-matrix", matrix),
+            ("eval-manifest", manifest),
+            ("comparison-report", comparison),
+            ("activation-receipt", activation),
+            ("drift-report", drift),
+        ]:
+            require_synthetic(errors, f"{label}/{name}", artifact)
+        for index, source in enumerate(sources, 1):
+            require_synthetic(errors, f"{label}/source-ledger row {index}", source)
+
+        require(errors, {manifest.get("manifest_id"), comparison.get("manifest_id"), activation.get("manifest_id")} == {"eval-demo-001"}, f"{label}: manifest IDs do not match")
+        route_ids = {item.get("route_id") for item in matrix.get("routes", [])}
+        require(errors, route_ids == {manifest.get("baseline_route"), manifest.get("candidate_route")}, f"{label}: route matrix and eval manifest disagree")
+        require(errors, set(comparison.get("results", {})) == route_ids, f"{label}: comparison does not cover every evaluated route")
+
+        floors = manifest.get("hard_floors", {})
+        hard_floor_pass = True
+        for route_id in sorted(route_ids):
+            result = comparison.get("results", {}).get(route_id, {})
+            checks = [
+                result.get("privacy_leaks") == floors.get("privacy_leaks"),
+                result.get("unauthorized_actions") == floors.get("unauthorized_actions"),
+                isinstance(result.get("route_provenance_match"), (int, float)) and result.get("route_provenance_match") >= floors.get("route_provenance_match", 1.0),
+                isinstance(result.get("valid_structured_output_rate"), (int, float)) and result.get("valid_structured_output_rate") >= floors.get("valid_structured_output_rate", 1.0),
+            ]
+            hard_floor_pass = hard_floor_pass and all(checks)
+            evidence = result.get("route_provenance_evidence", {})
+            require(errors, evidence.get("expected_route_id") == route_id, f"{label}: {route_id} provenance expected route is missing or wrong")
+            require(errors, evidence.get("observed_route_id") == route_id, f"{label}: {route_id} provenance observed route is missing or wrong")
+            require(errors, bool(evidence.get("call_receipt_id")), f"{label}: {route_id} provenance call receipt is missing")
+        require(errors, comparison.get("hard_floors_passed") is hard_floor_pass, f"{label}: hard_floors_passed does not match recomputed results")
+        require(errors, hard_floor_pass, f"{label}: recomputed hard floors did not pass")
+        require(errors, comparison.get("human_approval_for_live_activation") == "pending", f"{label}: synthetic live approval must remain pending")
+
+        source_ids = {source.get("source_id") for source in sources}
+        for route in matrix.get("routes", []):
+            require(errors, route.get("retention_status") == "unknown_for_synthetic_route", f"{label}: exact synthetic route retention must remain unknown")
+            require(errors, route.get("retention_source_id") in source_ids, f"{label}: route retention source is not in the source ledger")
+            require(errors, route.get("retention_claim_scope") == "provider_policy_only_exact_route_unverified", f"{label}: route privacy claim is over-broad")
+        require(errors, len(matrix.get("unknowns", [])) == len(route_ids), f"{label}: exact-route privacy unknowns are incomplete")
+
+        require(errors, activation.get("candidate_route") == manifest.get("candidate_route"), f"{label}: activation receipt route mismatch")
+        require(errors, activation.get("live_activation") is False, f"{label}: fixture cannot claim live activation")
+        require(errors, activation.get("candidate_reactivated") is False, f"{label}: rehearsal must end default-off")
+        require(errors, activation.get("rollback_exercised") is True, f"{label}: rollback was not exercised")
+        require(errors, activation.get("approval_required_for_live_activation") is True, f"{label}: live activation approval gate is missing")
+
+        route_identity_changed = drift.get("observed_route") != drift.get("accepted_route")
+        require(errors, drift.get("drift_detected") is route_identity_changed, f"{label}: drift flag does not match route identity")
+        require(errors, drift.get("automatic_effect") == "block_new_activation_and_require_re_evaluation", f"{label}: drift does not fail closed")
+        require(errors, drift.get("live_route_changed") is False, f"{label}: synthetic drift fixture cannot claim live route mutation")
+    except (FixtureError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(f"{label}: malformed contract chain: {exc}")
+
+
+def validate_legal(examples: Path, errors: list[str]) -> None:
+    label = "legal-operator-v1"
+    folder = examples / label
+    try:
+        profile = load_json(folder / "profile.example.json")
+        request = load_json(folder / "matter-request.json")
+        handoff = load_json(folder / "matter-handoff.json")
+        matrix = load_json(folder / "eval-matrix.json")
+        for name, artifact in [("profile", profile), ("matter-request", request), ("matter-handoff", handoff), ("eval-matrix", matrix)]:
+            require_synthetic(errors, f"{label}/{name}", artifact)
+
+        require(errors, profile.get("licensed_counsel") is False, f"{label}: profile cannot claim licensed counsel status")
+        public_tools = profile.get("modes", {}).get("public_research", {}).get("allowed_tools", [])
+        private_mode = profile.get("modes", {}).get("private_matter", {})
+        require(errors, "matter_scoped_draft_writer" not in public_tools, f"{label}: public mode exposes a private matter writer")
+        require(errors, "public_source_packet_writer" in public_tools, f"{label}: public mode lacks a sanitized source-packet writer")
+        require(errors, profile.get("modes", {}).get("public_research", {}).get("confidential_inputs_allowed") is False, f"{label}: public mode permits confidential inputs")
+        require(errors, private_mode.get("network_allowed") is False, f"{label}: private mode does not fail closed on network access")
+        require(errors, all(value == "absent" for value in profile.get("external_actions", {}).values()), f"{label}: external action capability must remain absent")
+        require(errors, profile.get("memory", {}).get("global_memory") == "disabled", f"{label}: global memory must be disabled")
+        require(errors, profile.get("memory", {}).get("session_resume") == "disabled", f"{label}: session resume must be disabled")
+        require(errors, profile.get("direct_entry", {}).get("usable_matter_authority") is False, f"{label}: direct entry cannot carry matter authority")
+
+        for key in ["run_id", "matter_id", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "authorized_inputs"]:
+            require(errors, request.get(key) == handoff.get(key), f"{label}: request/handoff binding mismatch for {key}")
+        require(errors, request.get("external_action_authority") is False, f"{label}: request cannot grant external action authority")
+        require(errors, handoff.get("external_action_taken") is False, f"{label}: handoff claims an external action")
+        require(errors, handoff.get("gate_state") == "PARTIAL_BLOCKED_SLICE", f"{label}: handoff gate state is missing or wrong")
+        require(errors, handoff.get("confidence") in {"verified", "likely", "weak", "contested"}, f"{label}: handoff confidence is invalid")
+        require(errors, bool(handoff.get("bottom_line")) and bool(handoff.get("recommended_position")), f"{label}: handoff is disclaimer-first or lacks a recommendation")
+        require(errors, bool(handoff.get("completed_unaffected_lanes")), f"{label}: handoff did not finish unaffected lanes")
+        blocked = handoff.get("blocked_slice", {})
+        require(errors, blocked.get("owner") == request.get("owner"), f"{label}: blocked-slice owner does not match request")
+        require(errors, blocked.get("deadline") == request.get("deadline"), f"{label}: blocked-slice deadline does not match request")
+
+        input_versions = {(item.get("artifact_id"), item.get("version")) for item in request.get("authorized_inputs", [])}
+        source_versions = {(item.get("artifact_id"), item.get("version")) for item in handoff.get("sources", [])}
+        require(errors, bool(source_versions), f"{label}: handoff source ledger is empty")
+        require(errors, source_versions.issubset(input_versions), f"{label}: handoff source is not bound to an authorized input version")
+        require(errors, all(source.get("synthetic") is True and source.get("pinpoints") for source in handoff.get("sources", [])), f"{label}: source provenance or pinpoint is missing")
+
+        require(errors, bool(matrix.get("safety_cases")), f"{label}: safety evaluation cases are missing")
+        require(errors, bool(matrix.get("usefulness_cases")), f"{label}: usefulness evaluation cases are missing")
+        require(errors, bool(matrix.get("over_conservatism_failures")), f"{label}: over-conservatism evaluation is missing")
+        require(errors, all(value == 0 for value in matrix.get("hard_floors", {}).values()), f"{label}: hard floors must require zero failures")
+    except (FixtureError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(f"{label}: malformed contract chain: {exc}")
+
+
+def validate(root: Path) -> list[str]:
+    errors: list[str] = []
+    examples = root / "examples"
+
+    for path in sorted(examples.rglob("*.json")):
+        try:
+            load_json(path)
+        except FixtureError as exc:
+            errors.append(str(exc))
+    for path in sorted(examples.rglob("*.jsonl")):
+        try:
+            load_jsonl(path)
+        except FixtureError as exc:
+            errors.append(str(exc))
+
+    validate_engineering(examples, errors)
+    validate_onboarding(examples, errors)
+    validate_legal(examples, errors)
+    return errors
+
+
+def main(argv: list[str]) -> int:
+    root = Path(argv[1] if len(argv) > 1 else ".").resolve()
+    errors = validate(root)
+    if errors:
+        for error in errors:
+            print(error)
+        print(f"fixture_smoke: FAILED. {len(errors)} error(s).")
+        return 1
+    print("fixture_smoke: CLEAN. Syntax, synthetic authority, lifecycle, route, rollback, drift, and matter bindings passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

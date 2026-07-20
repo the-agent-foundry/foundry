@@ -10,6 +10,20 @@ This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 - Repository update-notification workflow: GitHub Releases, changelog, release notes, and migration guidance.
 - Reader subscription instructions in `README.md`.
 - Maintainer release process in `docs/release-process.md`.
+- Model-calibrated engineering governance for completion-capable, hesitant, and mixed model fleets.
+- Model-onboarding skill and synthetic exact-route evaluation/activation fixture.
+- Legal-operator / executive counsel-desk archetype and synthetic matter-scoped config fixture.
+- Engineering-governance v2 fixture with frozen acceptance, finding relationships, retained checkpoints, and parent follow-through.
+
+### Updated
+- Engineer, red-team, QA, build-manifest, and Auto-buildroom patterns now separate direct defects, adjacent improvements, and review-machinery failures.
+- Completion proof now distinguishes worker build, independent review, parent promotion, live activation, runtime readback, and rollback.
+
+### Breaking changes
+- None. Existing forks may adopt the new governance fields incrementally.
+
+### Migration notes
+- Do not copy older completion-heavy engineer prompts wholesale into more agentic models. Keep the structural governance core and add only the bounded completion-support module when fixed evaluations show premature stopping.
 
 ### Action needed
 - Maintainers should publish a GitHub Release after merging a meaningful update batch to `main`.
