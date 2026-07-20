@@ -290,6 +290,10 @@ def validate_legal(examples: Path, errors: list[str]) -> None:
         for key in required_bindings:
             require(errors, key in request and key in handoff, f"{label}: mandatory request/handoff binding is missing for {key}")
             require(errors, request.get(key) == handoff.get(key), f"{label}: request/handoff binding mismatch for {key}")
+        nonempty_identity_bindings = ["run_id", "matter_id", "requester", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "profile_generation"]
+        for key in nonempty_identity_bindings:
+            value = request.get(key)
+            require(errors, isinstance(value, str) and bool(value.strip()), f"{label}: identity binding must be non-empty for {key}")
         expected_input_hashes = [item.get("sha256") for item in request.get("authorized_inputs", [])]
         require(errors, bool(expected_input_hashes) and request.get("input_hashes") == expected_input_hashes, f"{label}: input-hash binding does not match authorized inputs")
         require(errors, bool(request.get("profile_generation")), f"{label}: profile generation binding is missing")

@@ -86,7 +86,7 @@ qa:
     - criterion: Synthetic contract chains parse and agree.
       evidence: python3 gates/scripts/fixture_smoke.py . -> CLEAN
     - criterion: Gate regressions pass.
-      evidence: python3 -m unittest discover -s gates/tests -v -> 31 passed
+      evidence: python3 -m unittest discover -s gates/tests -v -> 32 passed
     - criterion: Maintained secret scanner is clean.
       evidence: gitleaks detect --source . --no-git --redact -> no leaks found
     - criterion: Repository history contains no detected maintained secret patterns.
@@ -151,6 +151,11 @@ adversarial_remediation:
     - AFR-F04: profile, request, and handoff share one exact run-binding schema including requester, input hashes, and profile generation
     - AFR-F05: committed adversarial tests assert specific validator failures for lifecycle, identity, authority, and binding mutations
   fourth_pass_adversarial_matrix: 17/17 unsafe mutations rejected
+  fifth_pass_cross_model_verdict: APPROVE_WITH_CHANGES
+  fifth_pass_direct_p0_p1: 1
+  fifth_pass_repair:
+    - RT-P1-01: run, matter, requester, owner, audience, mode, jurisdiction, as-of, deadline, and profile-generation identities now reject empty or whitespace-only bindings
+  fifth_pass_empty_binding_matrix: 9/9 unsafe mutations rejected
   final_cross_model_review: pending
 
 safe_workspace_and_activation:

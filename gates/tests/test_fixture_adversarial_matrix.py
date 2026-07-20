@@ -122,6 +122,23 @@ class FixtureAdversarialMatrixTests(unittest.TestCase):
         with self.subTest(key="input_hash_inventory"):
             self.assert_rejected([(base + "matter-request.json", lambda value: value.update(input_hashes=["wrong-hash"])), (base + "matter-handoff.json", lambda value: value.update(input_hashes=["wrong-hash"]))], "input-hash binding does not match authorized inputs")
 
+    def test_legal_identity_bindings_reject_blank_and_whitespace(self):
+        base = "examples/legal-operator-v1/"
+        keys = ("run_id", "matter_id", "requester", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "profile_generation")
+        for key in keys:
+            for bad_value in ("", " \t "):
+                with self.subTest(key=key, bad_value=repr(bad_value)):
+                    def mutate_handoff(value, key=key, bad_value=bad_value):
+                        value[key] = bad_value
+                        if key in {"owner", "deadline"}:
+                            value["blocked_slice"][key] = bad_value
+
+                    mutations = [
+                        (base + "matter-request.json", lambda value, key=key, bad_value=bad_value: value.update({key: bad_value})),
+                        (base + "matter-handoff.json", mutate_handoff),
+                    ]
+                    self.assert_rejected(mutations, f"identity binding must be non-empty for {key}")
+
     def test_legal_profile_binding_contract_mutations_are_rejected(self):
         base = "examples/legal-operator-v1/"
         for key in ("matter_id", "profile_generation"):
