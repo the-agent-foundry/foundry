@@ -64,6 +64,10 @@ def validate_engineering(examples: Path, errors: list[str]) -> None:
             require_synthetic(errors, f"{label}/{name}", artifact)
 
         require(errors, {item.get("contract_id") for item in artifacts} == {"eng-demo-001"}, f"{label}: contract IDs do not match")
+        candidate_ids = {findings.get("candidate_id"), checkpoint.get("candidate_id"), followthrough.get("candidate_id")}
+        candidate_digests = {findings.get("candidate_digest"), checkpoint.get("candidate_digest"), followthrough.get("candidate_digest")}
+        require(errors, len(candidate_ids) == 1 and None not in candidate_ids and all(candidate_ids), f"{label}: candidate IDs do not bind one immutable candidate")
+        require(errors, len(candidate_digests) == 1 and None not in candidate_digests and all(candidate_digests), f"{label}: candidate digests do not bind one immutable candidate")
         require(errors, acceptance.get("approval_state") == "synthetic_scenario_approved", f"{label}: approval state must be explicitly synthetic")
         require(errors, acceptance.get("authoritative") is False, f"{label}: public fixture cannot claim authoritative state")
         require(errors, acceptance.get("live_runtime_affected") is False, f"{label}: acceptance fixture cannot claim live runtime effect")
@@ -152,6 +156,9 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
                 "provider": item.get("provider"),
                 "model": item.get("model"),
                 "endpoint_class": item.get("endpoint_class"),
+                "tools": item.get("tools"),
+                "structured_output": item.get("structured_output"),
+                "fallback": item.get("fallback"),
             }
             for item in route_rows
         }
@@ -210,6 +217,7 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
         require(errors, len(matrix.get("unknowns", [])) == len(route_ids), f"{label}: exact-route privacy unknowns are incomplete")
 
         require(errors, activation.get("candidate_route") == manifest.get("candidate_route"), f"{label}: activation receipt route mismatch")
+        require(errors, bool(manifest.get("candidate_generation")) and activation.get("generation_id") == manifest.get("candidate_generation"), f"{label}: activation generation does not match the candidate generation")
         require(errors, activation.get("state") == "DISPOSABLE_ACTIVATION_REHEARSAL_PASSED", f"{label}: activation receipt is not a disposable rehearsal")
         require(errors, activation.get("inactive_generation_validated") is True, f"{label}: inactive generation was not validated")
         require(errors, activation.get("actual_consumer_readback") == manifest.get("candidate_route"), f"{label}: candidate consumer readback mismatch")
@@ -223,6 +231,7 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
         require(errors, activation.get("approval_required_for_live_activation") is True, f"{label}: live activation approval gate is missing")
 
         require(errors, drift.get("accepted_route_id") == manifest.get("candidate_route"), f"{label}: drift accepted route ID mismatch")
+        require(errors, drift.get("accepted_generation") == manifest.get("candidate_generation") == activation.get("generation_id"), f"{label}: drift, manifest, and activation generations do not match")
         require(errors, drift.get("accepted_route") == route_details.get(manifest.get("candidate_route")), f"{label}: drift accepted route detail is not bound to the route matrix")
         route_identity_changed = (
             drift.get("observed_route_id") != drift.get("accepted_route_id")
@@ -263,10 +272,27 @@ def validate_legal(examples: Path, errors: list[str]) -> None:
         require(errors, profile.get("memory", {}).get("session_resume") == "disabled", f"{label}: session resume must be disabled")
         require(errors, profile.get("direct_entry", {}).get("usable_matter_authority") is False, f"{label}: direct entry cannot carry matter authority")
 
-        required_bindings = ["run_id", "matter_id", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "authorized_inputs"]
+        required_bindings = [
+            "run_id",
+            "matter_id",
+            "requester",
+            "owner",
+            "audience",
+            "mode",
+            "jurisdiction_hypothesis",
+            "as_of",
+            "deadline",
+            "authorized_inputs",
+            "input_hashes",
+            "profile_generation",
+        ]
+        require(errors, set(profile.get("required_run_bindings", [])) == set(required_bindings), f"{label}: profile required-run-binding schema is incomplete or contains unknown keys")
         for key in required_bindings:
             require(errors, key in request and key in handoff, f"{label}: mandatory request/handoff binding is missing for {key}")
             require(errors, request.get(key) == handoff.get(key), f"{label}: request/handoff binding mismatch for {key}")
+        expected_input_hashes = [item.get("sha256") for item in request.get("authorized_inputs", [])]
+        require(errors, bool(expected_input_hashes) and request.get("input_hashes") == expected_input_hashes, f"{label}: input-hash binding does not match authorized inputs")
+        require(errors, bool(request.get("profile_generation")), f"{label}: profile generation binding is missing")
         require(errors, request.get("external_action_authority") is False, f"{label}: request cannot grant external action authority")
         require(errors, handoff.get("external_action_taken") is False, f"{label}: handoff claims an external action")
         require(errors, handoff.get("gate_state") == "PARTIAL_BLOCKED_SLICE", f"{label}: handoff gate state is missing or wrong")

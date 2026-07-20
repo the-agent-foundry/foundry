@@ -1,17 +1,29 @@
 {
   "schema_version": "model-onboarding/drift-report/v1",
-  "accepted_generation": "generation-demo-candidate-v2",
+  "accepted_generation": "synthetic-generation-b",
   "accepted_route_id": "candidate-route",
   "observed_route_id": "candidate-route",
   "observed_route": {
     "provider": "provider-b",
-    "model": "candidate-model-v2-revision-x",
-    "endpoint_class": "responses"
+    "model": "candidate-model-revision",
+    "endpoint_class": "responses",
+    "tools": [
+      "read",
+      "test"
+    ],
+    "structured_output": true,
+    "fallback": "none"
   },
   "accepted_route": {
     "provider": "provider-b",
     "model": "candidate-model-v2",
-    "endpoint_class": "responses"
+    "endpoint_class": "responses",
+    "tools": [
+      "read",
+      "test"
+    ],
+    "structured_output": true,
+    "fallback": "none"
   },
   "drift_detected": true,
   "drift_class": "model_identity_changed",

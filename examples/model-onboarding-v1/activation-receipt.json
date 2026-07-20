@@ -2,7 +2,7 @@
   "schema_version": "model-onboarding/activation-receipt/v1",
   "manifest_id": "eval-demo-001",
   "candidate_route": "candidate-route",
-  "generation_id": "generation-demo-candidate-v2",
+  "generation_id": "synthetic-generation-b",
   "state": "DISPOSABLE_ACTIVATION_REHEARSAL_PASSED",
   "inactive_generation_validated": true,
   "actual_consumer_readback": "candidate-route",
@@ -19,11 +19,23 @@
   "actual_consumer_route": {
     "provider": "provider-b",
     "model": "candidate-model-v2",
-    "endpoint_class": "responses"
+    "endpoint_class": "responses",
+    "tools": [
+      "read",
+      "test"
+    ],
+    "structured_output": true,
+    "fallback": "none"
   },
   "predecessor_readback_route": {
     "provider": "provider-a",
     "model": "baseline-model-v1",
-    "endpoint_class": "responses"
+    "endpoint_class": "responses",
+    "tools": [
+      "read",
+      "test"
+    ],
+    "structured_output": true,
+    "fallback": "none"
   }
 }

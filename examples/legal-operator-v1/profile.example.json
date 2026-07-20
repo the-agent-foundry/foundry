@@ -29,6 +29,10 @@
     "owner",
     "audience",
     "mode",
+    "jurisdiction_hypothesis",
+    "as_of",
+    "deadline",
+    "authorized_inputs",
     "input_hashes",
     "profile_generation"
   ],

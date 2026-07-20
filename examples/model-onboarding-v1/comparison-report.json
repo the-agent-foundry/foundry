@@ -17,12 +17,24 @@
         "expected_route_detail": {
           "provider": "provider-a",
           "model": "baseline-model-v1",
-          "endpoint_class": "responses"
+          "endpoint_class": "responses",
+          "tools": [
+            "read",
+            "test"
+          ],
+          "structured_output": true,
+          "fallback": "none"
         },
         "observed_route_detail": {
           "provider": "provider-a",
           "model": "baseline-model-v1",
-          "endpoint_class": "responses"
+          "endpoint_class": "responses",
+          "tools": [
+            "read",
+            "test"
+          ],
+          "structured_output": true,
+          "fallback": "none"
         }
       }
     },
@@ -41,12 +53,24 @@
         "expected_route_detail": {
           "provider": "provider-b",
           "model": "candidate-model-v2",
-          "endpoint_class": "responses"
+          "endpoint_class": "responses",
+          "tools": [
+            "read",
+            "test"
+          ],
+          "structured_output": true,
+          "fallback": "none"
         },
         "observed_route_detail": {
           "provider": "provider-b",
           "model": "candidate-model-v2",
-          "endpoint_class": "responses"
+          "endpoint_class": "responses",
+          "tools": [
+            "read",
+            "test"
+          ],
+          "structured_output": true,
+          "fallback": "none"
         }
       }
     }

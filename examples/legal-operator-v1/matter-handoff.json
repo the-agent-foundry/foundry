@@ -58,5 +58,10 @@
   },
   "external_action_taken": false,
   "synthetic": true,
-  "authorizing": false
+  "authorizing": false,
+  "requester": "synthetic-executive-requester",
+  "profile_generation": "synthetic-legal-profile-v1",
+  "input_hashes": [
+    "synthetic-document-v1"
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "engineering-governance/parent-followthrough/v1",
   "contract_id": "eng-demo-001",
-  "candidate_id": "candidate-demo-b",
+  "candidate_id": "synthetic-candidate-b",
   "worker_state": "BUILT_QA_APPROVED",
   "deployment_required": true,
   "backup": {
@@ -26,5 +26,6 @@
   "live_runtime_affected": false,
   "terminal_state": "DONE_VERIFIED",
   "synthetic": true,
-  "authorizing": false
+  "authorizing": false,
+  "candidate_digest": "synthetic-candidate-b-digest"
 }

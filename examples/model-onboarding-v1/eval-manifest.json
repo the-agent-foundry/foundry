@@ -20,5 +20,7 @@
   },
   "benchmark_mutation_allowed": false,
   "synthetic": true,
-  "authorizing": false
+  "authorizing": false,
+  "baseline_generation": "synthetic-generation-a",
+  "candidate_generation": "synthetic-generation-b"
 }

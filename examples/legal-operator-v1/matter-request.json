@@ -2,7 +2,7 @@
   "schema_version": "legal-operator/matter-request/v1",
   "run_id": "run-synthetic-001",
   "matter_id": "matter-synthetic-nda-001",
-  "requester": "operations-lead",
+  "requester": "synthetic-executive-requester",
   "owner": "business-owner",
   "audience": "internal-decision-team",
   "mode": "PRIVATE_MATTER",
@@ -22,5 +22,9 @@
   ],
   "external_action_authority": false,
   "synthetic": true,
-  "authorizing": false
+  "authorizing": false,
+  "profile_generation": "synthetic-legal-profile-v1",
+  "input_hashes": [
+    "synthetic-document-v1"
+  ]
 }
