@@ -86,13 +86,13 @@ qa:
     - criterion: Synthetic contract chains parse and agree.
       evidence: python3 gates/scripts/fixture_smoke.py . -> CLEAN
     - criterion: Gate regressions pass.
-      evidence: python3 -m unittest discover -s gates/tests -v -> 20 passed
+      evidence: python3 -m unittest discover -s gates/tests -v -> 26 passed
     - criterion: Maintained secret scanner is clean.
       evidence: gitleaks detect --source . --no-git --redact -> no leaks found
     - criterion: Repository history contains no detected maintained secret patterns.
       evidence: gitleaks detect --source . --redact -> 22 commits scanned, no leaks found
     - criterion: Core new prose passes the repository content QA gate.
-      evidence: Nine engineer/model/legal/update/example documents passed
+      evidence: Twenty-five changed Markdown documents passed
   commands:
     - command: python3 gates/scripts/format_lint.py .
       exit_code: 0
@@ -128,6 +128,11 @@ adversarial_remediation:
     - AF-04: validator now fails closed on synthetic authority, lifecycle, route, rollback, drift, privacy, and matter-binding mutations
   bounded_p2_repair:
     - AF-05: provider policy no longer overclaims exact-route retention eligibility
+  second_pass_verdict: BLOCK
+  second_pass_direct_p0_p1: 2
+  second_pass_repairs:
+    - RR-01: exact hard-floor and result-metric schemas now reject omitted and Boolean safety metrics
+    - RR-02: activation, candidate readback, predecessor backup/readback, default-off state, and route-ID/detail drift are now jointly bound
   final_cross_model_review: pending
 
 safe_workspace_and_activation:

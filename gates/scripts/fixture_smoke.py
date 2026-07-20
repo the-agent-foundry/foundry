@@ -112,10 +112,33 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
         require(errors, set(comparison.get("results", {})) == route_ids, f"{label}: comparison does not cover every evaluated route")
 
         floors = manifest.get("hard_floors", {})
+        required_floor_keys = {
+            "privacy_leaks",
+            "unauthorized_actions",
+            "route_provenance_match",
+            "valid_structured_output_rate",
+        }
+        require(errors, set(floors) == required_floor_keys, f"{label}: hard-floor schema is incomplete or contains unknown keys")
+        require(
+            errors,
+            all(isinstance(floors.get(key), (int, float)) and not isinstance(floors.get(key), bool) for key in required_floor_keys),
+            f"{label}: hard-floor values must be numeric and non-Boolean",
+        )
         hard_floor_pass = True
         for route_id in sorted(route_ids):
             result = comparison.get("results", {}).get(route_id, {})
+            required_result_keys = required_floor_keys | {"quality_score", "completion_score", "restraint_score", "route_provenance_evidence"}
+            result_schema_complete = required_result_keys.issubset(result)
+            result_types_valid = all(
+                isinstance(result.get(key), (int, float)) and not isinstance(result.get(key), bool)
+                for key in required_floor_keys | {"quality_score", "completion_score", "restraint_score"}
+            )
+            require(errors, result_schema_complete, f"{label}: {route_id} result schema is incomplete")
+            require(errors, result_types_valid, f"{label}: {route_id} result metrics must be numeric and non-Boolean")
             checks = [
+                set(floors) == required_floor_keys,
+                result_schema_complete,
+                result_types_valid,
                 result.get("privacy_leaks") == floors.get("privacy_leaks"),
                 result.get("unauthorized_actions") == floors.get("unauthorized_actions"),
                 isinstance(result.get("route_provenance_match"), (int, float)) and result.get("route_provenance_match") >= floors.get("route_provenance_match", 1.0),
@@ -138,12 +161,21 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
         require(errors, len(matrix.get("unknowns", [])) == len(route_ids), f"{label}: exact-route privacy unknowns are incomplete")
 
         require(errors, activation.get("candidate_route") == manifest.get("candidate_route"), f"{label}: activation receipt route mismatch")
+        require(errors, activation.get("state") == "DISPOSABLE_ACTIVATION_REHEARSAL_PASSED", f"{label}: activation receipt is not a disposable rehearsal")
+        require(errors, activation.get("inactive_generation_validated") is True, f"{label}: inactive generation was not validated")
+        require(errors, activation.get("actual_consumer_readback") == manifest.get("candidate_route"), f"{label}: candidate consumer readback mismatch")
+        require(errors, activation.get("predecessor_backup_verified") is True, f"{label}: predecessor backup was not verified")
         require(errors, activation.get("live_activation") is False, f"{label}: fixture cannot claim live activation")
         require(errors, activation.get("candidate_reactivated") is False, f"{label}: rehearsal must end default-off")
         require(errors, activation.get("rollback_exercised") is True, f"{label}: rollback was not exercised")
+        require(errors, activation.get("predecessor_readback_after_rollback") == manifest.get("baseline_route"), f"{label}: predecessor rollback readback mismatch")
         require(errors, activation.get("approval_required_for_live_activation") is True, f"{label}: live activation approval gate is missing")
 
-        route_identity_changed = drift.get("observed_route") != drift.get("accepted_route")
+        require(errors, drift.get("accepted_route_id") == manifest.get("candidate_route"), f"{label}: drift accepted route ID mismatch")
+        route_identity_changed = (
+            drift.get("observed_route_id") != drift.get("accepted_route_id")
+            or drift.get("observed_route") != drift.get("accepted_route")
+        )
         require(errors, drift.get("drift_detected") is route_identity_changed, f"{label}: drift flag does not match route identity")
         require(errors, drift.get("automatic_effect") == "block_new_activation_and_require_re_evaluation", f"{label}: drift does not fail closed")
         require(errors, drift.get("live_route_changed") is False, f"{label}: synthetic drift fixture cannot claim live route mutation")
