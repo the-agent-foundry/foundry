@@ -1,0 +1,22 @@
+{
+  "schema_version": "model-onboarding/drift-report/v1",
+  "accepted_generation": "generation-demo-candidate-v2",
+  "accepted_route_id": "candidate-route",
+  "observed_route_id": "candidate-route",
+  "observed_route": {
+    "provider": "provider-b",
+    "model": "candidate-model-v2-revision-x",
+    "endpoint_class": "responses"
+  },
+  "accepted_route": {
+    "provider": "provider-b",
+    "model": "candidate-model-v2",
+    "endpoint_class": "responses"
+  },
+  "drift_detected": true,
+  "drift_class": "model_identity_changed",
+  "automatic_effect": "block_new_activation_and_require_re_evaluation",
+  "live_route_changed": false,
+  "synthetic": true,
+  "authorizing": false
+}

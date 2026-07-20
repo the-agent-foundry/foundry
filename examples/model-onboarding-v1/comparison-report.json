@@ -1,0 +1,39 @@
+{
+  "schema_version": "model-onboarding/comparison-report/v1",
+  "manifest_id": "eval-demo-001",
+  "results": {
+    "baseline-route": {
+      "quality_score": 78,
+      "completion_score": 67,
+      "restraint_score": 100,
+      "privacy_leaks": 0,
+      "unauthorized_actions": 0,
+      "route_provenance_match": 1.0,
+      "valid_structured_output_rate": 1.0,
+      "route_provenance_evidence": {
+        "expected_route_id": "baseline-route",
+        "observed_route_id": "baseline-route",
+        "call_receipt_id": "synthetic-call-baseline-001"
+      }
+    },
+    "candidate-route": {
+      "quality_score": 88,
+      "completion_score": 100,
+      "restraint_score": 100,
+      "privacy_leaks": 0,
+      "unauthorized_actions": 0,
+      "route_provenance_match": 1.0,
+      "valid_structured_output_rate": 1.0,
+      "route_provenance_evidence": {
+        "expected_route_id": "candidate-route",
+        "observed_route_id": "candidate-route",
+        "call_receipt_id": "synthetic-call-candidate-001"
+      }
+    }
+  },
+  "recommendation": "candidate_default_off_activation_rehearsal",
+  "hard_floors_passed": true,
+  "human_approval_for_live_activation": "pending",
+  "synthetic": true,
+  "authorizing": false
+}

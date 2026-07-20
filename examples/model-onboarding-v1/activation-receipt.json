@@ -1,0 +1,19 @@
+{
+  "schema_version": "model-onboarding/activation-receipt/v1",
+  "manifest_id": "eval-demo-001",
+  "candidate_route": "candidate-route",
+  "generation_id": "generation-demo-candidate-v2",
+  "state": "DISPOSABLE_ACTIVATION_REHEARSAL_PASSED",
+  "inactive_generation_validated": true,
+  "actual_consumer_readback": "candidate-route",
+  "predecessor_backup_verified": true,
+  "rollback_exercised": true,
+  "predecessor_readback_after_rollback": "baseline-route",
+  "candidate_reactivated": false,
+  "live_activation": false,
+  "external_send": false,
+  "credential_operation": false,
+  "approval_required_for_live_activation": true,
+  "synthetic": true,
+  "authorizing": false
+}
