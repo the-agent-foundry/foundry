@@ -13,7 +13,17 @@
       "route_provenance_evidence": {
         "expected_route_id": "baseline-route",
         "observed_route_id": "baseline-route",
-        "call_receipt_id": "synthetic-call-baseline-001"
+        "call_receipt_id": "synthetic-call-baseline-001",
+        "expected_route_detail": {
+          "provider": "provider-a",
+          "model": "baseline-model-v1",
+          "endpoint_class": "responses"
+        },
+        "observed_route_detail": {
+          "provider": "provider-a",
+          "model": "baseline-model-v1",
+          "endpoint_class": "responses"
+        }
       }
     },
     "candidate-route": {
@@ -27,7 +37,17 @@
       "route_provenance_evidence": {
         "expected_route_id": "candidate-route",
         "observed_route_id": "candidate-route",
-        "call_receipt_id": "synthetic-call-candidate-001"
+        "call_receipt_id": "synthetic-call-candidate-001",
+        "expected_route_detail": {
+          "provider": "provider-b",
+          "model": "candidate-model-v2",
+          "endpoint_class": "responses"
+        },
+        "observed_route_detail": {
+          "provider": "provider-b",
+          "model": "candidate-model-v2",
+          "endpoint_class": "responses"
+        }
       }
     }
   },

@@ -147,7 +147,7 @@ class FixtureSmokeTests(unittest.TestCase):
             root = copy_repository_examples(temp)
             path = root / "examples/legal-operator-v1/profile.example.json"
             mutate_json(path, lambda value: value["modes"]["public_research"]["allowed_tools"].append("matter_scoped_draft_writer"))
-            self.assertTrue(any("public mode exposes a private matter writer" in error for error in MODULE.validate(root)))
+            self.assertTrue(any("public tool inventory is incomplete or crosses into private matter capability" in error for error in MODULE.validate(root)))
 
     def test_legal_request_cannot_grant_external_authority(self):
         with tempfile.TemporaryDirectory() as temp:

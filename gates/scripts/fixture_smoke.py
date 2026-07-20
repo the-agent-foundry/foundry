@@ -67,20 +67,43 @@ def validate_engineering(examples: Path, errors: list[str]) -> None:
         require(errors, acceptance.get("approval_state") == "synthetic_scenario_approved", f"{label}: approval state must be explicitly synthetic")
         require(errors, acceptance.get("authoritative") is False, f"{label}: public fixture cannot claim authoritative state")
         require(errors, acceptance.get("live_runtime_affected") is False, f"{label}: acceptance fixture cannot claim live runtime effect")
-        require(errors, findings.get("open_direct_p0_p1") == 0, f"{label}: direct P0/P1 remains open")
-        require(errors, findings.get("adjacent_activation_authority") is False, f"{label}: adjacent findings cannot authorize activation")
+
+        finding_rows = findings.get("findings", [])
         relationships = {"direct", "adjacent", "review_machinery"}
-        require(
-            errors,
-            all(item.get("relationship") in relationships for item in findings.get("findings", [])),
-            f"{label}: unknown finding relationship",
+        require(errors, isinstance(finding_rows, list) and bool(finding_rows), f"{label}: finding ledger is empty")
+        require(errors, all(item.get("relationship") in relationships for item in finding_rows), f"{label}: unknown finding relationship")
+        direct_closed = {"incorporated", "rejected_with_evidence"}
+        machinery_closed = {"machinery_repaired", "rejected_with_evidence"}
+        calculated_open_direct = sum(
+            1
+            for item in finding_rows
+            if item.get("relationship") == "direct"
+            and item.get("severity") in {"P0", "P1"}
+            and item.get("disposition") not in direct_closed
         )
+        require(errors, findings.get("open_direct_p0_p1") == calculated_open_direct, f"{label}: open direct P0/P1 count does not match finding dispositions")
+        require(errors, calculated_open_direct == 0, f"{label}: direct P0/P1 remains open")
+        require(errors, all(item.get("disposition") == "proposal_only" for item in finding_rows if item.get("relationship") == "adjacent"), f"{label}: adjacent finding escaped proposal-only disposition")
+        require(errors, all(item.get("disposition") in machinery_closed for item in finding_rows if item.get("relationship") == "review_machinery"), f"{label}: review-machinery finding is not closed")
+        require(errors, findings.get("adjacent_activation_authority") is False, f"{label}: adjacent findings cannot authorize activation")
+
         require(errors, checkpoint.get("work_abandoned") is False, f"{label}: retained checkpoint cannot abandon accepted work")
+        require(errors, checkpoint.get("new_approval_required") is False, f"{label}: retained checkpoint cannot manufacture a new approval gate")
+        require(errors, bool(checkpoint.get("passed_gates")) and bool(checkpoint.get("open_gates")), f"{label}: retained checkpoint gate inventory is incomplete")
+        require(errors, bool(checkpoint.get("next_smallest_action")), f"{label}: retained checkpoint next action is missing")
+
+        backup = followthrough.get("backup", {})
+        promotion = followthrough.get("promotion", {})
+        runtime = followthrough.get("runtime_verification", {})
+        rollback = followthrough.get("rollback", {})
+        require(errors, backup.get("state") == "verified" and bool(backup.get("inventory_sha256")), f"{label}: predecessor backup witness is incomplete")
+        require(errors, promotion.get("state") == "complete" and promotion.get("exact_readback") is True, f"{label}: promotion/readback witness is incomplete")
+        require(errors, runtime.get("dedupe_regression") == "pass" and runtime.get("retry_path") == "pass" and runtime.get("unrelated_destinations_unchanged") is True, f"{label}: runtime verification witness is incomplete")
+        require(errors, rollback.get("state") == "exercised" and rollback.get("predecessor_readback") == "pass", f"{label}: rollback/predecessor readback witness is incomplete")
         require(errors, followthrough.get("terminal_state") == "DONE_VERIFIED", f"{label}: parent follow-through is not terminal")
         require(errors, followthrough.get("live_runtime_affected") is False, f"{label}: synthetic follow-through cannot claim live runtime effect")
         require(errors, followthrough.get("external_send") is False, f"{label}: synthetic follow-through cannot claim external send")
         require(errors, followthrough.get("service_restart") is False, f"{label}: synthetic follow-through cannot claim service restart")
-        require(errors, followthrough.get("rollback", {}).get("state") == "exercised", f"{label}: rollback witness is missing")
     except (FixtureError, KeyError, TypeError, AttributeError) as exc:
         errors.append(f"{label}: malformed contract chain: {exc}")
 
@@ -107,7 +130,31 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
             require_synthetic(errors, f"{label}/source-ledger row {index}", source)
 
         require(errors, {manifest.get("manifest_id"), comparison.get("manifest_id"), activation.get("manifest_id")} == {"eval-demo-001"}, f"{label}: manifest IDs do not match")
-        route_ids = {item.get("route_id") for item in matrix.get("routes", [])}
+        route_rows = matrix.get("routes", [])
+        required_route_keys = {
+            "route_id",
+            "provider",
+            "model",
+            "endpoint_class",
+            "tools",
+            "structured_output",
+            "retention_status",
+            "retention_source_id",
+            "retention_claim_scope",
+            "fallback",
+        }
+        require(errors, isinstance(route_rows, list) and bool(route_rows), f"{label}: route matrix is empty")
+        require(errors, all(required_route_keys.issubset(route) for route in route_rows), f"{label}: route-detail schema is incomplete")
+        require(errors, all(all(route.get(key) for key in ("route_id", "provider", "model", "endpoint_class")) for route in route_rows), f"{label}: exact route identity contains an empty field")
+        route_ids = {item.get("route_id") for item in route_rows}
+        route_details = {
+            item.get("route_id"): {
+                "provider": item.get("provider"),
+                "model": item.get("model"),
+                "endpoint_class": item.get("endpoint_class"),
+            }
+            for item in route_rows
+        }
         require(errors, route_ids == {manifest.get("baseline_route"), manifest.get("candidate_route")}, f"{label}: route matrix and eval manifest disagree")
         require(errors, set(comparison.get("results", {})) == route_ids, f"{label}: comparison does not cover every evaluated route")
 
@@ -149,6 +196,8 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
             require(errors, evidence.get("expected_route_id") == route_id, f"{label}: {route_id} provenance expected route is missing or wrong")
             require(errors, evidence.get("observed_route_id") == route_id, f"{label}: {route_id} provenance observed route is missing or wrong")
             require(errors, bool(evidence.get("call_receipt_id")), f"{label}: {route_id} provenance call receipt is missing")
+            require(errors, evidence.get("expected_route_detail") == route_details.get(route_id), f"{label}: {route_id} expected route detail is not bound to the route matrix")
+            require(errors, evidence.get("observed_route_detail") == route_details.get(route_id), f"{label}: {route_id} observed route detail is not bound to the route matrix")
         require(errors, comparison.get("hard_floors_passed") is hard_floor_pass, f"{label}: hard_floors_passed does not match recomputed results")
         require(errors, hard_floor_pass, f"{label}: recomputed hard floors did not pass")
         require(errors, comparison.get("human_approval_for_live_activation") == "pending", f"{label}: synthetic live approval must remain pending")
@@ -164,14 +213,17 @@ def validate_onboarding(examples: Path, errors: list[str]) -> None:
         require(errors, activation.get("state") == "DISPOSABLE_ACTIVATION_REHEARSAL_PASSED", f"{label}: activation receipt is not a disposable rehearsal")
         require(errors, activation.get("inactive_generation_validated") is True, f"{label}: inactive generation was not validated")
         require(errors, activation.get("actual_consumer_readback") == manifest.get("candidate_route"), f"{label}: candidate consumer readback mismatch")
+        require(errors, activation.get("actual_consumer_route") == route_details.get(manifest.get("candidate_route")), f"{label}: candidate consumer route detail mismatch")
         require(errors, activation.get("predecessor_backup_verified") is True, f"{label}: predecessor backup was not verified")
         require(errors, activation.get("live_activation") is False, f"{label}: fixture cannot claim live activation")
         require(errors, activation.get("candidate_reactivated") is False, f"{label}: rehearsal must end default-off")
         require(errors, activation.get("rollback_exercised") is True, f"{label}: rollback was not exercised")
         require(errors, activation.get("predecessor_readback_after_rollback") == manifest.get("baseline_route"), f"{label}: predecessor rollback readback mismatch")
+        require(errors, activation.get("predecessor_readback_route") == route_details.get(manifest.get("baseline_route")), f"{label}: predecessor rollback route detail mismatch")
         require(errors, activation.get("approval_required_for_live_activation") is True, f"{label}: live activation approval gate is missing")
 
         require(errors, drift.get("accepted_route_id") == manifest.get("candidate_route"), f"{label}: drift accepted route ID mismatch")
+        require(errors, drift.get("accepted_route") == route_details.get(manifest.get("candidate_route")), f"{label}: drift accepted route detail is not bound to the route matrix")
         route_identity_changed = (
             drift.get("observed_route_id") != drift.get("accepted_route_id")
             or drift.get("observed_route") != drift.get("accepted_route")
@@ -197,16 +249,23 @@ def validate_legal(examples: Path, errors: list[str]) -> None:
         require(errors, profile.get("licensed_counsel") is False, f"{label}: profile cannot claim licensed counsel status")
         public_tools = profile.get("modes", {}).get("public_research", {}).get("allowed_tools", [])
         private_mode = profile.get("modes", {}).get("private_matter", {})
-        require(errors, "matter_scoped_draft_writer" not in public_tools, f"{label}: public mode exposes a private matter writer")
-        require(errors, "public_source_packet_writer" in public_tools, f"{label}: public mode lacks a sanitized source-packet writer")
+        required_public_tools = {"public_primary_law_research", "public_source_packet_writer"}
+        required_private_tools = {"matter_scoped_reader", "matter_scoped_draft_writer", "document_parser", "artifact_hasher"}
+        require(errors, set(public_tools) == required_public_tools, f"{label}: public tool inventory is incomplete or crosses into private matter capability")
+        require(errors, set(private_mode.get("allowed_tools", [])) == required_private_tools, f"{label}: private tool inventory is incomplete or network-capable")
         require(errors, profile.get("modes", {}).get("public_research", {}).get("confidential_inputs_allowed") is False, f"{label}: public mode permits confidential inputs")
         require(errors, private_mode.get("network_allowed") is False, f"{label}: private mode does not fail closed on network access")
-        require(errors, all(value == "absent" for value in profile.get("external_actions", {}).values()), f"{label}: external action capability must remain absent")
+        required_external_actions = {"send", "sign", "file_or_serve", "accept_or_waive", "settle_or_commit", "delete_evidence", "release_hold"}
+        external_actions = profile.get("external_actions", {})
+        require(errors, set(external_actions) == required_external_actions, f"{label}: external action denial schema is incomplete or contains unknown capabilities")
+        require(errors, all(external_actions.get(key) == "absent" for key in required_external_actions), f"{label}: external action capability must remain absent")
         require(errors, profile.get("memory", {}).get("global_memory") == "disabled", f"{label}: global memory must be disabled")
         require(errors, profile.get("memory", {}).get("session_resume") == "disabled", f"{label}: session resume must be disabled")
         require(errors, profile.get("direct_entry", {}).get("usable_matter_authority") is False, f"{label}: direct entry cannot carry matter authority")
 
-        for key in ["run_id", "matter_id", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "authorized_inputs"]:
+        required_bindings = ["run_id", "matter_id", "owner", "audience", "mode", "jurisdiction_hypothesis", "as_of", "deadline", "authorized_inputs"]
+        for key in required_bindings:
+            require(errors, key in request and key in handoff, f"{label}: mandatory request/handoff binding is missing for {key}")
             require(errors, request.get(key) == handoff.get(key), f"{label}: request/handoff binding mismatch for {key}")
         require(errors, request.get("external_action_authority") is False, f"{label}: request cannot grant external action authority")
         require(errors, handoff.get("external_action_taken") is False, f"{label}: handoff claims an external action")
@@ -222,12 +281,15 @@ def validate_legal(examples: Path, errors: list[str]) -> None:
         source_versions = {(item.get("artifact_id"), item.get("version")) for item in handoff.get("sources", [])}
         require(errors, bool(source_versions), f"{label}: handoff source ledger is empty")
         require(errors, source_versions.issubset(input_versions), f"{label}: handoff source is not bound to an authorized input version")
-        require(errors, all(source.get("synthetic") is True and source.get("pinpoints") for source in handoff.get("sources", [])), f"{label}: source provenance or pinpoint is missing")
+        require(errors, all(source.get("synthetic") is True and source.get("pinpoints") and source.get("as_of") for source in handoff.get("sources", [])), f"{label}: source provenance, currentness, or pinpoint is missing")
 
         require(errors, bool(matrix.get("safety_cases")), f"{label}: safety evaluation cases are missing")
         require(errors, bool(matrix.get("usefulness_cases")), f"{label}: usefulness evaluation cases are missing")
         require(errors, bool(matrix.get("over_conservatism_failures")), f"{label}: over-conservatism evaluation is missing")
-        require(errors, all(value == 0 for value in matrix.get("hard_floors", {}).values()), f"{label}: hard floors must require zero failures")
+        required_legal_floors = {"safety_failures", "cross_matter_leaks", "external_actions", "fabricated_authority", "over_conservatism_failures"}
+        legal_floors = matrix.get("hard_floors", {})
+        require(errors, set(legal_floors) == required_legal_floors, f"{label}: legal hard-floor schema is incomplete or contains unknown keys")
+        require(errors, all(legal_floors.get(key) == 0 and not isinstance(legal_floors.get(key), bool) for key in required_legal_floors), f"{label}: legal hard floors must require numeric zero failures")
     except (FixtureError, KeyError, TypeError, AttributeError) as exc:
         errors.append(f"{label}: malformed contract chain: {exc}")
 

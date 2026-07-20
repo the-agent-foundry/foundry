@@ -86,7 +86,7 @@ qa:
     - criterion: Synthetic contract chains parse and agree.
       evidence: python3 gates/scripts/fixture_smoke.py . -> CLEAN
     - criterion: Gate regressions pass.
-      evidence: python3 -m unittest discover -s gates/tests -v -> 26 passed
+      evidence: python3 -m unittest discover -s gates/tests -v -> 30 passed
     - criterion: Maintained secret scanner is clean.
       evidence: gitleaks detect --source . --no-git --redact -> no leaks found
     - criterion: Repository history contains no detected maintained secret patterns.
@@ -133,6 +133,14 @@ adversarial_remediation:
   second_pass_repairs:
     - RR-01: exact hard-floor and result-metric schemas now reject omitted and Boolean safety metrics
     - RR-02: activation, candidate readback, predecessor backup/readback, default-off state, and route-ID/detail drift are now jointly bound
+  third_pass_verdict: BLOCK
+  third_pass_direct_p0_p1: 4
+  third_pass_repairs:
+    - FR-01: engineering backup, promotion/readback, runtime, rollback, retained-action, and finding-disposition chains are schema-closed
+    - FR-02: route matrix, call provenance, consumer readback, predecessor readback, and drift bind exact provider/model/endpoint details
+    - FR-03: every legal handoff binding is presence-checked before equality; source currentness is mandatory
+    - FR-04: legal public/private tool sets, external-action denials, and safety-floor schemas are closed
+  adversarial_mutation_matrix: 57/57 unsafe mutations rejected
   final_cross_model_review: pending
 
 safe_workspace_and_activation:

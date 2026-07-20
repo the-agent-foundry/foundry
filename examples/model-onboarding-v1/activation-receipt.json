@@ -15,5 +15,15 @@
   "credential_operation": false,
   "approval_required_for_live_activation": true,
   "synthetic": true,
-  "authorizing": false
+  "authorizing": false,
+  "actual_consumer_route": {
+    "provider": "provider-b",
+    "model": "candidate-model-v2",
+    "endpoint_class": "responses"
+  },
+  "predecessor_readback_route": {
+    "provider": "provider-a",
+    "model": "baseline-model-v1",
+    "endpoint_class": "responses"
+  }
 }
