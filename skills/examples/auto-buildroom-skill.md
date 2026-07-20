@@ -67,6 +67,12 @@ Do not use it for one-off tasks, external outreach, customer-visible sends, cred
    - Trust report labels the job clean, watch, or investigate.
    - Retention recommends keep, improve, park, or prune. Retention is recommendation-only and performs no deletion or move.
 
+8a. **Route adjacent findings without scope creep**
+   - Classify every build/reviewer finding by severity and relationship: direct, adjacent, or review-machinery.
+   - Direct P0/P1 stays with the approved build. Adjacent P0-P3 becomes a deduplicated proposal-only idea contract with no build or activation authority.
+   - Review-machinery findings stay with the current build only when they prevent trustworthy QA; otherwise they become separate proposals.
+   - Never let a reviewer finding silently rewrite the approved product plan.
+
 9. **Operator summary**
    - Surface current status, trust counts, active/completed/watch/investigate jobs, and real human-needed decisions.
    - Do not pad the summary with permission requests for reversible local work the agent should finish.
@@ -80,6 +86,7 @@ Do not use it for one-off tasks, external outreach, customer-visible sends, cred
 - Trust state compresses uncertainty without hiding it.
 - Retention recommendations never delete, archive, or move by themselves.
 - The operator sees only real decisions, not governance confetti.
+- Model capability is calibrated: completion-capable models receive scope ceilings; hesitant models receive bounded completion support on top of the same governance core.
 
 ## Output contract
 
@@ -153,3 +160,5 @@ Promote the autonomy level only after multiple useful clean cycles: high-signal 
 - **QA by self-report**: the builder's summary is not independent proof.
 - **Retention side effects**: `prune` means recommendation, not deletion.
 - **Quiet autonomy creep**: a scheduled scout is not permission for scheduled building.
+- **Severity-as-scope**: a serious adjacent finding may deserve a prominent proposal, but it does not become part of the current build by adjective.
+- **Legacy oversteer**: “keep going forever” instructions that once coaxed a hesitant model can make a stronger model absorb the entire proposal backlog.

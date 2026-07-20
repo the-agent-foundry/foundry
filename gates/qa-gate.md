@@ -45,6 +45,9 @@ For MODERATE and COMPLEX work, collect evidence for each item that applies:
 - **Idempotence:** reruns do not duplicate work or corrupt state unless duplication is explicitly safe.
 - **Rollback/recovery:** the change can be reverted or safely disabled.
 - **Human legibility:** logs, manifests, or dashboards explain what happened without spelunking.
+- **Finding relationship:** direct defects are closed; adjacent findings are preserved without widening scope; QA-machinery defects are not mislabeled as product defects.
+- **Boundary completion:** worker build, review, parent promotion, activation, runtime readback, and rollback are tracked separately when applicable.
+- **Retained continuation:** a mechanical interruption preserves the candidate, passed gates, open gates, and next smallest action.
 
 ## Evidence standards
 
@@ -73,7 +76,7 @@ Do not ship if any of these remain unresolved:
 - The artifact cannot be run, opened, rendered, or exercised.
 - A required test or scan fails.
 - A live side-effect path is unreviewed.
-- A P0/P1 red-team finding is unresolved.
+- A reproduced direct P0/P1 red-team finding is unresolved.
 - A secret, credential, real private path, private ID, or personal data appears in a public artifact.
 - The system can silently become stale or wrong and nobody is alerted.
 - The approval gate can be bypassed for a gated action.
@@ -111,6 +114,8 @@ The QA gate passes when:
 
 - Every acceptance criterion has evidence.
 - Every required surface is checked or explicitly ruled out.
-- All P0/P1 issues are closed.
+- All reproduced direct P0/P1 issues are closed.
 - Remaining P2/P3 issues are documented with owner, risk, and revisit trigger.
+- Adjacent findings remain visible and non-authorizing.
+- The terminal claim matches the boundary reached: build-green is not deployment-green, and deployment-green is not runtime-green without consumer readback.
 - The manifest makes the proof inspectable by someone who was not in the chat.

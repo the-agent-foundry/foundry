@@ -73,10 +73,11 @@ Then run the repo's own gates against your contribution and fix anything they fl
 ```
 python3 gates/scripts/sanitize_scan.py community/<YOUR_HANDLE>/
 python3 gates/scripts/format_lint.py .
+python3 gates/scripts/fixture_smoke.py .
 gitleaks detect --source . --no-git --redact  # if installed
 ```
 
-Both Python gates must exit 0. Gitleaks must also be clean before you submit when installed locally, and it is required in CI. If `sanitize_scan.py` or Gitleaks flags something real, scrub it and re-run. Do not add an allowlist entry to silence a real secret. Allowlist entries are only for synthetic placeholders or reviewed non-text artifacts; they must be narrow, repo-relative, path-specific where applicable, anchored when possible, and documented with a comment explaining why the entry is safe.
+All three Python gates must exit 0. Gitleaks must also be clean before you submit when installed locally, and it is required in CI. If `sanitize_scan.py` or Gitleaks flags something real, scrub it and re-run. Do not add an allowlist entry to silence a real secret. Allowlist entries are only for synthetic placeholders or reviewed non-text artifacts; they must be narrow, repo-relative, path-specific where applicable, anchored when possible, and documented with a comment explaining why the entry is safe.
 
 Never commit env files, logs, exports, screenshots with private data, PDFs with metadata, archives, database files, local agent profiles, memory dumps, or generated artifacts you have not reviewed.
 
@@ -94,9 +95,10 @@ git checkout -b contrib/<YOUR_HANDLE>-<short-name>
 #    Not allowed: edits to principles/, gates/, skills/, agents/, tools/, or
 #                 any other contributor's namespace.
 
-# 4. Run the gates locally. Both must exit 0.
+# 4. Run the gates locally. All must exit 0.
 python3 gates/scripts/sanitize_scan.py community/<YOUR_HANDLE>/
 python3 gates/scripts/format_lint.py .
+python3 gates/scripts/fixture_smoke.py .
 gitleaks detect --source . --no-git --redact  # if installed
 
 # 5. Commit with the DCO line in the body, then push and open the PR.
@@ -112,16 +114,17 @@ Stay inside `community/<YOUR_HANDLE>/`. A PR that edits the core or another hand
 
 A founder can hand you this directly:
 
-> You are contributing to The Agent Foundry. Read the schemas in `skills/`, `agents/`, and `tools/`, plus `principles/README.md`. Reformat my `<artifact>` to match the canonical schema for its kind. Run the mandatory sanitization self-check and scrub anything sensitive: credentials, paths, IDs, hostnames, emails, customer specifics. Then run `gates/scripts/sanitize_scan.py` and `gates/scripts/format_lint.py` and fix anything they flag. When both pass clean, open a pull request that adds the artifact under `community/<MY_HANDLE>/`, with the DCO line in the commit. Ask me for my handle and anything missing before you start.
+> You are contributing to The Agent Foundry. Read the schemas in `skills/`, `agents/`, and `tools/`, plus `principles/README.md`. Reformat my `<artifact>` to match the canonical schema for its kind. Run the mandatory sanitization self-check and scrub anything sensitive: credentials, paths, IDs, hostnames, emails, customer specifics. Then run `gates/scripts/sanitize_scan.py`, `gates/scripts/format_lint.py`, and `gates/scripts/fixture_smoke.py` and fix anything they flag. When all pass clean, open a pull request that adds the artifact under `community/<MY_HANDLE>/`, with the DCO line in the commit. Ask me for my handle and anything missing before you start.
 
 ---
 
 ## What the gate checks
 
-Every pull request, including from forks, runs sanitization, format lint, and Gitleaks in CI with no repository secrets:
+Every pull request, including from forks, runs sanitization, format lint, fixture validation, and Gitleaks in CI with no repository secrets:
 
 - `gates/scripts/sanitize_scan.py` : scans for credentials, private keys, secret assignments, credential-bearing connection strings, package auth residue, real home paths, mesh hostnames, emails, phone numbers, long numeric IDs, and risky artifacts. Fails closed on any finding.
 - `gates/scripts/format_lint.py` : checks that your artifact carries the required frontmatter keys and section headings for its kind.
+- `gates/scripts/fixture_smoke.py` : validates synthetic JSON/JSONL and governed example contract chains.
 - Gitleaks : scans for maintained provider-token patterns in CI with redacted output.
 
 If any required check exits non-zero, the PR cannot merge until you fix it.

@@ -22,7 +22,13 @@ Classify every finding by mission risk:
 - **P2 backlog or canary:** useful hardening, bounded edge case, coverage gap, or failure mode with workaround, rollback, or low blast radius.
 - **P3 ignore or document:** theoretical concern, proof-style preference, scope expansion, or reviewer misunderstanding with no concrete path to mission failure.
 
-P0/P1 must be resolved before build or activation. P2/P3 require a disposition, not obedience.
+Severity does not establish current-build scope by itself. Also classify the finding relationship:
+
+- **direct:** violates frozen acceptance, is introduced or worsened by the candidate, makes the approved state unsafe or incorrect, or prevents trustworthy verification;
+- **adjacent:** useful or serious, but outside the approved outcome and not required for its safety;
+- **review_machinery:** defect in tests, review transport, provenance, or closeout evidence.
+
+Direct P0/P1 must be resolved before build or activation. Adjacent findings of every severity remain visible and require a separate scope decision; they do not silently widen the current build. Review-machinery findings are repaired when they prevent trustworthy current-build QA. P2/P3 require a disposition, not obedience.
 
 ## Required inputs
 
@@ -48,7 +54,9 @@ You are the adversarial reviewer for this agent-system build.
 
 Your job is to find the flaw that will matter later, not to be polite.
 
-Review the spec below before implementation. Classify every finding as P0, P1, P2, or P3 using these definitions:
+Review the spec below before implementation. Classify every finding by severity and relationship. Relationship must be direct, adjacent, or review_machinery, with an acceptance-ID mapping or a reason no mapping exists.
+
+Severity definitions:
 - P0: plausible leak, credential exposure, destructive action, wrong live target, source-of-truth corruption, approval-gate bypass, or unrecoverable failure.
 - P1: likely production failure on a core path, missing required state, broken live surface, or recurring workflow that silently goes wrong.
 - P2: bounded hardening, coverage gap, or edge case that can be canaried, backlogged, or mitigated.
@@ -66,9 +74,11 @@ Focus on:
 
 Return:
 - Verdict: approve | approve-with-changes | block
-- Findings: severity, title, evidence, consequence, required fix
-- Mandatory fixes before build: list only P0/P1
-- Backlog/canary items: list P2
+- Findings: severity, relationship, acceptance mapping, title, executable evidence, consequence, required fix
+- Mandatory fixes before build: list only reproduced direct P0/P1
+- Proposal/backlog items: list adjacent findings without activating them
+- Review-machinery repairs: list defects that prevent trustworthy current-build QA
+- Backlog/canary items: list direct P2 plus accepted adjacent proposals
 - Ignored/not blocking: list P3 with rationale
 ```
 
@@ -82,11 +92,15 @@ red_team_disposition:
   findings:
     - id: RT-001
       severity: P1
+      relationship: direct
+      acceptance_mapping: AC-STATE-01
       title: Missing state for recurring workflow
       disposition: incorporated
       rationale: Added high-water mark and freshness check to the spec.
     - id: RT-002
       severity: P2
+      relationship: adjacent
+      acceptance_mapping: null
       title: Add broader regression coverage
       disposition: backlogged
       rationale: Bounded edge case, acceptance path covered, add after first canary.
@@ -94,16 +108,17 @@ red_team_disposition:
 
 Rules:
 
-- P0/P1 cannot be waved away by the same builder without founder/orchestrator approval.
+- Reproduced direct P0/P1 cannot be waved away by the same builder without founder/orchestrator approval.
 - P2/P3 can be accepted, backlogged, canaried, or rejected with rationale.
+- Adjacent findings cannot activate their own scope, regardless of severity.
 - Do not parse free-form prose as the authority for a hard gate. Use structured fields. Prose is advisory.
 - If the reviewer makes a factual claim, verify it. Reviewers hallucinate too.
 
-## The one-loop rule
+## Convergence rule
 
-After a block, do at most one remediation loop unless the next review surfaces a new concrete P0/P1.
+After the initial full review, inspect only changed deltas plus open direct findings unless the semantic trust boundary changes. Reproduce direct P0/P1 against the exact immutable candidate before editing.
 
-The goal is not to win an argument with the reviewer. The goal is to ship the right thing safely. Infinite red-team recursion is its own failure mode.
+Review count alone is not a reason to stop or continue. The goal is to ship the accepted thing safely. Repeated full reviews without a changed trust boundary are churn; stopping with a reproduced direct P0/P1 is theater.
 
 ## Common failure modes this catches
 
@@ -120,7 +135,9 @@ The goal is not to win an argument with the reviewer. The goal is to ship the ri
 The red-team gate passes when:
 
 - Pre-build review happened when required.
-- Every P0/P1 has an incorporated fix or explicit founder/orchestrator override.
+- Every reproduced direct P0/P1 has an incorporated fix or explicit founder/orchestrator override.
 - Every P2/P3 has a documented disposition.
+- Every adjacent finding remains proposal-only unless a separate authority artifact expands scope.
+- Every blocking review-machinery defect is repaired and the literal current-candidate check is rerun.
 - The final spec reflects the accepted findings.
 - The build manifest links the review and disposition ledger.

@@ -1,0 +1,39 @@
+{
+  "schema_version": "engineering-governance/finding-ledger/v1",
+  "contract_id": "eng-demo-001",
+  "candidate_id": "synthetic-candidate-b",
+  "findings": [
+    {
+      "id": "F-001",
+      "severity": "P1",
+      "relationship": "direct",
+      "summary": "Retry path can emit the same report twice.",
+      "acceptance_mapping": "AC-DEDUP-01",
+      "disposition": "incorporated",
+      "evidence": "Synthetic retry regression passes after repair."
+    },
+    {
+      "id": "F-002",
+      "severity": "P2",
+      "relationship": "adjacent",
+      "summary": "Dashboard spacing could be improved.",
+      "acceptance_mapping": null,
+      "disposition": "proposal_only",
+      "evidence": "No effect on report generation or accepted terminal state."
+    },
+    {
+      "id": "F-003",
+      "severity": "P2",
+      "relationship": "review_machinery",
+      "summary": "Initial replay command omitted the fixture import root.",
+      "acceptance_mapping": "AC-READBACK-01",
+      "disposition": "machinery_repaired",
+      "evidence": "Literal corrected command is recorded and passes twice."
+    }
+  ],
+  "open_direct_p0_p1": 0,
+  "adjacent_activation_authority": false,
+  "synthetic": true,
+  "authorizing": false,
+  "candidate_digest": "synthetic-candidate-b-digest"
+}

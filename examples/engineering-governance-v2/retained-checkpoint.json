@@ -1,0 +1,23 @@
+{
+  "schema_version": "engineering-governance/retained-checkpoint/v1",
+  "contract_id": "eng-demo-001",
+  "checkpoint_id": "checkpoint-demo-01",
+  "interruption_class": "mechanical_context_ceiling",
+  "candidate_id": "synthetic-candidate-b",
+  "candidate_sha256": "synthetic-candidate-b",
+  "passed_gates": [
+    "spec frozen",
+    "direct regression green",
+    "focused QA green"
+  ],
+  "open_gates": [
+    "parent promotion",
+    "runtime readback"
+  ],
+  "next_smallest_action": "Resume at parent promotion using the frozen candidate; do not repeat research or rebuild.",
+  "work_abandoned": false,
+  "new_approval_required": false,
+  "synthetic": true,
+  "authorizing": false,
+  "candidate_digest": "synthetic-candidate-b-digest"
+}

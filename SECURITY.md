@@ -37,6 +37,7 @@ Before public releases or broad sharing, maintainers should run:
 ```bash
 python3 gates/scripts/sanitize_scan.py .
 python3 gates/scripts/format_lint.py .
+python3 gates/scripts/fixture_smoke.py .
 gitleaks detect --source . --redact
 ```
 

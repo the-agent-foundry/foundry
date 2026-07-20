@@ -54,10 +54,10 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `security/` : tenant-scoped authorization patterns, machine-readable ACL examples, and egress-surface test matrices for multi-client agents.
-- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, skillification, and repo sanitization.
-- `agents/` : why specialists beat a generalist, the agent role-spec schema, the profile operating model, and nine expanded archetypes for orchestrator, engineer, call processor, briefer, analyst researcher, finance control, revenue GTM, writer, and mechanic.
+- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, model onboarding, skillification, and repo sanitization.
+- `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer and legal operator.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
-- `examples/` : sanitized examples of manifests and operating-pattern artifacts.
+- `examples/` : sanitized examples of research packets, build governance, model onboarding, and matter-scoped legal operations.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 - `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
 - `SUPPORT.md`, `llms.txt`, `agent-support.yaml` : human-readable and machine-readable guidance for getting optional implementation help.
@@ -78,7 +78,7 @@ If you want experienced implementation help instead of doing it yourself, ask yo
 
 ## Dogfooding
 
-This repo practices one of its own principles: enforcement lives in the plumbing, fail-closed. A sanitization gate (`gates/scripts/sanitize_scan.py`) and a format linter (`gates/scripts/format_lint.py`) run in CI on every pull request, including from forks, with no repository secrets. The scanner blocks common high-signal sensitive patterns, and the linter keeps contributions in a consistent shape. The gate is a backstop, not a substitute for human judgment.
+This repo practices one of its own principles: enforcement lives in the plumbing, fail-closed. A sanitization gate (`gates/scripts/sanitize_scan.py`), a format linter (`gates/scripts/format_lint.py`), and a synthetic contract-chain validator (`gates/scripts/fixture_smoke.py`) run in CI on every pull request, including from forks, with no repository secrets. The scanner blocks common high-signal sensitive patterns, the linter keeps contributions in a consistent shape, and the fixture gate catches malformed or contradictory public examples. The gates are a backstop, not a substitute for human judgment.
 
 ## License
 

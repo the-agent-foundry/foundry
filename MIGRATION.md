@@ -4,7 +4,9 @@ Most Agent Foundry updates are additive. When a release changes folder layout, s
 
 ## Current migration status
 
-No migration is required for the `2026.06.20` update batch.
+No mandatory migration is required for the current additive update batch.
+
+If you use an older engineer-agent configuration, review `agents/model-calibrated-engineering.md` before copying the updated archetype. Preserve frozen acceptance, approval boundaries, evidence gates, and rollback for every model. For models that stop early, add the bounded completion-support module. Do not preserve unbounded “boil the ocean” or “fix everything you find” language when moving to a more agentic model.
 
 If you maintain a fork:
 

@@ -22,12 +22,13 @@ You own your namespace. You cannot overwrite the core or anyone else's namespace
 
 ## The gate does the gatekeeping
 
-Every pull request, including from forks, runs two checks automatically before anything merges:
+Every pull request, including from forks, runs three repository-native checks automatically before anything merges:
 
 1. **Sanitization scan** (`gates/scripts/sanitize_scan.py`) looks for credentials, keys, real paths, IDs, and PII. Any finding fails the check. Nothing sensitive lands by accident.
 2. **Format lint** (`gates/scripts/format_lint.py`) confirms your artifact matches the canonical schema, so everything in the repo has a consistent, agent-readable shape.
+3. **Fixture smoke** (`gates/scripts/fixture_smoke.py`) validates synthetic JSON/JSONL examples and their governed contract chains.
 
-If both checks are green, your contribution can land. This is the same principle the field guide preaches: enforcement lives in the plumbing, fail-closed, not in a polite request to be careful.
+If all checks are green, your contribution can land. This is the same principle the field guide preaches: enforcement lives in the plumbing, fail-closed, not in a polite request to be careful.
 
 Community contributions are squash-merged, so the history stays clean and any problem is a single clean revert.
 

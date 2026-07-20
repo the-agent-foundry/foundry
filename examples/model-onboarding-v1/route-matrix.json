@@ -1,0 +1,41 @@
+{
+  "schema_version": "model-onboarding/route-matrix/v1",
+  "routes": [
+    {
+      "route_id": "baseline-route",
+      "provider": "provider-a",
+      "model": "baseline-model-v1",
+      "endpoint_class": "responses",
+      "tools": [
+        "read",
+        "test"
+      ],
+      "structured_output": true,
+      "retention_status": "unknown_for_synthetic_route",
+      "retention_source_id": "official-privacy-docs-demo",
+      "retention_claim_scope": "provider_policy_only_exact_route_unverified",
+      "fallback": "none"
+    },
+    {
+      "route_id": "candidate-route",
+      "provider": "provider-b",
+      "model": "candidate-model-v2",
+      "endpoint_class": "responses",
+      "tools": [
+        "read",
+        "test"
+      ],
+      "structured_output": true,
+      "retention_status": "unknown_for_synthetic_route",
+      "retention_source_id": "official-privacy-docs-demo",
+      "retention_claim_scope": "provider_policy_only_exact_route_unverified",
+      "fallback": "none"
+    }
+  ],
+  "unknowns": [
+    "baseline-route exact retention eligibility",
+    "candidate-route exact retention eligibility"
+  ],
+  "synthetic": true,
+  "authorizing": false
+}

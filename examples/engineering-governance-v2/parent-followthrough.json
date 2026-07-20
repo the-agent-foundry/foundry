@@ -1,0 +1,31 @@
+{
+  "schema_version": "engineering-governance/parent-followthrough/v1",
+  "contract_id": "eng-demo-001",
+  "candidate_id": "synthetic-candidate-b",
+  "worker_state": "BUILT_QA_APPROVED",
+  "deployment_required": true,
+  "backup": {
+    "state": "verified",
+    "inventory_sha256": "synthetic-backup-inventory"
+  },
+  "promotion": {
+    "state": "complete",
+    "exact_readback": true
+  },
+  "runtime_verification": {
+    "dedupe_regression": "pass",
+    "retry_path": "pass",
+    "unrelated_destinations_unchanged": true
+  },
+  "rollback": {
+    "state": "exercised",
+    "predecessor_readback": "pass"
+  },
+  "external_send": false,
+  "service_restart": false,
+  "live_runtime_affected": false,
+  "terminal_state": "DONE_VERIFIED",
+  "synthetic": true,
+  "authorizing": false,
+  "candidate_digest": "synthetic-candidate-b-digest"
+}

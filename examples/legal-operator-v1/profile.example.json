@@ -1,0 +1,64 @@
+{
+  "schema_version": "legal-operator-profile/v1",
+  "role": "internal_legal_operator",
+  "identity": "executive_counsel_desk_ai_software",
+  "licensed_counsel": false,
+  "reports_to": "orchestrator",
+  "modes": {
+    "public_research": {
+      "allowed_tools": [
+        "public_primary_law_research",
+        "public_source_packet_writer"
+      ],
+      "confidential_inputs_allowed": false
+    },
+    "private_matter": {
+      "allowed_tools": [
+        "matter_scoped_reader",
+        "matter_scoped_draft_writer",
+        "document_parser",
+        "artifact_hasher"
+      ],
+      "network_allowed": false
+    }
+  },
+  "required_run_bindings": [
+    "run_id",
+    "matter_id",
+    "requester",
+    "owner",
+    "audience",
+    "mode",
+    "jurisdiction_hypothesis",
+    "as_of",
+    "deadline",
+    "authorized_inputs",
+    "input_hashes",
+    "profile_generation"
+  ],
+  "external_actions": {
+    "send": "absent",
+    "sign": "absent",
+    "file_or_serve": "absent",
+    "accept_or_waive": "absent",
+    "settle_or_commit": "absent",
+    "delete_evidence": "absent",
+    "release_hold": "absent"
+  },
+  "memory": {
+    "global_memory": "disabled",
+    "session_resume": "disabled"
+  },
+  "direct_entry": {
+    "usable_matter_authority": false
+  },
+  "approval_required": [
+    "private_provider_route",
+    "external_communication",
+    "official_record_mutation",
+    "company_commitment",
+    "evidence_or_hold_action"
+  ],
+  "synthetic": true,
+  "authorizing": false
+}
