@@ -20,6 +20,15 @@ real_goal: <underlying need, not the implementation>
 domain_concept: <real-world concept modeled by the design>
 instance_vs_problem: <one-off | reusable system | conscious hybrid>
 
+acceptance_contract:
+  contract_id: <stable ID>
+  approved_outcome: <exact end state>
+  acceptance_ids: [<AC-001>]
+  non_goals: [<neighboring work that remains out of scope>]
+  protected_surfaces: [<surface>]
+  deployment_required: <yes | no>
+  terminal_state: <DONE_VERIFIED | NOT_DONE_TRUE_GATE | other defined state>
+
 design_gate:
   real_goal: <answer to design question 1>
   domain_concept: <answer to design question 2>
@@ -73,6 +82,8 @@ red_team:
     disposition:
       - id: <RT-001>
         severity: <P0 | P1 | P2 | P3>
+        relationship: <direct | adjacent | review_machinery>
+        acceptance_mapping: <AC-001 | null>
         title: <finding title>
         disposition: <incorporated | backlogged | canaried | rejected | override-approved>
         rationale: <why>
@@ -83,6 +94,8 @@ red_team:
     disposition:
       - id: <QA-RT-001>
         severity: <P0 | P1 | P2 | P3>
+        relationship: <direct | adjacent | review_machinery>
+        acceptance_mapping: <AC-001 | null>
         title: <finding title>
         disposition: <incorporated | backlogged | canaried | rejected | override-approved>
         rationale: <why>
@@ -115,6 +128,20 @@ safe_workspace_and_activation:
   activation_status: <not-needed | pending | approved | complete | blocked>
   canary_or_first_run_monitoring: <plan or not-applicable>
 
+completion_ledger:
+  worker_build: <not-started | in-progress | passed | failed>
+  independent_review: <not-required | pending | passed | blocked>
+  parent_promotion: <not-required | pending | passed | blocked>
+  live_activation: <not-required | pending | passed | blocked>
+  runtime_readback: <not-required | pending | passed | blocked>
+  rollback_proof: <not-required | pending | passed | blocked>
+  retained_checkpoint: <artifact path or not-applicable>
+
+model_steering:
+  mode: <scope-calibrated-autonomy | completion-support | hybrid>
+  rationale: <observed model behavior and fixed-eval evidence>
+  legacy_completion_module_enabled: <yes | no>
+
 privacy_and_sanitization:
   public_safe: <yes | no>
   checks:
@@ -142,6 +169,8 @@ final_state:
 - If red-team was skipped, explain why.
 - If QA was partial, mark the build `partial` and state what remains.
 - If a reviewer blocks, classify the finding by P0/P1/P2/P3 and record the disposition.
+- Classify every finding by relationship as well as severity. Adjacent findings cannot widen current scope without a separate authority artifact.
+- Do not mark `complete` when a required completion-ledger boundary is still pending.
 - Structured fields are the authority. Free-form prose is not a hard gate.
 
 ## Minimal manifest for small work
