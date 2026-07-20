@@ -1,0 +1,62 @@
+{
+  "schema_version": "legal-operator/matter-handoff/v1",
+  "run_id": "run-synthetic-001",
+  "matter_id": "matter-synthetic-nda-001",
+  "owner": "business-owner",
+  "audience": "internal-decision-team",
+  "mode": "PRIVATE_MATTER",
+  "jurisdiction_hypothesis": "Example jurisdiction; verification required",
+  "as_of": "2026-07-20T00:00:00Z",
+  "deadline": "2026-08-01T17:00:00Z",
+  "gate_state": "PARTIAL_BLOCKED_SLICE",
+  "confidence": "likely",
+  "authorized_inputs": [
+    {
+      "artifact_id": "synthetic-nda-v1",
+      "sha256": "synthetic-document-v1",
+      "version": 1
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "synthetic-nda-v1",
+      "source_type": "authorized_document",
+      "artifact_id": "synthetic-nda-v1",
+      "version": 1,
+      "pinpoints": [
+        "Section 8.2"
+      ],
+      "as_of": "2026-07-20",
+      "synthetic": true
+    }
+  ],
+  "bottom_line": "Proceed only after narrowing the assignment clause and confirming the governing-law assumption.",
+  "recommended_position": "Accept confidentiality scope with a mutual carve-out; reject unilateral assignment without consent.",
+  "material_issues": [
+    {
+      "issue": "Assignment clause is broader than the stated transaction need.",
+      "document_pinpoint": "Section 8.2",
+      "business_impact": "Counterparty could transfer obligations to an unknown affiliate.",
+      "preferred_redline": "Require prior written consent, not unreasonably withheld.",
+      "fallback": "Permit assignment only in a change of control with notice.",
+      "confidence": "likely"
+    }
+  ],
+  "assumptions": [
+    "Example jurisdiction is provisional until the owner confirms governing law."
+  ],
+  "completed_unaffected_lanes": [
+    "confidentiality definition review",
+    "term and survival review",
+    "return-or-destruction issue spotting"
+  ],
+  "blocked_slice": {
+    "issue": "Jurisdiction-specific enforceability conclusion",
+    "gate": "verified governing law required",
+    "owner": "business-owner",
+    "deadline": "2026-08-01T17:00:00Z"
+  },
+  "external_action_taken": false,
+  "synthetic": true,
+  "authorizing": false
+}
