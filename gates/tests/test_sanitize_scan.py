@@ -86,6 +86,18 @@ class SanitizeScanTests(unittest.TestCase):
         self.assertTrue(errors)
         self.assertEqual(errors[0][2], "Dangerously broad sanitize allowlist regex")
 
+    def test_linked_worktree_git_pointer_is_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            git_pointer = root / ".git"
+            git_pointer.write_text(
+                "gitdir: /" + "Users" + "/private/repository/.git/worktrees/candidate\n",
+                encoding="utf-8",
+            )
+            (root / "README.md").write_text("safe public content\n", encoding="utf-8")
+            scanned = list(sanitize_scan.iter_files(str(root)))
+        self.assertNotIn(str(git_pointer), scanned)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -34,7 +34,7 @@ The usual shape is one orchestrator that holds context and delegates, with speci
   - `archetypes/call-processor.md` : turns recordings and transcripts into corrected business intelligence, memory, and routed actions.
   - `archetypes/briefer.md` : monitors sources, filters signal, verifies claims, and composes decision-useful briefings.
   - `archetypes/analyst-researcher.md` : produces decision-grade research packets with source ledgers, claim ledgers, contradictions, confidence labels, and orchestrator-owned handoff routing.
-  - `archetypes/finance-control.md` : handles scoped finance operations with evidence-backed actions, approval classes, mutation ledgers, verification, and undo paths.
+  - `archetypes/finance-control.md` : handles exact-scope finance operations with digest-bound mission envelopes, source-provenance and claim-precedence evidence, concrete pre-bound Class A grants, complete Class B approval packets, actionable blockers, absent Class C capabilities, readback, and undo proof.
   - `archetypes/revenue-gtm.md` : supports GTM and sales enablement while separating internal strategy from externally approved claims.
   - `archetypes/legal-operator.md` : internal legal operator / executive counsel desk with positive duties, matter isolation, primary-source rigor, and no external-action authority.
   - `archetypes/writer.md` : drafts in founder voice using a voice corpus, anti-slop corpus, recursive revision, and human final approval.
@@ -58,7 +58,7 @@ The field guide uses named specialists. In this repo, the generic role names are
 
 The public archetypes are sanitized, not hollow. They intentionally omit private prompts, live paths, credential handling, customer names, and internal logs, but they preserve the operating pattern well enough for another founder's agent to adapt.
 
-The engineer archetype now includes model-calibrated completion and scope control: one governance core, bounded completion support for hesitant models, and tighter scope ceilings for more agentic models. The legal-operator archetype adds the positive-duty, matter-isolated pattern behind a useful internal counsel desk without publishing private runtime config.
+The engineer archetype now includes model-calibrated completion and scope control: one governance core, bounded completion support for hesitant models, and tighter scope ceilings for more agentic models. The legal-operator archetype adds the positive-duty, matter-isolated pattern behind a useful internal counsel desk without publishing private runtime config. The finance-control archetype adds a closed action-level authority model and links to a complete synthetic mission fixture.
 
 ## Pickup prompt
 

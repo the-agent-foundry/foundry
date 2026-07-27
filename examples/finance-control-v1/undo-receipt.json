@@ -1,0 +1,28 @@
+{
+  "synthetic": true,
+  "authorizing": false,
+  "mission_id": "finance-demo-001",
+  "scope_id": "synthetic-entity-2026-q2",
+  "profile_generation": "finance-control-v1-demo",
+  "undo_receipt_id": "undo-receipt-001",
+  "mutation_receipt_id": "receipt-mutation-001",
+  "action_id": "act-a-category",
+  "exact_target": {
+    "record_id": "record-001",
+    "field": "category"
+  },
+  "before_value": "uncategorized",
+  "before_digest": "digest-record-001-before",
+  "after_value": "travel",
+  "after_digest": "digest-record-001-after",
+  "rehearsal_executed": true,
+  "rehearsal_restored_value": "uncategorized",
+  "rehearsal_restored_digest": "digest-record-001-before",
+  "predecessor_readback": "passed",
+  "candidate_state_preserved": true,
+  "live_system_affected": false,
+  "mission_envelope_id": "finance-envelope-001",
+  "mission_envelope_digest": "sha256:df:f6:c7:68:b5:8d:21:aa:ab:5e:1c:d9:9d:41:94:6e:d7:54:ea:bf:5e:85:4e:32:40:14:2e:b7:b1:20:22:60",
+  "undo_destination": "undo-receipt.json",
+  "rehearsed_at": "2026-07-27T12:10:00Z"
+}

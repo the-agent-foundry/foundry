@@ -1,0 +1,61 @@
+{
+  "synthetic": true,
+  "authorizing": false,
+  "mission_id": "finance-demo-001",
+  "scope_id": "synthetic-entity-2026-q2",
+  "profile_generation": "finance-control-v1-demo",
+  "closeout_id": "closeout-finance-demo-001",
+  "terminal_state": "PARTIAL_VERIFIED",
+  "counts": {
+    "executed_writes": 1,
+    "already_satisfied_noops": 1,
+    "idempotent_replay_noops": 1,
+    "awaiting_class_b_approval": 1,
+    "blocked_or_unresolved": 8,
+    "external_sends": 0,
+    "money_movements": 0,
+    "class_c_executions": 0
+  },
+  "adjacent_class_a_completed": true,
+  "undo_rehearsal": "passed",
+  "pending_action_ids": [
+    "act-b-bulk"
+  ],
+  "blocked_action_ids": [
+    "act-c-merge",
+    "act-c-money",
+    "act-c-payroll",
+    "act-c-tax",
+    "act-c-legal",
+    "act-c-send",
+    "act-a-stale",
+    "act-a-conflict"
+  ],
+  "executed_action_ids": [
+    "act-a-category"
+  ],
+  "live_system_affected": false,
+  "all_claims_verified": false,
+  "mission_envelope_id": "finance-envelope-001",
+  "mission_envelope_digest": "sha256:df:f6:c7:68:b5:8d:21:aa:ab:5e:1c:d9:9d:41:94:6e:d7:54:ea:bf:5e:85:4e:32:40:14:2e:b7:b1:20:22:60",
+  "requester": {
+    "requester_id": "synthetic-requester-role",
+    "role": "finance_requester"
+  },
+  "owner": {
+    "owner_id": "synthetic-owner-role",
+    "role": "finance_control_owner"
+  },
+  "audience": {
+    "audience_id": "synthetic-owner-role",
+    "role": "finance_control_owner"
+  },
+  "mission_scope": {
+    "entity_id": "synthetic-entity",
+    "book_id": "synthetic-book",
+    "period_id": "2026-Q2",
+    "target_system": "synthetic-ledger"
+  },
+  "artifact_ref": "mission-closeout.json",
+  "required_closeout_state": "PARTIAL_VERIFIED"
+}

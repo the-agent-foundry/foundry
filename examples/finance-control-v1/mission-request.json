@@ -1,0 +1,137 @@
+{
+  "synthetic": true,
+  "authorizing": false,
+  "mission_id": "finance-demo-001",
+  "scope_id": "synthetic-entity-2026-q2",
+  "profile_generation": "finance-control-v1-demo",
+  "target_system": "synthetic-ledger",
+  "as_of": "2026-07-27T12:00:00Z",
+  "mission_envelope": {
+    "envelope_id": "finance-envelope-001",
+    "requester": {
+      "requester_id": "synthetic-requester-role",
+      "role": "finance_requester"
+    },
+    "owner": {
+      "owner_id": "synthetic-owner-role",
+      "role": "finance_control_owner"
+    },
+    "audience": {
+      "audience_id": "synthetic-owner-role",
+      "role": "finance_control_owner"
+    },
+    "scope": {
+      "entity_id": "synthetic-entity",
+      "book_id": "synthetic-book",
+      "period_id": "2026-Q2",
+      "target_system": "synthetic-ledger"
+    },
+    "as_of": "2026-07-27T12:00:00Z",
+    "authorized_inputs": [
+      {
+        "input_id": "input-system-current",
+        "source_kind": "system_record",
+        "version": "synthetic-system-v1",
+        "digest": "sha256:5d:b2:3b:73:1b:5b:b4:83:e4:44:3e:fa:fa:aa:5e:cf:45:57:76:a4:00:3a:13:e2:07:79:08:98:40:74:f1:4c",
+        "as_of": "2026-07-27T11:55:00Z",
+        "valid_through": "2026-07-27T13:00:00Z"
+      },
+      {
+        "input_id": "input-export-current",
+        "source_kind": "export",
+        "version": "synthetic-export-v2",
+        "digest": "sha256:29:a9:68:73:19:db:70:6a:13:b0:8c:71:f7:e5:d9:7e:7d:58:5f:18:3f:bc:5b:01:d0:95:82:98:9b:f1:0a:52",
+        "as_of": "2026-07-27T11:50:00Z",
+        "valid_through": "2026-07-27T13:00:00Z"
+      },
+      {
+        "input_id": "input-signed-current",
+        "source_kind": "signed_source",
+        "version": "synthetic-signed-v1",
+        "digest": "sha256:b1:14:b4:af:05:56:8a:8c:2e:eb:1e:4f:44:01:ef:18:21:bd:ab:97:c3:47:00:9c:d9:ef:44:7f:fc:d0:c2:21",
+        "as_of": "2026-07-27T11:45:00Z",
+        "valid_through": "2026-07-27T13:00:00Z"
+      },
+      {
+        "input_id": "input-export-stale",
+        "source_kind": "export",
+        "version": "synthetic-export-v1",
+        "digest": "sha256:97:fe:be:d8:2e:4d:77:11:b5:df:9b:c3:81:b2:ac:68:7e:b5:99:ed:7c:45:83:d4:a0:89:0b:e4:0a:59:78:34",
+        "as_of": "2026-05-31T12:00:00Z",
+        "valid_through": "2026-06-30T23:59:59Z"
+      },
+      {
+        "input_id": "input-document-current",
+        "source_kind": "document",
+        "version": "synthetic-document-v3",
+        "digest": "sha256:f5:ce:6c:67:f9:1c:f7:2e:9e:36:66:44:f2:6a:9b:5a:bd:c3:e5:dd:c5:62:5b:fc:f4:7e:d0:5a:7b:25:6f:88",
+        "as_of": "2026-07-27T11:40:00Z",
+        "valid_through": "2026-07-27T13:00:00Z"
+      },
+      {
+        "input_id": "input-note-current",
+        "source_kind": "note",
+        "version": "synthetic-note-v1",
+        "digest": "sha256:be:93:70:c0:3e:81:2d:d4:1c:85:89:bf:eb:43:b4:c7:83:eb:ca:05:98:c8:c3:6a:4e:1a:53:ee:17:64:c3:49",
+        "as_of": "2026-07-27T11:35:00Z",
+        "valid_through": "2026-07-27T13:00:00Z"
+      }
+    ],
+    "artifact_destinations": {
+      "evidence_ledger": "evidence-ledger.jsonl",
+      "before_snapshot": "before-snapshot.json",
+      "action_candidates": "action-candidates.jsonl",
+      "approval_packets": "approval-packets.jsonl",
+      "blocker_ledger": "blocker-ledger.jsonl",
+      "mutation_ledger": "mutation-ledger.jsonl",
+      "after_snapshot": "after-snapshot.json",
+      "undo_receipt": "undo-receipt.json",
+      "mission_closeout": "mission-closeout.json"
+    },
+    "undo_destination": "undo-receipt.json",
+    "required_closeout_state": "PARTIAL_VERIFIED"
+  },
+  "mission_envelope_digest": "sha256:df:f6:c7:68:b5:8d:21:aa:ab:5e:1c:d9:9d:41:94:6e:d7:54:ea:bf:5e:85:4e:32:40:14:2e:b7:b1:20:22:60",
+  "entry_mode": "bound_mission_request",
+  "direct_entry": false,
+  "mission_prose_authority": false,
+  "requested_action_ids": [
+    "act-a-category",
+    "act-a-satisfied",
+    "act-a-replay",
+    "act-b-bulk",
+    "act-c-merge",
+    "act-c-money",
+    "act-c-payroll",
+    "act-c-tax",
+    "act-c-legal",
+    "act-c-send",
+    "act-a-stale",
+    "act-a-conflict"
+  ],
+  "write_grant": {
+    "grant_type": "action_layer_write_grant",
+    "grant_id": "grant-demo-category-001",
+    "mission_id": "finance-demo-001",
+    "scope_id": "synthetic-entity-2026-q2",
+    "action_id": "act-a-category",
+    "action_class": "A",
+    "action_type": "category_correction",
+    "exact_target": {
+      "record_id": "record-001",
+      "field": "category"
+    },
+    "expected_target_digest": "digest-record-001-before",
+    "evidence_ids": [
+      "ev-record-001",
+      "ev-export-001"
+    ],
+    "operation_key": "op-a-001",
+    "execution_limit": 1,
+    "issued_at": "2026-07-27T11:00:00Z",
+    "expires_at": "2026-07-27T13:00:00Z",
+    "allowed": true
+  },
+  "external_effect_authority": false,
+  "live_system_targeted": false
+}

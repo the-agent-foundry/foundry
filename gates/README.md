@@ -22,8 +22,9 @@ Do not rely on the model choosing not to do the wrong thing. Put the control at 
 ## What is in this folder
 
 - `scripts/sanitize_scan.py` : the working sanitization gate that guards this repo. Scans for credentials, keys, real paths, IDs, and PII-like patterns. Fails closed on high-signal findings. This is a hard gate.
+- Linked-worktree `.git` pointer files are treated as Git metadata and skipped; public content remains fully scanned. A regression test protects this isolated-worktree commit path.
 - `scripts/format_lint.py` : checks contributed artifacts against the canonical schemas.
-- `scripts/fixture_smoke.py` : parses synthetic JSON/JSONL fixtures and verifies governed contract chains agree across engineering, model-onboarding, and legal-operator examples.
+- `scripts/fixture_smoke.py` : parses synthetic JSON/JSONL fixtures and verifies governed contract chains agree across engineering, model-onboarding, legal-operator, and finance-control examples. Finance validation closes and mechanically binds the mission envelope, source provenance/currentness, claim precedence, Class B preview/impact/rollback/receipt contract, actionable blockers, mutation preconditions/readback/undo, closeout, and evaluation schemas.
 - `content-qa-gate.py` : a mechanical anti-slop checker for prose. Run any draft through it before it ships. This is the real script, shipped as-is.
 - `six-question-design-gate.md` : six questions to answer before building any non-trivial system. A reasoning gate with teeth.
 - `research-gate.md` : when to research external issues before building, and the source ledger the agent must return.
@@ -56,6 +57,9 @@ python3 gates/scripts/format_lint.py .
 
 # Synthetic fixture validator: exits non-zero on malformed or contradictory contract chains.
 python3 gates/scripts/fixture_smoke.py .
+
+# Finance-control focused smoke and adversarial mutation matrix.
+python3 -m unittest gates.tests.test_finance_fixture gates.tests.test_finance_adversarial_matrix -v
 
 # Anti-slop content gate: run a draft through it.
 python3 gates/content-qa-gate.py path/to/draft.md

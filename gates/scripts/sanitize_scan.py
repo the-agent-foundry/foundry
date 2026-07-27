@@ -33,7 +33,7 @@ RISKY_BINARY_EXTS = {
 }
 
 MAX_TEXT_BYTES = 2_000_000
-SELF_SKIP_NAMES = {"sanitize_scan.py", ".sanitize-allow"}
+SELF_SKIP_NAMES = {"sanitize_scan.py", ".sanitize-allow", ".git"}
 
 PLACEHOLDER_TOKENS = [
     "example.com", "example.org", "example.net", "example.edu",

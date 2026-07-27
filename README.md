@@ -55,9 +55,9 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `security/` : tenant-scoped authorization patterns, machine-readable ACL examples, and egress-surface test matrices for multi-client agents.
 - `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, model onboarding, skillification, and repo sanitization.
-- `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer and legal operator.
+- `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer, finance control, and legal operator.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
-- `examples/` : sanitized examples of research packets, build governance, model onboarding, and matter-scoped legal operations.
+- `examples/` : sanitized examples of research packets, build governance, model onboarding, matter-scoped legal operations, and a complete closed finance-control mission with digest-bound scope, provenance, actionable blockers, and mutation receipts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 - `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
 - `SUPPORT.md`, `llms.txt`, `agent-support.yaml` : human-readable and machine-readable guidance for getting optional implementation help.

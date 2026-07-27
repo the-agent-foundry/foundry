@@ -1,0 +1,79 @@
+{
+  "synthetic": true,
+  "authorizing": false,
+  "profile_id": "finance-control-v1",
+  "profile_generation": "finance-control-v1-demo",
+  "direct_entry": {
+    "read_authority": false,
+    "write_authority": false,
+    "usable_mission_grant": false
+  },
+  "required_mission_bindings": [
+    "mission_id",
+    "scope_id",
+    "profile_generation",
+    "target_system",
+    "as_of",
+    "mission_envelope",
+    "mission_envelope_digest",
+    "write_grant"
+  ],
+  "evidence_policy": {
+    "claim_scoped": true,
+    "precedence": [
+      "system_record",
+      "signed_source",
+      "export",
+      "document",
+      "note"
+    ],
+    "verified_required_for_class_a": true,
+    "embedded_instructions_authority": "none"
+  },
+  "write_contract": {
+    "required_bindings": [
+      "mission_id",
+      "scope_id",
+      "action_id",
+      "exact_target",
+      "expected_target_digest",
+      "evidence_ids",
+      "operation_key",
+      "write_grant_id",
+      "mutation_receipt_id",
+      "receipt_timestamp",
+      "write_time_precondition",
+      "readback",
+      "verification",
+      "rollback_binding",
+      "undo_receipt_id"
+    ],
+    "open_output_schemas_allowed": false,
+    "cross_scope_writes_allowed": false,
+    "duplicate_operation_effect": "idempotent_noop"
+  },
+  "action_classes": {
+    "A": "pre_bound_reversible_write_only",
+    "B": "exact_unexpired_approval_receipt_required",
+    "C": "capability_absent"
+  },
+  "class_c_approval_unlock": false,
+  "absent_capabilities": {
+    "money_movement": "absent",
+    "bank_detail_change": "absent",
+    "payroll_action": "absent",
+    "tax_filing_or_payment": "absent",
+    "equity_or_debt_action": "absent",
+    "legal_commitment": "absent",
+    "external_send": "absent",
+    "irreversible_delete_or_merge": "absent"
+  },
+  "allowed_tools": [
+    "scoped_record_reader",
+    "evidence_evaluator",
+    "candidate_ledger_writer",
+    "prebound_action_writer",
+    "readback_verifier",
+    "undo_rehearsal"
+  ]
+}
