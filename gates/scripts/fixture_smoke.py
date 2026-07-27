@@ -696,6 +696,7 @@ def validate_finance(examples: Path, errors: list[str]) -> None:
             require(errors, all(isinstance(row.get(key), bool) for key in ("verified", "current", "conflicted", "instruction_authority")), f"{label}: evidence state fields must be Boolean")
             require(errors, row.get("instruction_authority") is False, f"{label}: document, export, note, or prompt content cannot carry instruction authority")
             require(errors, nonempty_string(row.get("evidence_id")) and nonempty_string(row.get("claim_id")), f"{label}: evidence identity must be non-empty")
+            require(errors, nonempty_string(row.get("observed_value")), f"{label}: evidence observed value must be a non-empty string for {row.get('evidence_id')}")
             source = authorized_input_by_id.get(row.get("source_input_id"), {})
             require(errors, bool(source), f"{label}: evidence source input is not mission-authorized for {row.get('evidence_id')}")
             require(errors, row.get("source_kind") == source.get("source_kind"), f"{label}: evidence source kind does not match its authorized input for {row.get('evidence_id')}")
@@ -778,6 +779,8 @@ def validate_finance(examples: Path, errors: list[str]) -> None:
             rows = [item for item in selected if item is not None]
             if len({item.get("claim_id") for item in rows}) != 1:
                 return "cross_claim"
+            if len({item.get("observed_value") for item in rows}) != 1:
+                return "contested"
             if any(item.get("conflicted") is True for item in rows):
                 return "contested"
             if any(item.get("verified") is not True or item.get("current") is not True for item in rows):

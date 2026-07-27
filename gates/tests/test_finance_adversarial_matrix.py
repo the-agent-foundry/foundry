@@ -163,7 +163,7 @@ class FinanceAdversarialMutationTests(unittest.TestCase):
             "cross_claim_evidence": ([jl("action-candidates.jsonl", 0, lambda value: value.update(evidence_ids=["ev-record-001","ev-record-002"]))], "recomputed confidence does not match claim-scoped evidence for act-a-category"),
             "missing_evidence": ([jl("action-candidates.jsonl", 0, lambda value: value.update(evidence_ids=["ev-missing"]))], "recomputed confidence does not match claim-scoped evidence for act-a-category"),
             "stale_evidence_made_current": ([jl("evidence-ledger.jsonl", 5, lambda value: value.update(current=True))], "recomputed confidence does not match claim-scoped evidence for act-a-stale"),
-            "conflict_marker_removed": ([jl("evidence-ledger.jsonl", 7, lambda value: value.update(conflicted=False))], "recomputed confidence does not match claim-scoped evidence for act-a-conflict"),
+            "unmarked_value_disagreement": ([jl("evidence-ledger.jsonl", 1, lambda value: value.update(observed_value="meals"))], "recomputed confidence does not match claim-scoped evidence for act-a-category"),
             "confidence_forged": ([jl("action-candidates.jsonl", 10, lambda value: value.update(recomputed_confidence="verified"))], "recomputed confidence does not match claim-scoped evidence for act-a-stale"),
         }
         for name, (mutations, expected) in cases.items():
@@ -181,6 +181,7 @@ class FinanceAdversarialMutationTests(unittest.TestCase):
             "currentness_forged": ([jl("evidence-ledger.jsonl", 5, lambda value: value.update(current=True))], "evidence currentness does not match its source validity window for ev-stale-001"),
             "pinpoints_empty": ([jl("evidence-ledger.jsonl", 0, lambda value: value.update(pinpoints=[]))], "evidence pinpoints are missing or malformed for ev-record-001"),
             "pinpoint_blank": ([jl("evidence-ledger.jsonl", 0, lambda value: value.update(pinpoints=[" "]))], "evidence pinpoints are missing or malformed for ev-record-001"),
+            "observed_value_malformed": ([jl("evidence-ledger.jsonl", 0, lambda value: value.update(observed_value={}))], "evidence observed value must be a non-empty string for ev-record-001"),
             "resolution_claim_changed": ([jl("action-candidates.jsonl", 0, lambda value: value["precedence_resolution"].update(claim_id="other-claim"))], "claim-scoped precedence resolution mismatch for act-a-category"),
             "resolution_order_changed": ([jl("action-candidates.jsonl", 0, lambda value: value["precedence_resolution"].update(ordered_evidence_ids=["ev-export-001", "ev-record-001"]))], "claim-scoped precedence resolution mismatch for act-a-category"),
             "resolution_winner_changed": ([jl("action-candidates.jsonl", 0, lambda value: value["precedence_resolution"].update(winning_evidence_id="ev-export-001"))], "claim-scoped precedence resolution mismatch for act-a-category"),

@@ -50,7 +50,7 @@ safety_contract:
   class_b: complete preview/impact/rollback/owner packet plus exact closed-schema receipt
   class_c: capability absent and not approval-unlockable
   mission_envelope: closed roles, exact entity/book/period/system, versioned inputs, safe destinations, required closeout
-  evidence: authorized source version/digest/as-of/validity/pinpoints plus claim-scoped precedence resolution
+  evidence: authorized source version/digest/as-of/validity/pinpoints plus claim-scoped precedence resolution; unmarked value disagreements force contested state
   blockers: concrete reason/evidence/owner/human action and deterministic recovery
   mutation_receipt: timestamped write-time precondition, explicit readback method, rollback/undo binding
   direct_entry_write_authority: false
@@ -114,7 +114,7 @@ qa:
   linked_worktree_git_pointer_regression: passed
   fixture_smoke: clean
   focused_finance_tests: 22 tests passed
-  adversarial_mutations: 146 of 146 rejected with specific expected errors
+  adversarial_mutations: 154 of 154 rejected with specific expected errors
   full_unit_suite: 55 tests passed
   changed_markdown_content_qa: 10 of 10 passed without warnings
   json_jsonl_parse: clean, 35 JSON and 10 JSONL files

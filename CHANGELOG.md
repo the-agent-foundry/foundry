@@ -19,7 +19,7 @@ This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 ### Updated
 - Engineer, red-team, QA, build-manifest, and Auto-buildroom patterns now separate direct defects, adjacent improvements, and review-machinery failures.
 - Completion proof now distinguishes worker build, independent review, parent promotion, live activation, runtime readback, and rollback.
-- Finance-control authority now requires a concrete pre-bound grant for Class A, a complete preview/impact/rollback packet plus exact unexpired receipt for Class B, and absent capabilities for Class C. Direct entry and evidence content cannot grant write authority; every evidence row is version/digest/currentness/pinpoint bound and claim precedence is mechanically resolved.
+- Finance-control authority now requires a concrete pre-bound grant for Class A, a complete preview/impact/rollback packet plus exact unexpired receipt for Class B, and absent capabilities for Class C. Direct entry and evidence content cannot grant write authority; every evidence row is version/digest/currentness/pinpoint bound, claim precedence is mechanically resolved, and unmarked observed-value disagreement forces a contested claim.
 - The sanitizer now ignores the linked-worktree `.git` pointer as Git metadata, with regression coverage, so repository-native pre-commit checks work from isolated worktrees without weakening content scanning.
 
 ### Breaking changes
