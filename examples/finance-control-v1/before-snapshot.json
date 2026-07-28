@@ -1,0 +1,78 @@
+{
+  "synthetic": true,
+  "authorizing": false,
+  "mission_id": "finance-demo-001",
+  "scope_id": "synthetic-entity-2026-q2",
+  "profile_generation": "finance-control-v1-demo",
+  "snapshot_id": "snapshot-before-001",
+  "snapshot_role": "predecessor",
+  "target_system": "synthetic-ledger",
+  "records": [
+    {
+      "record_id": "record-001",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "uncategorized",
+      "digest": "digest-record-001-before",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-002",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "supplies",
+      "digest": "digest-record-002-stable",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-003",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "software",
+      "digest": "digest-record-003-stable",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-004",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "review",
+      "digest": "digest-record-004-stable",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-005",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "review",
+      "digest": "digest-record-005-stable",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-006",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "legacy",
+      "digest": "digest-record-006-stale",
+      "book": "synthetic-book"
+    },
+    {
+      "record_id": "record-007",
+      "period": "2026-Q2",
+      "entity": "synthetic-entity",
+      "category": "unclear",
+      "digest": "digest-record-007-conflict",
+      "book": "synthetic-book"
+    }
+  ],
+  "operation_keys_seen": [],
+  "live_system_affected": false,
+  "mission_envelope_id": "finance-envelope-001",
+  "mission_envelope_digest": "sha256:df:f6:c7:68:b5:8d:21:aa:ab:5e:1c:d9:9d:41:94:6e:d7:54:ea:bf:5e:85:4e:32:40:14:2e:b7:b1:20:22:60",
+  "mission_scope": {
+    "entity_id": "synthetic-entity",
+    "book_id": "synthetic-book",
+    "period_id": "2026-Q2",
+    "target_system": "synthetic-ledger"
+  }
+}
