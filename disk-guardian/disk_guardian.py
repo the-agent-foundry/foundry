@@ -12,6 +12,7 @@ import datetime as dt
 import fcntl
 import hashlib
 import json
+import math
 import os
 import plistlib
 import pwd
@@ -27,6 +28,7 @@ GIB = 1024 ** 3
 DATA_VOLUME = Path("/System/Volumes/Data")
 POLICY_SCHEMA = "disk-guardian-community-policy/v1"
 CONTRACT_SCHEMA = "disk-guardian-community-retention/v1"
+AUTHORITY_SCHEMA = "disk-guardian-community-authority/v1"
 RECEIPT_SCHEMA = "disk-guardian-community-receipt/v1"
 SEVERITIES = ("GREEN", "YELLOW", "ORANGE", "RED", "CRITICAL")
 MAX_POLICY_BYTES = 128 * 1024
@@ -109,8 +111,16 @@ def canonical_json(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 
 
-def sha256_bytes(payload):
-    return hashlib.sha256(payload).hexdigest()
+def sha256_bytes(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def fsync_directory(path):
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
 
 
 def utc_now(timestamp=None):
@@ -404,10 +414,9 @@ def ensure_private_state_directory(home, path, uid):
 
 
 def open_dir_no_follow(path, expected_uid=None, expected_device=None):
-    # macOS exposes /var, /tmp and /etc as compatibility symlinks. Resolve the
-    # caller-supplied root once, then open every canonical component without
-    # following any further link. Candidate traversal remains descriptor-bound.
-    path = Path(os.path.realpath(str(path)))
+    # The caller must pass a canonical absolute path. Every component is opened
+    # without following links; this function deliberately never calls realpath.
+    path = Path(path)
     if not path.is_absolute():
         raise GuardianError("anchored_path_not_absolute")
     flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
@@ -430,11 +439,36 @@ def open_dir_no_follow(path, expected_uid=None, expected_device=None):
         raise
 
 
-def metadata_line(name, st, link_text=None):
+def metadata_line(name, st, link_text=None, content_sha256=None):
     fields = [name, str(st.st_dev), str(st.st_ino), str(st.st_uid), str(stat.S_IFMT(st.st_mode)), str(st.st_size), str(st.st_mtime_ns)]
     if link_text is not None:
         fields.append(link_text)
+    if content_sha256 is not None:
+        fields.append(content_sha256)
     return "\0".join(fields).encode("utf-8", "surrogateescape") + b"\n"
+
+
+def hash_regular_file_at(parent_fd, name, expected):
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(name, flags, dir_fd=parent_fd)
+    digest = hashlib.sha256()
+    try:
+        before = os.fstat(fd)
+        identity = (before.st_dev, before.st_ino, before.st_uid, stat.S_IFMT(before.st_mode), before.st_size, before.st_mtime_ns)
+        if identity != expected:
+            raise GuardianError("file_identity_changed_during_hash")
+        while True:
+            chunk = os.read(fd, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+        after = os.fstat(fd)
+        after_identity = (after.st_dev, after.st_ino, after.st_uid, stat.S_IFMT(after.st_mode), after.st_size, after.st_mtime_ns)
+        if after_identity != identity:
+            raise GuardianError("file_changed_during_hash")
+    finally:
+        os.close(fd)
+    return digest.hexdigest()
 
 
 def fingerprint_at(parent_fd, name, allow_leaf_symlink=False, max_nodes=MAX_TREE_NODES, max_depth=MAX_TREE_DEPTH, max_metadata=MAX_TREE_METADATA_BYTES):
@@ -474,14 +508,18 @@ def fingerprint_at(parent_fd, name, allow_leaf_symlink=False, max_nodes=MAX_TREE
             inventory[relative] = {
                 "device": st.st_dev, "inode": st.st_ino, "uid": st.st_uid,
                 "type": mode, "size": st.st_size, "mtime_ns": st.st_mtime_ns,
-                "link_text": link_text,
+                "link_text": link_text, "content_sha256": None,
             }
             return
-        add(metadata_line(relative, st), st.st_size if stat.S_ISREG(st.st_mode) else 0)
+        content_sha256 = None
+        if stat.S_ISREG(st.st_mode):
+            expected = (st.st_dev, st.st_ino, st.st_uid, mode, st.st_size, st.st_mtime_ns)
+            content_sha256 = hash_regular_file_at(dir_fd, child_name, expected)
+        add(metadata_line(relative, st, content_sha256=content_sha256), st.st_size if stat.S_ISREG(st.st_mode) else 0)
         inventory[relative] = {
             "device": st.st_dev, "inode": st.st_ino, "uid": st.st_uid,
             "type": mode, "size": st.st_size, "mtime_ns": st.st_mtime_ns,
-            "link_text": None,
+            "link_text": None, "content_sha256": content_sha256,
         }
         if stat.S_ISREG(st.st_mode):
             return
@@ -543,7 +581,11 @@ def delete_at(parent_fd, name, expected, allow_leaf_symlink=False):
             "type": stat.S_IFMT(st.st_mode), "size": st.st_size,
             "mtime_ns": st.st_mtime_ns,
             "link_text": os.readlink(child_name, dir_fd=dir_fd) if stat.S_ISLNK(st.st_mode) else None,
+            "content_sha256": None,
         }
+        if stat.S_ISREG(st.st_mode):
+            expected_identity = (st.st_dev, st.st_ino, st.st_uid, stat.S_IFMT(st.st_mode), st.st_size, st.st_mtime_ns)
+            current["content_sha256"] = hash_regular_file_at(dir_fd, child_name, expected_identity)
         if current != frozen:
             raise GuardianError("delete_boundary_node_changed")
         if stat.S_ISLNK(st.st_mode):
@@ -704,8 +746,20 @@ def contract_identifier(payload):
     return sha256_bytes(canonical_json(base))
 
 
+def validate_authority(proofs, class_name):
+    if not isinstance(proofs, dict) or set(proofs) != CONTRACT_PROOFS[class_name]["true"] | CONTRACT_PROOFS[class_name]["false"]:
+        raise GuardianError("contract_proofs_invalid")
+    if any(type(flag) is not bool for flag in proofs.values()):
+        raise GuardianError("contract_proof_type_invalid")
+    if any(not proofs[name] for name in CONTRACT_PROOFS[class_name]["true"]):
+        raise GuardianError("contract_positive_proof_missing")
+    if any(proofs[name] for name in CONTRACT_PROOFS[class_name]["false"]):
+        raise GuardianError("contract_negative_proof_active")
+    return proofs
+
+
 def validate_contract(value, filename, home, now, max_age):
-    allowed = {"schema", "contract_id", "class", "root", "candidate", "issued_at_epoch", "expires_at_epoch", "minimum_age_seconds", "identity", "proofs", "active_references"}
+    allowed = {"schema", "contract_id", "class", "root", "candidate", "issued_at_epoch", "expires_at_epoch", "minimum_age_seconds", "identity", "authority_sha256", "lock_identity"}
     require_closed_keys(value, allowed, "contract")
     if value.get("schema") != CONTRACT_SCHEMA:
         raise GuardianError("contract_schema_invalid")
@@ -726,7 +780,7 @@ def validate_contract(value, filename, home, now, max_age):
         raise GuardianError("contract_candidate_invalid")
     issued = value.get("issued_at_epoch")
     expires = value.get("expires_at_epoch")
-    if isinstance(issued, bool) or isinstance(expires, bool) or not isinstance(issued, (int, float)) or not isinstance(expires, (int, float)):
+    if isinstance(issued, bool) or isinstance(expires, bool) or not isinstance(issued, (int, float)) or not isinstance(expires, (int, float)) or not math.isfinite(float(issued)) or not math.isfinite(float(expires)):
         raise GuardianError("contract_time_invalid")
     if issued > now + 1 or expires <= now or expires - issued > max_age or now - issued > max_age:
         raise GuardianError("contract_expired_or_future")
@@ -740,23 +794,17 @@ def validate_contract(value, filename, home, now, max_age):
         raise GuardianError("contract_tree_hash_invalid")
     if now - identity["newest_mtime_ns"] / 1_000_000_000 < minimum_age:
         raise GuardianError("contract_candidate_too_young")
-    proofs = value.get("proofs")
-    if not isinstance(proofs, dict) or set(proofs) != CONTRACT_PROOFS[class_name]["true"] | CONTRACT_PROOFS[class_name]["false"]:
-        raise GuardianError("contract_proofs_invalid")
-    if any(type(flag) is not bool for flag in proofs.values()):
-        raise GuardianError("contract_proof_type_invalid")
-    if any(not proofs[name] for name in CONTRACT_PROOFS[class_name]["true"]):
-        raise GuardianError("contract_positive_proof_missing")
-    if any(proofs[name] for name in CONTRACT_PROOFS[class_name]["false"]):
-        raise GuardianError("contract_negative_proof_active")
-    references = value.get("active_references")
-    if references != []:
-        raise GuardianError("contract_active_references")
+    if not isinstance(value.get("authority_sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", value["authority_sha256"]):
+        raise GuardianError("contract_authority_hash_invalid")
+    lock_identity = value.get("lock_identity")
+    require_closed_keys(lock_identity, {"device", "inode", "uid", "type"}, "lock_identity")
+    for key in ("device", "inode", "uid", "type"):
+        require_int(lock_identity.get(key), "lock_identity_" + key, 0)
     root = safe_join(home, value["root"])
     return {"value": value, "root": root, "class": class_name, "contract_id": contract_id}
 
 
-def make_contract(class_name, candidate_path, issued_at=None, ttl_seconds=86400, minimum_age_seconds=3600, proofs=None):
+def make_contract(class_name, candidate_path, authority_sha256, lock_identity, issued_at=None, ttl_seconds=86400, minimum_age_seconds=3600):
     """Build a contract object from an exact candidate. Intended for producers."""
     if class_name not in CONTRACT_ROOTS:
         raise GuardianError("contract_class_invalid")
@@ -770,9 +818,8 @@ def make_contract(class_name, candidate_path, issued_at=None, ttl_seconds=86400,
     identity.pop("name")
     identity.pop("_inventory")
     issued = time.time() if issued_at is None else float(issued_at)
-    proof_names = CONTRACT_PROOFS[class_name]["true"] | CONTRACT_PROOFS[class_name]["false"]
-    if proofs is None or set(proofs) != proof_names or any(type(value) is not bool for value in proofs.values()):
-        raise GuardianError("contract_proofs_invalid")
+    if not isinstance(authority_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", authority_sha256):
+        raise GuardianError("contract_authority_hash_invalid")
     value = {
         "schema": CONTRACT_SCHEMA,
         "contract_id": "",
@@ -783,8 +830,8 @@ def make_contract(class_name, candidate_path, issued_at=None, ttl_seconds=86400,
         "expires_at_epoch": issued + ttl_seconds,
         "minimum_age_seconds": minimum_age_seconds,
         "identity": identity,
-        "proofs": dict(sorted(proofs.items())),
-        "active_references": [],
+        "authority_sha256": authority_sha256,
+        "lock_identity": lock_identity,
     }
     value["contract_id"] = contract_identifier(value)
     return value
@@ -802,6 +849,7 @@ class Guardian:
         self.contract_dir = safe_join(self.home, policy["retention_contracts"]["directory"])
         self.receipt_dir = self.state_root / "receipts"
         self.claim_dir = self.state_root / "claims"
+        self.operation_dir = self.state_root / "operations"
         self.lock_path = self.state_root / "guardian.lock"
         ensure_private_state_directory(self.home, self.state_root, self.uid)
 
@@ -898,6 +946,18 @@ class Guardian:
                 lock_stat = lock_path.lstat()
                 if stat.S_ISLNK(lock_stat.st_mode) or not stat.S_ISREG(lock_stat.st_mode) or lock_stat.st_uid != self.uid or stat.S_IMODE(lock_stat.st_mode) != 0o600:
                     raise GuardianError("contract_lock_invalid")
+                live_lock_identity = {
+                    "device": lock_stat.st_dev, "inode": lock_stat.st_ino,
+                    "uid": lock_stat.st_uid, "type": stat.S_IFMT(lock_stat.st_mode),
+                }
+                if live_lock_identity != value["lock_identity"]:
+                    raise GuardianError("contract_lock_identity_changed")
+                authority_dir = parsed["root"] / ".disk-guardian-authority"
+                authority_path = authority_dir / (sha256_bytes(value["candidate"].encode("utf-8")) + ".json")
+                authority, _, _ = load_json_regular(authority_path, MAX_CONTRACT_BYTES, self.uid, 0o600)
+                self._validate_live_authority(authority, parsed)
+                if sha256_bytes(canonical_json(authority)) != value["authority_sha256"]:
+                    raise GuardianError("contract_authority_changed")
                 fd, _ = open_dir_no_follow(parsed["root"], expected_uid=self.uid, expected_device=self.home.stat().st_dev)
                 try:
                     observed = fingerprint_at(fd, value["candidate"], allow_leaf_symlink=False)
@@ -913,12 +973,31 @@ class Guardian:
                     raise GuardianError("contract_open_handle")
                 parsed["fingerprint"] = observed
                 parsed["lock_path"] = lock_path
+                parsed["authority_path"] = authority_path
+                parsed["lock_identity"] = live_lock_identity
                 summary.update(status="eligible", blocker=None, **{"class": parsed["class"], "logical_bytes": observed["logical_bytes"]})
                 eligible.append(parsed)
             except (GuardianError, OSError) as exc:
                 summary["blocker"] = str(exc) if isinstance(exc, GuardianError) else "contract_inspection_failed"
             results.append(summary)
         return results, eligible
+
+    def _validate_live_authority(self, authority, parsed):
+        allowed = {"schema", "class", "root", "candidate", "proofs", "active_references", "updated_at_epoch"}
+        require_closed_keys(authority, allowed, "authority")
+        if authority.get("schema") != AUTHORITY_SCHEMA or authority.get("class") != parsed["class"]:
+            raise GuardianError("authority_identity_invalid")
+        if authority.get("root") != parsed["value"]["root"] or authority.get("candidate") != parsed["value"]["candidate"]:
+            raise GuardianError("authority_identity_invalid")
+        updated = authority.get("updated_at_epoch")
+        if isinstance(updated, bool) or not isinstance(updated, (int, float)) or not math.isfinite(float(updated)):
+            raise GuardianError("authority_time_invalid")
+        if updated > self.now_fn() + 1 or updated < parsed["value"]["issued_at_epoch"] - 1:
+            raise GuardianError("authority_time_invalid")
+        validate_authority(authority.get("proofs"), parsed["class"])
+        if authority.get("active_references") != []:
+            raise GuardianError("contract_active_references")
+        return authority
 
     def scan(self):
         sample = self.sample()
@@ -953,7 +1032,9 @@ class Guardian:
     def doctor(self):
         scan = self.scan()
         sample = scan["sample"]
-        recoverable = scan["eligible_cache_bytes"] + scan["eligible_contract_bytes"]
+        candidates = [("cache", root, row) for root, row in scan["_cache_candidates"]]
+        candidates += [("contract", row["root"], row) for row in scan["_contracts"]]
+        _, recoverable = self._bounded_plan(candidates)
         deficit = max(0, sample["thresholds"]["target"] - sample["free_bytes"])
         blockers = sorted({row.get("blocker") for row in scan["cache_classes"] + scan["retention_contracts"] if row.get("blocker")})
         return {
@@ -968,6 +1049,20 @@ class Guardian:
             "verdict": "actionable" if recoverable else ("healthy" if sample["severity"] == "GREEN" else "no_proven_autonomous_relief"),
         }
 
+    def _bounded_plan(self, candidates):
+        ordered = sorted(candidates, key=lambda item: (item[2].get("fingerprint", item[2])["newest_mtime_ns"], item[2].get("class", ""), item[2].get("contract_id", item[2].get("name", ""))))
+        selected = []
+        total = 0
+        transaction_cap = self.policy["limits"]["max_delete_bytes"]
+        candidate_cap = self.policy["limits"]["max_candidate_bytes"]
+        for item in ordered:
+            logical = item[2].get("fingerprint", item[2])["logical_bytes"]
+            if logical > candidate_cap or logical > transaction_cap - total:
+                continue
+            selected.append(item)
+            total += logical
+        return selected, total
+
     def _claim_contract(self, contract):
         self.claim_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
         os.chmod(self.claim_dir, 0o700)
@@ -979,6 +1074,7 @@ class Guardian:
             os.fsync(fd)
         finally:
             os.close(fd)
+        fsync_directory(self.claim_dir)
 
     def _write_receipt(self, receipt):
         self.receipt_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -992,8 +1088,27 @@ class Guardian:
             os.fsync(fd)
         finally:
             os.close(fd)
+        fsync_directory(self.receipt_dir)
         self._prune_receipts()
         return name
+
+    def _write_operation_record(self, payload):
+        self.operation_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+        os.chmod(self.operation_dir, 0o700)
+        record = dict(payload)
+        record["schema"] = "disk-guardian-community-operation/v1"
+        record["created_at"] = utc_now(self.now_fn())
+        data = canonical_json(record)
+        identifier = sha256_bytes(data)
+        path = self.operation_dir / (identifier + ".json")
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        try:
+            os.write(fd, data)
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        fsync_directory(self.operation_dir)
+        return identifier
 
     def _prune_receipts(self):
         try:
@@ -1007,11 +1122,11 @@ class Guardian:
                 if stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode):
                     rows.append((st.st_mtime, path))
             rows.sort(reverse=True)
-            for mtime, path in rows:
-                if len(rows) > MAX_RECEIPTS or now - mtime > RECEIPT_MAX_AGE_SECONDS:
+            keep = {path for index, (mtime, path) in enumerate(rows) if index < MAX_RECEIPTS and now - mtime <= RECEIPT_MAX_AGE_SECONDS}
+            for _, path in rows:
+                if path not in keep:
                     with contextlib.suppress(OSError):
                         path.unlink()
-                    rows.remove((mtime, path))
         except OSError:
             return
 
@@ -1028,6 +1143,7 @@ class Guardian:
                 "free_before_bytes": before["free_bytes"],
                 "target_free_bytes": before["thresholds"]["target"],
                 "logical_deleted_bytes": 0,
+                "planned_logical_bytes": 0,
                 "apfs_observed_free_delta_bytes": 0,
                 "deleted": [],
                 "blocked": [],
@@ -1047,12 +1163,14 @@ class Guardian:
                     receipt["stop_reason"] = "runtime_cap"
                     break
                 fingerprint = row["fingerprint"] if kind == "contract" else row
-                remaining = self.policy["limits"]["max_delete_bytes"] - receipt["logical_deleted_bytes"]
+                consumed = receipt["logical_deleted_bytes"] if not dry_run else receipt["planned_logical_bytes"]
+                remaining = self.policy["limits"]["max_delete_bytes"] - consumed
                 if fingerprint["logical_bytes"] > remaining or fingerprint["logical_bytes"] > self.policy["limits"]["max_candidate_bytes"]:
                     receipt["blocked"].append({"kind": kind, "class": row["class"], "reason": "candidate_over_remaining_cap"})
                     continue
                 if dry_run:
                     receipt["deleted"].append({"kind": kind, "class": row["class"], "logical_bytes": fingerprint["logical_bytes"], "dry_run": True})
+                    receipt["planned_logical_bytes"] += fingerprint["logical_bytes"]
                     continue
                 try:
                     if kind == "cache":
@@ -1066,11 +1184,20 @@ class Guardian:
                             observed = fingerprint_at(root_fd, row["name"], allow_leaf_symlink=(row["class"] == "uv_cache"))
                             if not same_fingerprint(observed, row):
                                 raise GuardianError("cache_identity_changed_at_boundary")
+                            operation_id = self._write_operation_record({"phase": "prepared", "kind": kind, "class": row["class"], "logical_bytes": row["logical_bytes"], "fingerprint_sha256": row["tree_sha256"]})
                             deleted = delete_at(root_fd, row["name"], row, allow_leaf_symlink=(row["class"] == "uv_cache"))
                         finally:
                             os.close(root_fd)
                     else:
                         with exclusive_lock(row["lock_path"]):
+                            locked_stat = row["lock_path"].lstat()
+                            locked_identity = {"device": locked_stat.st_dev, "inode": locked_stat.st_ino, "uid": locked_stat.st_uid, "type": stat.S_IFMT(locked_stat.st_mode)}
+                            if locked_identity != row["lock_identity"]:
+                                raise GuardianError("contract_lock_identity_changed_at_boundary")
+                            authority, _, _ = load_json_regular(row["authority_path"], MAX_CONTRACT_BYTES, self.uid, 0o600)
+                            self._validate_live_authority(authority, row)
+                            if sha256_bytes(canonical_json(authority)) != row["value"]["authority_sha256"]:
+                                raise GuardianError("contract_authority_changed_at_boundary")
                             if not lsof_clear(root / row["value"]["candidate"], self.runner):
                                 raise GuardianError("contract_open_handle_at_boundary")
                             root_fd, _ = open_dir_no_follow(root, expected_uid=self.uid, expected_device=self.home.stat().st_dev)
@@ -1079,11 +1206,13 @@ class Guardian:
                                 if not same_fingerprint(observed, fingerprint):
                                     raise GuardianError("contract_identity_changed_at_boundary")
                                 self._claim_contract(row)
+                                operation_id = self._write_operation_record({"phase": "prepared", "kind": kind, "class": row["class"], "logical_bytes": fingerprint["logical_bytes"], "fingerprint_sha256": fingerprint["tree_sha256"], "contract_id": row["contract_id"]})
                                 deleted = delete_at(root_fd, row["value"]["candidate"], fingerprint, allow_leaf_symlink=False)
                             finally:
                                 os.close(root_fd)
                     receipt["logical_deleted_bytes"] += deleted
-                    receipt["deleted"].append({"kind": kind, "class": row["class"], "logical_bytes": deleted})
+                    receipt["deleted"].append({"kind": kind, "class": row["class"], "logical_bytes": deleted, "operation_id": operation_id})
+                    self._write_operation_record({"phase": "completed", "prepared_operation_id": operation_id, "kind": kind, "class": row["class"], "logical_bytes": deleted})
                     after_candidate = self.sample()
                     if after_candidate["target_reached"]:
                         receipt["stop_reason"] = "target_reached"
@@ -1121,21 +1250,61 @@ def public_scan(scan):
     return result
 
 
-def write_contract_command(args):
+def write_contract_command(args, policy):
     home = passwd_home()
     root = safe_join(home, CONTRACT_ROOTS[args.class_name])
     candidate = root / args.candidate
     proofs, _, _ = load_json_regular(args.proofs_file, MAX_CONTRACT_BYTES, os.getuid())
-    value = make_contract(args.class_name, candidate, ttl_seconds=args.ttl_seconds, minimum_age_seconds=args.minimum_age_seconds, proofs=proofs)
-    output = Path(args.output) if args.output else safe_join(home, ".hermes/state/disk-guardian-community/contracts") / (value["contract_id"] + ".json")
-    output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    os.chmod(output.parent, 0o700)
-    fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    validate_authority(proofs, args.class_name)
+    assert_beneath_home_no_symlink(home, root)
+    lock_path = root / ".disk-guardian-retention.lock"
+    with exclusive_lock(lock_path):
+        lock_stat = lock_path.lstat()
+        if stat.S_ISLNK(lock_stat.st_mode) or not stat.S_ISREG(lock_stat.st_mode) or lock_stat.st_uid != os.getuid():
+            raise GuardianError("contract_lock_invalid")
+        os.chmod(lock_path, 0o600)
+        lock_identity = {"device": lock_stat.st_dev, "inode": lock_stat.st_ino, "uid": lock_stat.st_uid, "type": stat.S_IFMT(lock_stat.st_mode)}
+        now = time.time()
+        authority = {
+            "schema": AUTHORITY_SCHEMA,
+            "class": args.class_name,
+            "root": CONTRACT_ROOTS[args.class_name],
+            "candidate": args.candidate,
+            "proofs": dict(sorted(proofs.items())),
+            "active_references": [],
+            "updated_at_epoch": now,
+        }
+        authority_dir = root / ".disk-guardian-authority"
+        authority_dir.mkdir(mode=0o700, exist_ok=True)
+        authority_stat = authority_dir.lstat()
+        if stat.S_ISLNK(authority_stat.st_mode) or not stat.S_ISDIR(authority_stat.st_mode) or authority_stat.st_uid != os.getuid():
+            raise GuardianError("authority_directory_invalid")
+        os.chmod(authority_dir, 0o700)
+        authority_path = authority_dir / (sha256_bytes(args.candidate.encode("utf-8")) + ".json")
+        temporary = authority_dir / ("." + authority_path.name + ".candidate")
+        fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        try:
+            os.write(fd, canonical_json(authority))
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        os.replace(temporary, authority_path)
+        fsync_directory(authority_dir)
+        value = make_contract(
+            args.class_name, candidate, sha256_bytes(canonical_json(authority)), lock_identity,
+            issued_at=now, ttl_seconds=args.ttl_seconds,
+            minimum_age_seconds=args.minimum_age_seconds,
+        )
+    output_dir = safe_join(home, policy["retention_contracts"]["directory"])
+    ensure_private_state_directory(home, output_dir, os.getuid())
+    output = output_dir / (value["contract_id"] + ".json")
+    fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
     try:
         os.write(fd, canonical_json(value))
         os.fsync(fd)
     finally:
         os.close(fd)
+    fsync_directory(output_dir)
     print(str(output))
 
 
@@ -1155,7 +1324,6 @@ def build_parser():
     contract.add_argument("--ttl-seconds", type=int, default=86400)
     contract.add_argument("--minimum-age-seconds", type=int, default=3600)
     contract.add_argument("--proofs-file", required=True, help="closed JSON object containing the exact class proof booleans")
-    contract.add_argument("--output")
     sub.add_parser("self-test")
     return parser
 
@@ -1163,10 +1331,21 @@ def build_parser():
 def main(argv=None):
     args = build_parser().parse_args(argv)
     try:
-        if args.command == "make-contract":
-            write_contract_command(args)
+        if args.command == "self-test":
+            validate_policy(default_policy())
+            sample = parse_diskutil_plist(plistlib.dumps({
+                "MountPoint": str(DATA_VOLUME), "FilesystemType": "apfs",
+                "APFSContainerFree": 40 * GIB, "APFSContainerSize": 500 * GIB,
+            }))
+            thresholds = effective_thresholds(default_policy(), sample["size_bytes"])
+            if classify_pressure(sample, thresholds) != "ORANGE":
+                raise GuardianError("self_test_pressure_failed")
+            print("disk-guardian-community self-test: ok")
             return 0
         policy = load_policy(args.policy)
+        if args.command == "make-contract":
+            write_contract_command(args, policy)
+            return 0
         guardian = Guardian(policy)
         if args.command == "status":
             print(json.dumps(guardian.sample(), sort_keys=True))
@@ -1179,16 +1358,6 @@ def main(argv=None):
             if not (args.scheduled and not receipt.get("unresolved_pressure") and not receipt.get("blocked")):
                 print(json.dumps(receipt, sort_keys=True))
             return 2 if receipt.get("unresolved_pressure") and not args.dry_run else 0
-        elif args.command == "self-test":
-            validate_policy(default_policy())
-            sample = parse_diskutil_plist(plistlib.dumps({
-                "MountPoint": str(DATA_VOLUME), "FilesystemType": "apfs",
-                "APFSContainerFree": 40 * GIB, "APFSContainerSize": 500 * GIB,
-            }))
-            thresholds = effective_thresholds(default_policy(), sample["size_bytes"])
-            if classify_pressure(sample, thresholds) != "ORANGE":
-                raise GuardianError("self_test_pressure_failed")
-            print("disk-guardian-community self-test: ok")
         return 0
     except AlreadyRunning:
         return 0

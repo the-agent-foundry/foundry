@@ -118,7 +118,7 @@ class FilesystemSafetyTests(unittest.TestCase):
             target = root / "outside"
             target.write_text("keep")
             (root / "candidate").symlink_to(target)
-            fd, _ = dg.open_dir_no_follow(root, expected_uid=os.getuid())
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
             try:
                 with self.assertRaisesRegex(dg.GuardianError, "tree_symlink_prohibited"):
                     dg.fingerprint_at(fd, "candidate")
@@ -134,7 +134,7 @@ class FilesystemSafetyTests(unittest.TestCase):
             candidate = root / "candidate"
             candidate.mkdir()
             (candidate / "leaf").symlink_to(outside)
-            fd, _ = dg.open_dir_no_follow(root, expected_uid=os.getuid())
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
             try:
                 frozen = dg.fingerprint_at(fd, "candidate", allow_leaf_symlink=True)
                 dg.delete_at(fd, "candidate", frozen, allow_leaf_symlink=True)
@@ -149,7 +149,7 @@ class FilesystemSafetyTests(unittest.TestCase):
             candidate = root / "candidate"
             candidate.mkdir()
             (candidate / "file").write_text("one")
-            fd, _ = dg.open_dir_no_follow(root, expected_uid=os.getuid())
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
             try:
                 frozen = dg.fingerprint_at(fd, "candidate")
                 (candidate / "file").write_text("changed")
@@ -166,7 +166,7 @@ class FilesystemSafetyTests(unittest.TestCase):
             (candidate / "nested").mkdir(parents=True)
             leaf = candidate / "nested/file"
             leaf.write_text("one")
-            fd, _ = dg.open_dir_no_follow(root, expected_uid=os.getuid())
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
             try:
                 frozen = dg.fingerprint_at(fd, "candidate")
                 leaf.write_text("changed")
@@ -176,13 +176,31 @@ class FilesystemSafetyTests(unittest.TestCase):
                 os.close(fd)
             self.assertTrue(candidate.exists())
 
+    def test_same_size_same_mtime_content_rewrite_blocks_delete(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate"
+            candidate.mkdir()
+            leaf = candidate / "file"
+            leaf.write_text("one")
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
+            try:
+                frozen = dg.fingerprint_at(fd, "candidate")
+                old_mtime = leaf.stat().st_mtime_ns
+                leaf.write_text("two")
+                os.utime(leaf, ns=(old_mtime, old_mtime))
+                with self.assertRaisesRegex(dg.GuardianError, "delete_boundary_identity_changed"):
+                    dg.delete_at(fd, "candidate", frozen)
+            finally:
+                os.close(fd)
+
     def test_special_file_rejected(self):
         if not hasattr(os, "mkfifo"):
             self.skipTest("mkfifo unavailable")
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             os.mkfifo(root / "pipe")
-            fd, _ = dg.open_dir_no_follow(root, expected_uid=os.getuid())
+            fd = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0))
             try:
                 with self.assertRaisesRegex(dg.GuardianError, "tree_special_file_prohibited"):
                     dg.fingerprint_at(fd, "pipe")
@@ -288,6 +306,35 @@ class GuardianCacheTests(unittest.TestCase):
             self.assertTrue((home / ".cache/uv/pkg/data").exists())
             self.assertTrue(any(row["dry_run"] for row in receipt["deleted"]))
 
+    def test_dry_run_accounts_transaction_cap(self):
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            root = home / ".cache/uv"
+            for name in ("a", "b"):
+                (root / name).mkdir(parents=True)
+                (root / name / "data").write_bytes(b"x" * 600)
+            policy = dg.default_policy()
+            policy["limits"]["max_candidate_bytes"] = 1024
+            guardian = dg.Guardian(policy, home=home, measure_fn=fixed_measure(), runner=clear_runner)
+            guardian.policy["limits"]["max_delete_bytes"] = 1024
+            receipt = guardian.cleanup(dry_run=True)
+            self.assertLessEqual(receipt["planned_logical_bytes"], 1024)
+            self.assertEqual(len(receipt["deleted"]), 1)
+
+    def test_doctor_honors_transaction_cap(self):
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            root = home / ".cache/uv"
+            for name in ("a", "b"):
+                (root / name).mkdir(parents=True)
+                (root / name / "data").write_bytes(b"x" * 600)
+            policy = dg.default_policy()
+            policy["limits"]["max_candidate_bytes"] = 1024
+            guardian = dg.Guardian(policy, home=home, measure_fn=fixed_measure(99 * dg.GIB), runner=clear_runner)
+            guardian.policy["limits"]["max_delete_bytes"] = 1024
+            doctor = guardian.doctor()
+            self.assertLessEqual(doctor["proven_eligible_bytes"], 1024)
+
     def test_transaction_cap_blocks_oversize_candidate(self):
         with tempfile.TemporaryDirectory() as td:
             home = self.make_home(td)
@@ -329,7 +376,7 @@ class GuardianCacheTests(unittest.TestCase):
 
 class ContractTests(unittest.TestCase):
     def setup_candidate(self, td, class_name="worktree"):
-        home = Path(td)
+        home = Path(td).resolve()
         root = home / dg.CONTRACT_ROOTS[class_name]
         root.mkdir(parents=True)
         lock = root / ".disk-guardian-retention.lock"
@@ -345,7 +392,18 @@ class ContractTests(unittest.TestCase):
         negative = dg.CONTRACT_PROOFS[class_name]["false"]
         proofs = {name: True for name in positive}
         proofs.update({name: False for name in negative})
-        contract = dg.make_contract(class_name, candidate, issued_at=time.time(), minimum_age_seconds=3600, proofs=proofs)
+        authority = {
+            "schema": dg.AUTHORITY_SCHEMA, "class": class_name,
+            "root": dg.CONTRACT_ROOTS[class_name], "candidate": candidate.name,
+            "proofs": proofs, "active_references": [], "updated_at_epoch": time.time(),
+        }
+        authority_dir = root / ".disk-guardian-authority"
+        authority_dir.mkdir(); authority_dir.chmod(0o700)
+        authority_path = authority_dir / (dg.sha256_bytes(candidate.name.encode()) + ".json")
+        authority_path.write_bytes(dg.canonical_json(authority)); authority_path.chmod(0o600)
+        lock_stat = lock.lstat()
+        lock_identity = {"device": lock_stat.st_dev, "inode": lock_stat.st_ino, "uid": lock_stat.st_uid, "type": stat.S_IFMT(lock_stat.st_mode)}
+        contract = dg.make_contract(class_name, candidate, dg.sha256_bytes(dg.canonical_json(authority)), lock_identity, issued_at=time.time(), minimum_age_seconds=3600)
         contract_dir = home / ".hermes/state/disk-guardian-community/contracts"
         contract_dir.mkdir(parents=True)
         contract_dir.chmod(0o700)
@@ -365,23 +423,50 @@ class ContractTests(unittest.TestCase):
     def test_active_reference_blocks(self):
         with tempfile.TemporaryDirectory() as td:
             home, candidate, path, contract = self.setup_candidate(td)
-            contract["active_references"] = ["current"]
-            contract["contract_id"] = dg.contract_identifier(contract)
-            path.unlink()
-            path = path.parent / (contract["contract_id"] + ".json")
-            path.write_bytes(dg.canonical_json(contract)); path.chmod(0o600)
+            authority_path = candidate.parent / ".disk-guardian-authority" / (dg.sha256_bytes(candidate.name.encode()) + ".json")
+            authority = json.loads(authority_path.read_text())
+            authority["active_references"] = ["current"]
+            authority_path.write_bytes(dg.canonical_json(authority)); authority_path.chmod(0o600)
             guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
             scan = guardian.scan()
             self.assertTrue(candidate.exists())
             self.assertIn("contract_active_references", {row.get("blocker") for row in scan["retention_contracts"]})
 
-    def test_missing_proof_blocks(self):
+    def test_non_finite_contract_times_block(self):
         with tempfile.TemporaryDirectory() as td:
             home, candidate, path, contract = self.setup_candidate(td)
-            contract["proofs"].pop("clean")
+            contract["expires_at_epoch"] = float("nan")
             contract["contract_id"] = dg.contract_identifier(contract)
             path.unlink(); path = path.parent / (contract["contract_id"] + ".json")
             path.write_bytes(dg.canonical_json(contract)); path.chmod(0o600)
+            guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
+            self.assertIn("contract_time_invalid", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
+
+    def test_stale_authority_hash_blocks(self):
+        with tempfile.TemporaryDirectory() as td:
+            home, candidate, _, _ = self.setup_candidate(td)
+            authority_path = candidate.parent / ".disk-guardian-authority" / (dg.sha256_bytes(candidate.name.encode()) + ".json")
+            authority = json.loads(authority_path.read_text())
+            authority["updated_at_epoch"] += 1
+            authority_path.write_bytes(dg.canonical_json(authority)); authority_path.chmod(0o600)
+            guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
+            self.assertIn("contract_authority_changed", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
+
+    def test_replaced_lock_identity_blocks(self):
+        with tempfile.TemporaryDirectory() as td:
+            home, candidate, _, _ = self.setup_candidate(td)
+            lock = candidate.parent / ".disk-guardian-retention.lock"
+            lock.unlink(); lock.write_text(""); lock.chmod(0o600)
+            guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
+            self.assertIn("contract_lock_identity_changed", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
+
+    def test_missing_proof_blocks(self):
+        with tempfile.TemporaryDirectory() as td:
+            home, candidate, path, contract = self.setup_candidate(td)
+            authority_path = candidate.parent / ".disk-guardian-authority" / (dg.sha256_bytes(candidate.name.encode()) + ".json")
+            authority = json.loads(authority_path.read_text())
+            authority["proofs"].pop("clean")
+            authority_path.write_bytes(dg.canonical_json(authority)); authority_path.chmod(0o600)
             guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
             self.assertIn("contract_proofs_invalid", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
             self.assertTrue(candidate.exists())

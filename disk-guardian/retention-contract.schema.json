@@ -4,13 +4,13 @@
   "title": "Disk Guardian Community producer retention contract",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "contract_id", "class", "root", "candidate", "issued_at_epoch", "expires_at_epoch", "minimum_age_seconds", "identity", "proofs", "active_references"],
+  "required": ["schema", "contract_id", "class", "root", "candidate", "issued_at_epoch", "expires_at_epoch", "minimum_age_seconds", "identity", "authority_sha256", "lock_identity"],
   "properties": {
     "schema": {"const": "disk-guardian-community-retention/v1"},
     "contract_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "class": {"enum": ["worktree", "backup", "staging_qa", "retired_runtime_cache"]},
     "root": {"enum": [".hermes/worktrees", ".hermes/backups", ".hermes/staging", ".hermes/runtime-retired"]},
-    "candidate": {"type": "string", "minLength": 1, "pattern": "^[^/\\u0000]+$"},
+    "candidate": {"type": "string", "minLength": 1, "pattern": "^(?!\\.{1,2}$)[^/\\u0000]+$"},
     "issued_at_epoch": {"type": "number"},
     "expires_at_epoch": {"type": "number"},
     "minimum_age_seconds": {"type": "integer", "minimum": 3600, "maximum": 31536000},
@@ -30,7 +30,17 @@
         "tree_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       }
     },
-    "proofs": {"type": "object", "additionalProperties": {"type": "boolean"}},
-    "active_references": {"type": "array", "maxItems": 0}
+    "authority_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "lock_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["device", "inode", "uid", "type"],
+      "properties": {
+        "device": {"type": "integer", "minimum": 0},
+        "inode": {"type": "integer", "minimum": 0},
+        "uid": {"type": "integer", "minimum": 0},
+        "type": {"type": "integer", "minimum": 0}
+      }
+    }
   }
 }
