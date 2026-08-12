@@ -16,6 +16,7 @@ This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 - Engineering-governance v2 fixture with frozen acceptance, finding relationships, retained checkpoints, and parent follow-through.
 - Finance-control v1 synthetic package with a digest-bound mission envelope, source-provenance and action ledgers, a complete pending Class B packet, actionable blocker artifacts, one verified Class A write, timestamped precondition/readback/rollback receipts, undo rehearsal, closeout, and fixed evaluations.
 - Maintained [model-selection operating system](docs/updates/2026-08-11.md): public baseline roster, private-overlay pattern, evidence labels, route-aware cost/benefit guide, prompting guide, specialist appendix, synthetic selection record, renderer, validator, and adversarial tests.
+- [Disk Guardian Community](docs/updates/2026-08-11-disk-guardian.md): executable macOS/APFS pressure relief with bounded cache cleanup, closed producer-retention contracts for Hermes lifecycle artifacts, descriptor-anchored deletion, receipts, dry-run/doctor workflows, launchd generation, and adversarial tests.
 
 ### Updated
 - Engineer, red-team, QA, build-manifest, and Auto-buildroom patterns now separate direct defects, adjacent improvements, and review-machinery failures.
@@ -29,6 +30,7 @@ This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 
 ### Migration notes
 - Do not copy older completion-heavy engineer prompts wholesale into more agentic models. Keep the structural governance core and add only the bounded completion-support module when fixed evaluations show premature stopping.
+- Disk Guardian Community is additive. Review its local policy and run `doctor`, `scan`, and `cleanup --dry-run` before enabling launchd; no existing Agent Foundry artifact is replaced.
 
 ### Action needed
 - Maintainers should publish a GitHub Release after merging a meaningful update batch to `main`.

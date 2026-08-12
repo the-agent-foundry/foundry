@@ -1,2 +1,7 @@
 # Reviewed public X/Twitter status URL used as Stanford STORM attribution in Field Guide v0.5.
 line:https://x\.com/heynavtoor/status/2067194761446920264\?s=20
+# Reviewed byte-cap constants in the closed Disk Guardian example policy.
+line:^    "max_(?:delete|candidate)_bytes": (?:53687091200|21474836480),?$
+# Reviewed one-GiB lower bound in the closed Disk Guardian JSON schema.
+line:^        "(?:yellow|orange|red|critical|target)_free_bytes": \{"type": \["integer", "null"\], "minimum": 1073741824\},?$
+line:^        "max_delete_bytes": \{"type": "integer", "minimum": 1073741824\},?$

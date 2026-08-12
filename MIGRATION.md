@@ -12,6 +12,8 @@ If you use an older finance-control pattern, no mandatory migration is required.
 
 The model-selection package is additive. Existing forks do not need to replace live routes. For future crons, tools, profiles, reviewers, and subagents, adopt the public-baseline plus private-overlay split, record the selection decision, and use the existing model-onboarding contract before activation.
 
+Disk Guardian Community is additive. Existing forks require no migration. If adopting it, copy the `disk-guardian/` package, review the policy against the local APFS container size, run `self-test`, `doctor`, `scan`, and `cleanup --dry-run`, then enable launchd only after the eligible classes match the machine's actual pressure. Do not copy private or older site-specific Disk Guardian configuration into the public policy.
+
 If you maintain a fork:
 
 1. Pull the latest `main`.
