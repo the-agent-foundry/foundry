@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/the-agent-foundry/foundry/disk-guardian/policy.schema.json",
+  "title": "Disk Guardian Community policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "state_directory", "thresholds", "cache_classes", "retention_contracts", "limits", "scheduled_healthy_stdout"],
+  "properties": {
+    "schema": {"const": "disk-guardian-community-policy/v1"},
+    "state_directory": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["yellow_free_percent", "orange_free_percent", "red_free_percent", "critical_free_percent", "target_free_percent", "yellow_free_bytes", "orange_free_bytes", "red_free_bytes", "critical_free_bytes", "target_free_bytes"],
+      "properties": {
+        "yellow_free_percent": {"type": "number", "minimum": 0.5, "maximum": 95},
+        "orange_free_percent": {"type": "number", "minimum": 0.5, "maximum": 95},
+        "red_free_percent": {"type": "number", "minimum": 0.5, "maximum": 95},
+        "critical_free_percent": {"type": "number", "minimum": 0.5, "maximum": 95},
+        "target_free_percent": {"type": "number", "minimum": 0.5, "maximum": 95},
+        "yellow_free_bytes": {"type": ["integer", "null"], "minimum": 1073741824},
+        "orange_free_bytes": {"type": ["integer", "null"], "minimum": 1073741824},
+        "red_free_bytes": {"type": ["integer", "null"], "minimum": 1073741824},
+        "critical_free_bytes": {"type": ["integer", "null"], "minimum": 1073741824},
+        "target_free_bytes": {"type": ["integer", "null"], "minimum": 1073741824}
+      }
+    },
+    "cache_classes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uv_cache", "pip_cache", "npm_cache", "homebrew_download_cache"],
+      "properties": {
+        "uv_cache": {"type": "boolean"},
+        "pip_cache": {"type": "boolean"},
+        "npm_cache": {"type": "boolean"},
+        "homebrew_download_cache": {"type": "boolean"}
+      }
+    },
+    "retention_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "directory", "max_contract_age_seconds"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "directory": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "max_contract_age_seconds": {"type": "integer", "minimum": 3600, "maximum": 604800}
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_delete_bytes", "max_candidate_bytes", "max_runtime_seconds"],
+      "properties": {
+        "max_delete_bytes": {"type": "integer", "minimum": 1073741824},
+        "max_candidate_bytes": {"type": "integer", "minimum": 1024},
+        "max_runtime_seconds": {"type": "integer", "minimum": 30, "maximum": 7200}
+      }
+    },
+    "scheduled_healthy_stdout": {"const": ""}
+  }
+}

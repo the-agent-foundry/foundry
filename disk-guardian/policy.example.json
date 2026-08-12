@@ -1,0 +1,33 @@
+{
+  "schema": "disk-guardian-community-policy/v1",
+  "state_directory": ".disk-guardian",
+  "thresholds": {
+    "yellow_free_percent": 15.0,
+    "orange_free_percent": 10.0,
+    "red_free_percent": 7.0,
+    "critical_free_percent": 4.0,
+    "target_free_percent": 20.0,
+    "yellow_free_bytes": null,
+    "orange_free_bytes": null,
+    "red_free_bytes": null,
+    "critical_free_bytes": null,
+    "target_free_bytes": null
+  },
+  "cache_classes": {
+    "uv_cache": true,
+    "pip_cache": true,
+    "npm_cache": true,
+    "homebrew_download_cache": true
+  },
+  "retention_contracts": {
+    "enabled": true,
+    "directory": ".hermes/state/disk-guardian-community/contracts",
+    "max_contract_age_seconds": 86400
+  },
+  "limits": {
+    "max_delete_bytes": 53687091200,
+    "max_candidate_bytes": 21474836480,
+    "max_runtime_seconds": 2700
+  },
+  "scheduled_healthy_stdout": ""
+}

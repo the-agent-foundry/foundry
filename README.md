@@ -58,6 +58,7 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 - `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer, finance control, and legal operator.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `model-selection/` : a maintained public model-candidate roster, exact-route private-overlay contract, route-aware cost/benefit method, prompting guide, specialist appendix, synthetic selection record, schemas, and freshness gates.
+- `disk-guardian/` : an executable macOS/APFS pressure guardian with bounded cache cleanup, closed Hermes retention contracts, dry-run/doctor workflows, receipts, adversarial tests, and generated launchd scheduling.
 - `examples/` : sanitized examples of research packets, build governance, model onboarding, matter-scoped legal operations, and a complete closed finance-control mission with digest-bound scope, provenance, actionable blockers, and mutation receipts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 - `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
