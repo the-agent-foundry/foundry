@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "notice": "EXAMPLE ONLY. Copy this file to a private, non-public location. Never add credentials, tokens, account IDs, private contract terms, or private evaluation data to a public fork.",
+  "updated_at": "2026-08-11",
+  "routes": [
+    {
+      "route_id": "openai/gpt-5.6-terra/responses/global/standard",
+      "public_candidate_id": "openai/gpt-5.6-terra",
+      "provider": "OpenAI",
+      "model_id": "gpt-5.6-terra",
+      "api_mode": "responses",
+      "endpoint_class": "first_party_api",
+      "endpoint_label": "global standard endpoint",
+      "region_or_geography": "global",
+      "service_tier": "standard",
+      "tool_surface": ["client-tools", "structured-output"],
+      "structured_output_state": "supported",
+      "privacy_variant": "example standard data posture",
+      "credential_present": false,
+      "entitlement_state": "unknown",
+      "enabled_state": "not_enabled",
+      "runtime_validation_state": "not_tested",
+      "approved_data_classes": [],
+      "billing": {
+        "basis": "unknown",
+        "plan_or_contract_label": "private label only",
+        "marginal_cost_notes": "Record quota, credit multiplier, negotiated rate, or subscription constraint without copying secrets."
+      },
+      "measured": {
+        "fixture_set": "example-fixtures-v1",
+        "evaluated_at": null,
+        "quality_score": null,
+        "completion_score": null,
+        "restraint_score": null,
+        "p50_latency_ms": null,
+        "p95_latency_ms": null,
+        "successful_outcome_rate": null,
+        "estimated_cost_per_successful_outcome_usd": null
+      },
+      "allowed_workloads": [],
+      "fallback_route_id": null,
+      "re_evaluate_on": ["model version change", "provider or endpoint change", "API mode change", "service-tier change", "region or privacy change", "prompt adapter change", "tool change", "pricing or quota change", "material quality drift"]
+    }
+  ]
+}

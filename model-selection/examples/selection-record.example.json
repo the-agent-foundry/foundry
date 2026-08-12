@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "authorizing": false,
+  "selection_id": "selection-demo-daily-briefing",
+  "workload": {
+    "name": "daily executive briefing",
+    "outcome": "Produce a cited, concise morning briefing from approved sources before the workday starts.",
+    "volume": "one run per weekday",
+    "autonomy": "read and synthesize only",
+    "tools": ["approved-source-reader", "citation-writer"],
+    "modalities": ["text"],
+    "context_requirement": "medium",
+    "latency_target": "complete within ten minutes",
+    "data_sensitivity": "internal",
+    "failure_cost": "medium",
+    "budget": "optimize for reliability before lowest token price"
+  },
+  "thresholds": {
+    "quality_score_min": 0.85,
+    "completion_score_min": 0.9,
+    "restraint_score_min": 0.95,
+    "successful_outcome_rate_min": 0.9,
+    "p95_latency_seconds_max": 120
+  },
+  "candidates": [
+    {
+      "route_id": "provider/balanced-agent-model/responses/global/standard",
+      "hard_gates": {"approved_data_posture": true, "required_tools_supported": true, "structured_output_supported": true, "context_sufficient": true, "route_provenance_available": true, "completion_floor_passed": true, "restraint_floor_passed": true},
+      "quality_score": 0.91,
+      "completion_score": 0.96,
+      "restraint_score": 0.98,
+      "successful_outcome_rate": 0.94,
+      "p95_latency_seconds": 88,
+      "estimated_cost_per_run_usd": 0.18,
+      "estimated_cost_per_successful_outcome_usd": 0.19,
+      "evidence": "synthetic fixed-evaluation example"
+    },
+    {
+      "route_id": "provider/cheap-worker-model/responses/global/standard",
+      "hard_gates": {"approved_data_posture": true, "required_tools_supported": true, "structured_output_supported": true, "context_sufficient": true, "route_provenance_available": true, "completion_floor_passed": false, "restraint_floor_passed": true},
+      "quality_score": 0.78,
+      "completion_score": 0.84,
+      "restraint_score": 0.96,
+      "successful_outcome_rate": 0.76,
+      "p95_latency_seconds": 43,
+      "estimated_cost_per_run_usd": 0.03,
+      "estimated_cost_per_successful_outcome_usd": 0.07,
+      "evidence": "synthetic fixed-evaluation example"
+    },
+    {
+      "route_id": "provider/independent-review-model/messages/global/standard",
+      "hard_gates": {"approved_data_posture": true, "required_tools_supported": true, "structured_output_supported": true, "context_sufficient": true, "route_provenance_available": true, "completion_floor_passed": true, "restraint_floor_passed": true},
+      "quality_score": 0.9,
+      "completion_score": 0.93,
+      "restraint_score": 0.97,
+      "successful_outcome_rate": 0.92,
+      "p95_latency_seconds": 104,
+      "estimated_cost_per_run_usd": 0.24,
+      "estimated_cost_per_successful_outcome_usd": 0.26,
+      "evidence": "synthetic fixed-evaluation example"
+    }
+  ],
+  "decision": {
+    "chosen_route_id": "provider/balanced-agent-model/responses/global/standard",
+    "fallback_route_id": "provider/independent-review-model/messages/global/standard",
+    "rationale": "The cheaper route has lower cost per attempted run but fails the declared quality, completion, and successful-outcome floors. Both the balanced route and independent-review fallback clear every hard gate and threshold; the balanced route is chosen because it has lower cost per successful outcome and lower p95 latency.",
+    "approval_state": "example_only_not_approved",
+    "runtime_validation_state": "synthetic_only"
+  },
+  "re_evaluate_on": ["model or provider change", "prompt/tool change", "monthly cost drift", "successful outcome rate below 0.9"]
+}

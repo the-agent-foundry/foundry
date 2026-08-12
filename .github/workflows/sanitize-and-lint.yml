@@ -39,6 +39,11 @@ jobs:
       - name: Synthetic fixture smoke test
         run: python3 gates/scripts/fixture_smoke.py .
 
+      - name: Model roster contract and rendered-table check
+        run: |
+          python3 model-selection/scripts/validate_roster.py --today "$(date -u +%F)"
+          python3 model-selection/scripts/render_roster.py --check
+
       - name: Install Gitleaks
         run: |
           set -euo pipefail

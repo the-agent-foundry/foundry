@@ -11,6 +11,7 @@ These are not private run records. They are shapes your own agent can copy into 
 - `engineering-governance-v2/` : frozen acceptance, direct/adjacent/machinery finding taxonomy, retained checkpoints, and parent follow-through.
 - `model-onboarding-v1/` : exact-route source ledger, fixed evals, completion/restraint scoring, activation rehearsal, rollback, and drift detection.
 - `legal-operator-v1/` : matter-scoped legal-operator profile, request/handoff contracts, and safety plus over-conservatism evaluations.
+- `../model-selection/examples/` : synthetic workload selection record showing hard gates, accepted-outcome economics, fallback, and re-evaluation triggers.
 - `finance-control-v1/` : digest-bound finance mission with exact scope and destinations, source provenance plus claim-scoped precedence, one pre-bound Class A write, a complete pending/non-executed Class B packet, actionable blockers, absent Class C capabilities, timestamped readback, and undo rehearsal.
 
 ## Pickup prompt

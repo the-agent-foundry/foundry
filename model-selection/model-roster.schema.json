@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/the-agent-foundry/foundry/model-selection/model-roster.schema.json",
+  "title": "Agent Foundry public model-candidate roster",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "roster_version", "as_of", "review_due_at", "scope", "currency", "price_unit", "sources", "candidates"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "roster_version": {"type": "string", "pattern": "^[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}$"},
+    "as_of": {"type": "string", "format": "date"},
+    "review_due_at": {"type": "string", "format": "date"},
+    "scope": {"type": "string", "minLength": 20},
+    "currency": {"const": "USD"},
+    "price_unit": {"const": "per_1m_tokens_unless_noted"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "publisher", "url", "section", "claims", "accessed_at"],
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "publisher": {"type": "string", "minLength": 2},
+          "url": {"type": "string", "pattern": "^https://"},
+          "section": {"type": "string", "minLength": 2},
+          "claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+          "accessed_at": {"type": "string", "format": "date"}
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/candidate"}
+    }
+  },
+  "$defs": {
+    "price": {"type": ["number", "null"], "minimum": 0},
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "provider", "model", "distribution_surface", "status", "access_state", "validation_state", "billing_basis", "prices", "best_fit", "strengths", "weaknesses", "prompting_family", "evidence", "source_ids"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[a-z0-9.-]+/[a-z0-9._-]+$"},
+        "provider": {"type": "string", "minLength": 2},
+        "model": {"type": "string", "minLength": 2},
+        "distribution_surface": {"const": "first_party_api"},
+        "status": {"enum": ["current", "preview", "legacy", "retiring", "discontinued"]},
+        "access_state": {"enum": ["publicly_documented", "limited_availability", "unknown"]},
+        "validation_state": {"enum": ["not_validated_by_agent_foundry", "public_fixture_only", "observed"]},
+        "billing_basis": {"enum": ["metered_tokens", "subscription_quota", "credits", "contract", "unknown"]},
+        "prices": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input", "cached_input", "cache_write", "output", "notes"],
+          "properties": {
+            "input": {"$ref": "#/$defs/price"},
+            "cached_input": {"$ref": "#/$defs/price"},
+            "cache_write": {"$ref": "#/$defs/price"},
+            "output": {"$ref": "#/$defs/price"},
+            "notes": {"type": "string", "minLength": 3}
+          }
+        },
+        "best_fit": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+        "strengths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+        "weaknesses": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+        "prompting_family": {"enum": ["openai-reasoning", "claude", "gemini", "grok"]},
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identity_and_price", "suitability"],
+          "properties": {
+            "identity_and_price": {"const": "official"},
+            "suitability": {"enum": ["editorial", "observed"]}
+          }
+        },
+        "source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9-]+$"}}
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/the-agent-foundry/foundry/model-selection/local-overlay.schema.json",
+  "title": "Private exact-route overlay",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "notice", "updated_at", "routes"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "notice": {"type": "string", "minLength": 3},
+    "updated_at": {"type": "string", "format": "date"},
+    "routes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/route"}}
+  },
+  "$defs": {
+    "nullableScore": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "nullableNonnegative": {"type": ["number", "null"], "minimum": 0},
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_id", "public_candidate_id", "provider", "model_id", "api_mode", "endpoint_class", "endpoint_label", "region_or_geography", "service_tier", "tool_surface", "structured_output_state", "privacy_variant", "credential_present", "entitlement_state", "enabled_state", "runtime_validation_state", "approved_data_classes", "billing", "measured", "allowed_workloads", "fallback_route_id", "re_evaluate_on"],
+      "properties": {
+        "route_id": {"type": "string", "pattern": "^[a-z0-9._/-]+$"},
+        "public_candidate_id": {"type": "string", "pattern": "^[a-z0-9.-]+/[a-z0-9._-]+$"},
+        "provider": {"type": "string", "minLength": 2},
+        "model_id": {"type": "string", "minLength": 2},
+        "api_mode": {"enum": ["responses", "messages", "generate_content", "chat_completions", "grpc", "other"]},
+        "endpoint_class": {"enum": ["first_party_api", "managed_cloud", "router", "subscription", "oauth", "local"]},
+        "endpoint_label": {"type": "string", "minLength": 2},
+        "region_or_geography": {"type": "string", "minLength": 2},
+        "service_tier": {"type": "string", "minLength": 2},
+        "tool_surface": {"type": "array", "items": {"type": "string", "minLength": 2}, "uniqueItems": true},
+        "structured_output_state": {"enum": ["supported", "unsupported", "unknown"]},
+        "privacy_variant": {"type": "string", "minLength": 2},
+        "credential_present": {"type": "boolean"},
+        "entitlement_state": {"enum": ["unknown", "not_entitled", "entitled"]},
+        "enabled_state": {"enum": ["not_enabled", "enabled"]},
+        "runtime_validation_state": {"enum": ["not_tested", "failed", "passed"]},
+        "approved_data_classes": {"type": "array", "items": {"type": "string", "minLength": 2}, "uniqueItems": true},
+        "billing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["basis", "plan_or_contract_label", "marginal_cost_notes"],
+          "properties": {
+            "basis": {"enum": ["unknown", "metered_tokens", "subscription_quota", "credits", "contract"]},
+            "plan_or_contract_label": {"type": "string"},
+            "marginal_cost_notes": {"type": "string", "minLength": 3}
+          }
+        },
+        "measured": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fixture_set", "evaluated_at", "quality_score", "completion_score", "restraint_score", "p50_latency_ms", "p95_latency_ms", "successful_outcome_rate", "estimated_cost_per_successful_outcome_usd"],
+          "properties": {
+            "fixture_set": {"type": "string", "minLength": 2},
+            "evaluated_at": {"type": ["string", "null"], "format": "date"},
+            "quality_score": {"$ref": "#/$defs/nullableScore"},
+            "completion_score": {"$ref": "#/$defs/nullableScore"},
+            "restraint_score": {"$ref": "#/$defs/nullableScore"},
+            "p50_latency_ms": {"$ref": "#/$defs/nullableNonnegative"},
+            "p95_latency_ms": {"$ref": "#/$defs/nullableNonnegative"},
+            "successful_outcome_rate": {"$ref": "#/$defs/nullableScore"},
+            "estimated_cost_per_successful_outcome_usd": {"$ref": "#/$defs/nullableNonnegative"}
+          }
+        },
+        "allowed_workloads": {"type": "array", "items": {"type": "string", "minLength": 2}, "uniqueItems": true},
+        "fallback_route_id": {"type": ["string", "null"]},
+        "re_evaluate_on": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}, "uniqueItems": true}
+      }
+    }
+  }
+}
