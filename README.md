@@ -57,6 +57,7 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 - `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, model onboarding, skillification, and repo sanitization.
 - `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer, finance control, and legal operator.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
+- `model-selection/` : a maintained public model-candidate roster, exact-route private-overlay contract, route-aware cost/benefit method, prompting guide, specialist appendix, synthetic selection record, schemas, and freshness gates.
 - `examples/` : sanitized examples of research packets, build governance, model onboarding, matter-scoped legal operations, and a complete closed finance-control mission with digest-bound scope, provenance, actionable blockers, and mutation receipts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 - `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
@@ -69,6 +70,8 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 3. Read the folder README. Each one ends with a pickup prompt.
 4. Hand that prompt to your agent and let it pull the schema, the examples, and the principles into context.
 5. Answer its questions. Decide what to build.
+
+When creating a cron, tool, profile, reviewer, or subagent, start with [`model-selection/`](model-selection/) before picking a model. Combine the public baseline with a private local overlay and validate the exact route; do not treat a public model name or leaderboard as production proof.
 
 Top-level pickup prompt, if you want to start broad:
 

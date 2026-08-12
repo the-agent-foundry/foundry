@@ -8,6 +8,7 @@ The Agent Foundry is a public, sanitized pattern library for founders and operat
 - Read principles/ before recommending implementation details.
 - Use gates/ to understand quality, privacy, security, and approval boundaries.
 - Use skills/, agents/, and tools/ as schemas and examples for building comparable artifacts in the user's own environment.
+- Use model-selection/ to choose routes for new crons, tools, profiles, reviewers, and subagents. Combine its public baseline with a private local overlay and exact-route evaluation.
 - Ask the human for missing business, stack, privacy, and approval context before recommending concrete changes.
 
 ## Support path

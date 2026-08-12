@@ -1,0 +1,127 @@
+{
+  "schema_version": "1.0",
+  "roster_version": "2026.08.11",
+  "as_of": "2026-08-11",
+  "review_due_at": "2026-09-11",
+  "scope": "Selected first-party API model candidates for agent-capable language work. Public documentation proves catalogue and list-price claims only; an exact executable route exists only in a private overlay and requires local validation.",
+  "currency": "USD",
+  "price_unit": "per_1m_tokens_unless_noted",
+  "sources": [
+    {"source_id": "openai-pricing", "publisher": "OpenAI", "url": "https://developers.openai.com/api/docs/pricing", "section": "Model pricing", "claims": ["first-party standard token prices", "cache prices and pricing modifiers"], "accessed_at": "2026-08-11"},
+    {"source_id": "openai-selection", "publisher": "OpenAI", "url": "https://developers.openai.com/api/docs/guides/model-selection", "section": "Model selection", "claims": ["official model-selection framing"], "accessed_at": "2026-08-11"},
+    {"source_id": "anthropic-pricing", "publisher": "Anthropic", "url": "https://platform.claude.com/docs/en/about-claude/pricing.md", "section": "Model pricing", "claims": ["first-party standard token and cache prices", "route and geography pricing modifiers"], "accessed_at": "2026-08-11"},
+    {"source_id": "anthropic-models", "publisher": "Anthropic", "url": "https://platform.claude.com/docs/en/about-claude/models/overview.md", "section": "Latest models comparison", "claims": ["Claude API model identifiers", "official model capability summaries"], "accessed_at": "2026-08-11"},
+    {"source_id": "anthropic-refusals", "publisher": "Anthropic", "url": "https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback", "section": "Refusals and fallback", "claims": ["Claude Fable 5 refusal response and fallback behavior"], "accessed_at": "2026-08-11"},
+    {"source_id": "anthropic-retention", "publisher": "Anthropic", "url": "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention", "section": "Model-specific data retention requirements", "claims": ["Claude Fable 5 30-day retention and zero-data-retention exclusion"], "accessed_at": "2026-08-11"},
+    {"source_id": "gemini-pricing", "publisher": "Google", "url": "https://ai.google.dev/gemini-api/docs/pricing", "section": "Gemini API pricing", "claims": ["paid-tier token prices", "grounding and cache pricing modifiers"], "accessed_at": "2026-08-11"},
+    {"source_id": "gemini-models", "publisher": "Google", "url": "https://ai.google.dev/gemini-api/docs/models", "section": "Models", "claims": ["Gemini API model identifiers and lifecycle state"], "accessed_at": "2026-08-11"},
+    {"source_id": "xai-pricing", "publisher": "xAI", "url": "https://docs.x.ai/developers/pricing", "section": "Text API", "claims": ["standard and long-context token prices", "server-side tool pricing modifiers"], "accessed_at": "2026-08-11"},
+    {"source_id": "xai-models", "publisher": "xAI", "url": "https://docs.x.ai/developers/models", "section": "Models", "claims": ["xAI API model identifiers and context limits"], "accessed_at": "2026-08-11"}
+  ],
+  "candidates": [
+    {
+      "candidate_id": "openai/gpt-5.6-sol", "provider": "OpenAI", "model": "gpt-5.6-sol", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 5.0, "cached_input": 0.5, "cache_write": 6.25, "output": 30.0, "notes": "Standard short-context rate; long-context and fast-mode rates are higher."},
+      "best_fit": ["hardest long-horizon agentic work", "large codebase reasoning", "high-stakes synthesis"],
+      "strengths": ["highest capability in the GPT-5.6 tier", "strong completion on complex multi-step work"],
+      "weaknesses": ["expensive for routine or high-volume tasks", "long-context and service-tier multipliers can dominate cost"],
+      "prompting_family": "openai-reasoning", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["openai-pricing", "openai-selection"]
+    },
+    {
+      "candidate_id": "openai/gpt-5.6-terra", "provider": "OpenAI", "model": "gpt-5.6-terra", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 2.0, "cached_input": 0.2, "cache_write": 2.5, "output": 12.0, "notes": "Standard short-context rate; long-context and fast-mode rates are higher."},
+      "best_fit": ["balanced daily agents", "production coding and analysis", "moderate-volume professional workflows"],
+      "strengths": ["strong quality-cost balance", "broad general-purpose capability"],
+      "weaknesses": ["not the cheapest route for bounded extraction", "still needs workload-specific completion and restraint evaluation"],
+      "prompting_family": "openai-reasoning", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["openai-pricing", "openai-selection"]
+    },
+    {
+      "candidate_id": "openai/gpt-5.6-luna", "provider": "OpenAI", "model": "gpt-5.6-luna", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 0.2, "cached_input": 0.02, "cache_write": 0.25, "output": 1.2, "notes": "Standard short-context rate; long-context and fast-mode rates are higher."},
+      "best_fit": ["bounded high-volume workers", "classification and extraction", "cheap subagents with strong contracts"],
+      "strengths": ["very low token cost", "useful member of the same GPT-5.6 family"],
+      "weaknesses": ["lower ceiling on ambiguous or long-horizon work", "cheap calls become expensive when weak specifications cause retries"],
+      "prompting_family": "openai-reasoning", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["openai-pricing", "openai-selection"]
+    },
+    {
+      "candidate_id": "anthropic/claude-fable-5", "provider": "Anthropic", "model": "claude-fable-5", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 10.0, "cached_input": 1.0, "cache_write": 12.5, "output": 50.0, "notes": "Five-minute cache-write price shown; one-hour cache writes cost more."},
+      "best_fit": ["maximum-capability autonomous knowledge work", "long-horizon coding", "capability-critical research"],
+      "strengths": ["highest-capability Claude tier", "designed for autonomous knowledge and coding work"],
+      "weaknesses": ["highest list price in the main Claude roster", "safety classifiers may return refusals as HTTP 200 and require explicit fallback handling", "30-day data retention; not available under zero data retention"],
+      "prompting_family": "claude", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["anthropic-pricing", "anthropic-models", "anthropic-refusals", "anthropic-retention"]
+    },
+    {
+      "candidate_id": "anthropic/claude-opus-5", "provider": "Anthropic", "model": "claude-opus-5", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 5.0, "cached_input": 0.5, "cache_write": 6.25, "output": 25.0, "notes": "Five-minute cache-write price shown; fast mode and US-only inference add premiums."},
+      "best_fit": ["deep reasoning and review", "complex agentic coding", "independent high-stakes critique"],
+      "strengths": ["strong judgment and long-context work", "useful independent reviewer for non-Claude builders"],
+      "weaknesses": ["can be verbose or expand narrow tasks without a tight contract", "premium cost for routine execution"],
+      "prompting_family": "claude", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["anthropic-pricing", "anthropic-models"]
+    },
+    {
+      "candidate_id": "anthropic/claude-sonnet-5", "provider": "Anthropic", "model": "claude-sonnet-5", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 2.0, "cached_input": 0.2, "cache_write": 2.5, "output": 10.0, "notes": "Five-minute cache-write price shown."},
+      "best_fit": ["everyday production agents", "general coding", "balanced Claude workloads"],
+      "strengths": ["best mainstream Claude cost-capability balance", "strong coding and agentic utility"],
+      "weaknesses": ["not the maximum reasoning tier", "route-specific tool and restraint behavior still requires evaluation"],
+      "prompting_family": "claude", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["anthropic-pricing", "anthropic-models"]
+    },
+    {
+      "candidate_id": "anthropic/claude-haiku-4-5-20251001", "provider": "Anthropic", "model": "claude-haiku-4-5-20251001", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 1.0, "cached_input": 0.1, "cache_write": 1.25, "output": 5.0, "notes": "Five-minute cache-write price shown."},
+      "best_fit": ["fast lightweight agents", "repetitive transformations", "latency-sensitive bounded work"],
+      "strengths": ["fast and inexpensive within the Claude family", "good fit for simple high-volume tasks"],
+      "weaknesses": ["lower ceiling on hard reasoning", "often more expensive than the cheapest cross-provider small models"],
+      "prompting_family": "claude", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["anthropic-pricing", "anthropic-models"]
+    },
+    {
+      "candidate_id": "google/gemini-3.6-flash", "provider": "Google", "model": "gemini-3.6-flash", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 1.5, "cached_input": 0.15, "cache_write": null, "output": 7.5, "notes": "Standard paid tier; search grounding, cache storage, batch, flex, and priority have separate economics."},
+      "best_fit": ["fast frontier multimodal work", "search-grounded agents", "coding and web workflows"],
+      "strengths": ["speed-intelligence balance", "strong native grounding and multimodal surface"],
+      "weaknesses": ["tool and grounding charges can exceed token cost", "free and paid tiers have materially different privacy and feature posture"],
+      "prompting_family": "gemini", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["gemini-pricing", "gemini-models"]
+    },
+    {
+      "candidate_id": "google/gemini-3.1-pro-preview", "provider": "Google", "model": "gemini-3.1-pro-preview", "distribution_surface": "first_party_api", "status": "preview", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 2.0, "cached_input": 0.2, "cache_write": null, "output": 12.0, "notes": "Standard prompts up to 200k tokens; longer prompts cost more. Preview routes can change."},
+      "best_fit": ["deep multimodal reasoning", "technical analysis", "agentic coding evaluations"],
+      "strengths": ["high reasoning and multimodal ceiling", "large-context professional work"],
+      "weaknesses": ["preview stability risk", "long-context and grounding costs require explicit modeling"],
+      "prompting_family": "gemini", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["gemini-pricing", "gemini-models"]
+    },
+    {
+      "candidate_id": "google/gemini-3.5-flash-lite", "provider": "Google", "model": "gemini-3.5-flash-lite", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 0.3, "cached_input": 0.03, "cache_write": null, "output": 2.5, "notes": "Standard paid tier; batch/flex rates are lower."},
+      "best_fit": ["high-volume agentic tasks", "translation", "simple data processing"],
+      "strengths": ["low-cost multimodal input", "good volume economics"],
+      "weaknesses": ["lower reasoning ceiling", "grounding fees can erase savings for search-heavy tasks"],
+      "prompting_family": "gemini", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["gemini-pricing", "gemini-models"]
+    },
+    {
+      "candidate_id": "xai/grok-4.5", "provider": "xAI", "model": "grok-4.5", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 2.0, "cached_input": 0.3, "cache_write": null, "output": 6.0, "notes": "Prompts at or above 200k tokens cost 2x; server-side tools are separately metered."},
+      "best_fit": ["adversarial review", "general agentic tools", "current X and web research when tools are enabled"],
+      "strengths": ["strong critique posture", "native X-search ecosystem"],
+      "weaknesses": ["real-time knowledge requires separately priced tools", "speculative review must be constrained by evidence and severity rules"],
+      "prompting_family": "grok", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["xai-pricing", "xai-models"]
+    },
+    {
+      "candidate_id": "xai/grok-4.3", "provider": "xAI", "model": "grok-4.3", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 1.25, "cached_input": 0.2, "cache_write": null, "output": 2.5, "notes": "Prompts at or above 200k tokens cost 2x; server-side tools are separately metered."},
+      "best_fit": ["fast instruction following", "tool-calling agents", "cost-sensitive xAI workloads"],
+      "strengths": ["lower xAI text cost than Grok 4.5", "large documented context window"],
+      "weaknesses": ["lower ceiling than Grok 4.5 for difficult review", "tool costs and long-context tiers need explicit budgeting"],
+      "prompting_family": "grok", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["xai-pricing", "xai-models"]
+    },
+    {
+      "candidate_id": "xai/grok-build-0.1", "provider": "xAI", "model": "grok-build-0.1", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
+      "prices": {"input": 1.0, "cached_input": 0.2, "cache_write": null, "output": 2.0, "notes": "Prompts at or above 200k tokens cost 2x."},
+      "best_fit": ["bounded agentic software engineering", "implementation workers", "code review with exact artifacts"],
+      "strengths": ["coding-specialized economics", "low output price for build loops"],
+      "weaknesses": ["specialist rather than universal default", "requires tests and file-bound verification to prevent invented completion evidence"],
+      "prompting_family": "grok", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["xai-pricing", "xai-models"]
+    }
+  ]
+}
