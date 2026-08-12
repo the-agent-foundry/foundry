@@ -456,9 +456,16 @@ class ContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             home, candidate, _, _ = self.setup_candidate(td)
             lock = candidate.parent / ".disk-guardian-retention.lock"
-            lock.unlink(); lock.write_text(""); lock.chmod(0o600)
-            guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
-            self.assertIn("contract_lock_identity_changed", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
+            held_fd = os.open(lock, os.O_RDONLY)
+            try:
+                original = os.fstat(held_fd)
+                lock.unlink(); lock.write_text(""); lock.chmod(0o600)
+                replacement = lock.lstat()
+                self.assertNotEqual((original.st_dev, original.st_ino), (replacement.st_dev, replacement.st_ino))
+                guardian = dg.Guardian(dg.default_policy(), home=home, measure_fn=fixed_measure(), runner=clear_runner)
+                self.assertIn("contract_lock_identity_changed", {row.get("blocker") for row in guardian.scan()["retention_contracts"]})
+            finally:
+                os.close(held_fd)
 
     def test_missing_proof_blocks(self):
         with tempfile.TemporaryDirectory() as td:
