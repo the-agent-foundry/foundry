@@ -16,6 +16,16 @@ The fix is not to choose between completion and restraint. It is to separate the
 - **Complete** does not authorize unrelated architecture, speculative hardening, neighboring product work, or repeated review loops.
 - **Sufficient** means every accepted outcome and direct defect is closed with inspectable proof.
 
+## Portable implementation: the proportionate execution contract
+
+The reusable implementation has three layers. Most teams need the first two, not the third:
+
+1. **Standing prompt/configuration**: a short Markdown or text contract loaded into the engineering agent's system prompt, profile, or task launcher. It makes the accepted task the sole source of scope, requires every material action to advance one open claim or gate, parks adjacent findings, and stops material work after first green.
+2. **Per-task contract artifacts**: a compact task contract, action ledger, and closeout receipt that make scope and completion inspectable. Small changes can infer these fields from the request rather than creating paperwork.
+3. **Optional runtime admission**: code or middleware that denies prohibited material actions after first green on one exact contracted run. Use only after controlled evaluations prove prompt-only failure; keep it default-off and transparent outside exact contracts.
+
+The public [`proportionate-execution-contract` skill](../skills/examples/proportionate-execution-contract-skill.md) and [synthetic fixture](../examples/proportionate-execution-contract-v1/) provide the drop-in pattern, validator, and adversarial cases. They intentionally omit private prompts, local paths, runtime wiring, and production receipts.
+
 ## One governance core, adaptive steering
 
 Do not maintain two contradictory engineering systems for “smart” and “old” models. Keep one structural core and vary only the behavioral steering layer.

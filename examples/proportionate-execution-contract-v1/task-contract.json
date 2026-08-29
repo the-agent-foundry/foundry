@@ -1,0 +1,51 @@
+{
+  "schema_version": "proportionate-execution-contract/task/v1",
+  "contract_id": "pec-demo-001",
+  "accepted_outcome": "Change the existing report-retention value from 14 to 30 days through its current owner path and prove the result.",
+  "claims": [
+    {
+      "id": "CLAIM-CONFIG-01",
+      "kind": "accepted_claim",
+      "state": "open",
+      "requirement": "The existing report-retention key equals 30 days.",
+      "acceptance_evidence": "Exact readback from the changed synthetic configuration fixture."
+    },
+    {
+      "id": "GATE-VALIDATION-01",
+      "kind": "mandatory_gate",
+      "state": "open",
+      "requirement": "Focused configuration validation passes with unrelated keys unchanged.",
+      "acceptance_evidence": "Validator exit code 0 and protected-surface comparison."
+    }
+  ],
+  "non_goals": [
+    "generalize the configuration module",
+    "add a compatibility adapter",
+    "introduce a second configuration path",
+    "replace the scheduler"
+  ],
+  "allowed_surfaces": [
+    "synthetic report-retention key",
+    "focused synthetic validation evidence"
+  ],
+  "protected_surfaces": [
+    "other configuration keys",
+    "notification destinations",
+    "scheduler behavior",
+    "credentials"
+  ],
+  "approval_boundaries": [
+    "no external send",
+    "no service restart",
+    "no credential operation",
+    "no live activation"
+  ],
+  "terminal_result": "DONE_VERIFIED",
+  "bounded_closeout_actions": [
+    "write closeout receipt",
+    "read back changed synthetic value"
+  ],
+  "runtime_enforcement_required": false,
+  "synthetic": true,
+  "authorizing": false
+}

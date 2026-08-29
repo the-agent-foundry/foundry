@@ -9,7 +9,9 @@ Use them as patterns:
 - Keep private prompts, customer data, chat IDs, raw transcripts, internal paths, and credential details out of public artifacts.
 - Add your own scar tissue. The examples are useful, but your failures are the part that makes the skill compound.
 
-Current examples include reusable patterns for call intelligence, branded documents, content voice, privacy routing, recurring briefings, Question Storm inquiry, Auto-buildroom governance, model onboarding, repo sanitization, research packets, skillification, and well-structured task execution.
+Current examples include reusable patterns for call intelligence, branded documents, content voice, privacy routing, recurring briefings, Question Storm inquiry, Auto-buildroom governance, model onboarding, proportionate execution, repo sanitization, research packets, skillification, and well-structured task execution.
+
+- [`proportionate-execution-contract-skill.md`](proportionate-execution-contract-skill.md) keeps completion-heavy agents inside accepted scope, makes new machinery prove necessity, and stops material work after the requested outcome is proven.
 
 ## Pickup prompt
 
