@@ -1,0 +1,32 @@
+{
+  "schema_version": "proportionate-execution-contract/closeout/v1",
+  "contract_id": "pec-demo-001",
+  "result": "DONE_VERIFIED",
+  "closed_claim_ids": [
+    "CLAIM-CONFIG-01",
+    "GATE-VALIDATION-01"
+  ],
+  "open_claims": [],
+  "first_green_ordinal": 5,
+  "post_green_material_actions": 0,
+  "post_green_actions": [
+    "write closeout receipt",
+    "read back changed synthetic value"
+  ],
+  "adjacent_findings_parked": 1,
+  "rejected_unnecessary_machinery": 1,
+  "changed_surfaces": [
+    "synthetic report-retention key",
+    "focused synthetic validation evidence"
+  ],
+  "protected_surfaces_unchanged": true,
+  "runtime_enforcement_used": false,
+  "residual_risks": [
+    "Future storage-backend generalization remains outside this task and requires a separate accepted outcome."
+  ],
+  "external_send": false,
+  "service_restart": false,
+  "live_activation": false,
+  "synthetic": true,
+  "authorizing": false
+}

@@ -1,0 +1,8 @@
+{
+  "report_retention_days": 30,
+  "notification_destination": "synthetic-internal-inbox",
+  "scheduler_mode": "daily",
+  "credential_handling": "unchanged-reference",
+  "synthetic": true,
+  "authorizing": false
+}
