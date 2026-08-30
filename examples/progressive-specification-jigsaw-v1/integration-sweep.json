@@ -1,0 +1,24 @@
+{
+  "schema_version": "jigsaw-integration-sweep.v1",
+  "fixture_id": "synthetic-jigsaw-v1",
+  "programme_id": "workshop-booking-planner",
+  "synthetic": true,
+  "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "generation": 1,
+  "status": "pass",
+  "accepted_piece_ids": [
+    "PIECE-DATA-01",
+    "PIECE-SCHEDULE-01",
+    "PIECE-INTEGRATION-01"
+  ],
+  "checks": [
+    {"check_id": "producer_consumer_parity", "status": "pass", "evidence": "Every command, record, audit, query, and output interface has a named producer and consumer."},
+    {"check_id": "state_owner", "status": "pass", "evidence": "The booking store solely owns accepted booking and audit state."},
+    {"check_id": "migration", "status": "pass", "evidence": "The synthetic first release has no predecessor data migration."},
+    {"check_id": "observability", "status": "pass", "evidence": "Audit entries and explicit read/write errors cover accepted mutations and failures."},
+    {"check_id": "recovery", "status": "pass", "evidence": "Transactional rollback preserves prior state after failed writes."},
+    {"check_id": "rollback", "status": "pass", "evidence": "No live activation exists; builder cells require a reversible local fixture before any launch proposal."},
+    {"check_id": "acceptance_coverage", "status": "pass", "evidence": "REQ-001 through REQ-005 map to accepted pieces and build-cell verification."}
+  ],
+  "execution_authority": false
+}

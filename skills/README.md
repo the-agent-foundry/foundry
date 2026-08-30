@@ -72,6 +72,7 @@ Every skill in this repo follows one canonical schema so a human or an agent can
 - `examples/repo-sanitization-skill.md` : publishing useful public repo material without leaking private implementation.
 - `examples/research-packet-skill.md` : creating evidence-backed research packets with ledgers, confidence labels, human-facing companions, and orchestrator-owned handoff.
 - `examples/safe-runtime-upgrade-skill.md` : upgrading an agent runtime with preflight proof, local-change protection, postflight checks, and rollback.
+- `examples/progressive-specification-jigsaw-skill.md` : turning ambiguous product goals into an exact owner-approved, integrated builder blueprint without starting implementation.
 
 ## How to use this with your agent
 

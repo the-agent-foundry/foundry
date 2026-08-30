@@ -1,0 +1,20 @@
+{
+  "schema_version": "jigsaw-status.v1",
+  "fixture_id": "synthetic-jigsaw-v1",
+  "programme_id": "workshop-booking-planner",
+  "synthetic": true,
+  "phase": 4,
+  "charter_state": "locked",
+  "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "accepted_piece_ids": [
+    "PIECE-DATA-01",
+    "PIECE-SCHEDULE-01",
+    "PIECE-INTEGRATION-01"
+  ],
+  "integration_status": "pass",
+  "readiness_status": "READY_FOR_BUILDER",
+  "build_state": "BUILD_NOT_STARTED",
+  "build_started": false,
+  "next_owner_gate": "Authorize handoff of the exact validated blueprint to a builder.",
+  "execution_authority": false
+}

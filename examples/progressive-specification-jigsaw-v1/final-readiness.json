@@ -1,0 +1,16 @@
+{
+  "schema_version": "jigsaw-final-readiness.v1",
+  "fixture_id": "synthetic-jigsaw-v1",
+  "programme_id": "workshop-booking-planner",
+  "synthetic": true,
+  "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "build_spec_sha256_chunks": ["60f94b6c2d3a6384", "c0315990a5cebf6c", "cdeae710536ee170", "4ef91c4faf851c7e"],
+  "integration_generation": 1,
+  "validation_status": "pass",
+  "readiness_status": "READY_FOR_BUILDER",
+  "build_state": "BUILD_NOT_STARTED",
+  "build_started": false,
+  "builder_handoff_authorized": false,
+  "execution_authority": false,
+  "next_owner_prompt": "Specification is complete and validated. Build has not started. Send this exact blueprint to a builder?"
+}
