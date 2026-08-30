@@ -163,7 +163,7 @@ class ProgressiveSpecificationJigsawTests(unittest.TestCase):
     def test_lifecycle_identity_rewrite_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             fixture = copy_fixture(temp)
-            for filename in ("charter-lock.json", "integration-sweep.json", "BUILD-SPEC.json", "STATUS.json", "final-readiness.json"):
+            for filename in ("PHASE-0-DISCOVERY.json", "charter-lock.json", "integration-sweep.json", "BUILD-SPEC.json", "STATUS.json", "final-readiness.json"):
                 mutate_json(fixture / filename, lambda value: value.update(programme_id="different-programme"))
             rows = read_jsonl(fixture / "decision-pieces.jsonl")
             for row in rows:
@@ -172,13 +172,90 @@ class ProgressiveSpecificationJigsawTests(unittest.TestCase):
             errors = MODULE.validate(fixture)
             self.assertTrue(any("programme identity drift" in error or "stale charter or programme binding" in error for error in errors))
 
-    def test_private_marker_is_rejected(self):
+    def test_phase0_requires_adaptive_questions_and_no_charter(self):
+        mutations = (
+            lambda value: value.update(adaptive_questions=[]),
+            lambda value: value.update(adaptive_questions=value["adaptive_questions"] + [dict(value["adaptive_questions"][0])]),
+            lambda value: value.update(charter_created_during_conversation=True),
+        )
+        for mutation in mutations:
+            with tempfile.TemporaryDirectory() as temp:
+                fixture = copy_fixture(temp)
+                mutate_json(fixture / "PHASE-0-DISCOVERY.json", mutation)
+                errors = MODULE.validate(fixture)
+                self.assertTrue(any("PHASE-0-DISCOVERY" in error for error in errors))
+
+    def test_decision_and_integration_generations_are_content_bound(self):
         with tempfile.TemporaryDirectory() as temp:
             fixture = copy_fixture(temp)
-            readme = fixture / "README.md"
-            readme.write_text(readme.read_text(encoding="utf-8") + "\nPrivate path: /Users/example/runtime\n", encoding="utf-8")
+            mutate_jsonl(
+                fixture / "decision-pieces.jsonl",
+                0,
+                lambda value: value.update(
+                    decision="Launch an unrelated public marketplace immediately.",
+                    evidence=["rewritten evidence that retains the same reusable piece identity"],
+                ),
+            )
             errors = MODULE.validate(fixture)
-            self.assertTrue(any("private marker detected" in error for error in errors))
+            self.assertTrue(any("frozen accepted generation" in error for error in errors))
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = copy_fixture(temp)
+            mutate_json(
+                fixture / "integration-sweep.json",
+                lambda value: [check.update(evidence="x") for check in value["checks"]],
+            )
+            errors = MODULE.validate(fixture)
+            self.assertTrue(any("frozen accepted generation" in error for error in errors))
+            self.assertTrue(any("substantive passing evidence" in error for error in errors))
+
+    def test_cell_requirements_must_be_supported_by_named_pieces(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = copy_fixture(temp)
+            rows = read_jsonl(fixture / "decision-pieces.jsonl")
+            rows[0]["requirement_ids"] = ["REQ-004"]
+            rows[1]["requirement_ids"] = ["REQ-001", "REQ-002", "REQ-003", "REQ-005"]
+            write_jsonl(fixture / "decision-pieces.jsonl", rows)
+            errors = MODULE.validate(fixture)
+            self.assertTrue(any("not supported by the cell's named pieces" in error for error in errors))
+
+    def test_owner_gate_prose_cannot_widen_authority(self):
+        mutations = (
+            ("STATUS.json", lambda value: value.update(next_owner_gate="Builder authorized; launch now without approval.")),
+            ("final-readiness.json", lambda value: value.update(next_owner_prompt="Implementation started; launch the builder now.")),
+        )
+        for filename, mutation in mutations:
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as temp:
+                fixture = copy_fixture(temp)
+                mutate_json(fixture / filename, mutation)
+                errors = MODULE.validate(fixture)
+                self.assertTrue(any("authority widening" in error for error in errors))
+
+    def test_wrong_container_types_fail_closed_without_crashing(self):
+        mutations = (
+            ("integration-sweep.json", lambda value: value.update(accepted_piece_ids=True)),
+            ("STATUS.json", lambda value: value.update(accepted_piece_ids=True)),
+            ("decision-pieces.jsonl", None),
+            ("BUILD-SPEC.json", lambda value: value["cells"][0].update(dependencies=True)),
+        )
+        for filename, mutation in mutations:
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as temp:
+                fixture = copy_fixture(temp)
+                if filename == "decision-pieces.jsonl":
+                    mutate_jsonl(fixture / filename, 0, lambda value: value.update(dependencies=True))
+                else:
+                    assert mutation is not None
+                    mutate_json(fixture / filename, mutation)
+                errors = MODULE.validate(fixture)
+                self.assertTrue(errors)
+                self.assertTrue(any("string list" in error for error in errors))
+
+    def test_duplicate_piece_identity_lists_fail_closed(self):
+        for filename in ("integration-sweep.json", "STATUS.json"):
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as temp:
+                fixture = copy_fixture(temp)
+                mutate_json(fixture / filename, lambda value: value["accepted_piece_ids"].append(value["accepted_piece_ids"][0]))
+                errors = MODULE.validate(fixture)
+                self.assertTrue(any("unique non-empty string list" in error for error in errors))
 
 
 if __name__ == "__main__":

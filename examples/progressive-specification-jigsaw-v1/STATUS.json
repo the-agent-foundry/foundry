@@ -6,6 +6,9 @@
   "phase": 4,
   "charter_state": "locked",
   "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "decision_pieces_sha256_chunks": ["bc42631061e6c8a6", "3c28a7a519b9c138", "4c3f248ca61cb050", "b5996a3be3aac808"],
+  "integration_sweep_sha256_chunks": ["2452758891af743b", "d4d67c3830bb2f71", "dcf15f324e364cbc", "954eeb618ef3a043"],
+  "build_spec_sha256_chunks": ["595d38c5c575a6d6", "8d2058e680ea1658", "0f64d80a786d7a62", "0b38b9a95b9556c8"],
   "accepted_piece_ids": [
     "PIECE-DATA-01",
     "PIECE-SCHEDULE-01",

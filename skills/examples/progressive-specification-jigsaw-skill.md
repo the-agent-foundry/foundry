@@ -97,14 +97,15 @@ If destination, audience, authority, or unacceptable failure is unclear, remain 
 
 Minimum durable artifact chain:
 
-1. `PHASE-0-SPECIFICATION`: complete owner-visible candidate.
-2. `CHARTER`: exact copy of the approved candidate.
-3. `charter-lock`: candidate/charter digests, approval reference, charter state, and no-execution boundary.
-4. `decision-pieces`: typed accepted decisions with evidence and charter binding.
-5. `integration-sweep`: exact generation, required seam checks, and pass/fail evidence.
-6. `BUILD-SPEC`: dependency-ordered cells with cumulative verification and protected surfaces.
-7. `STATUS`: phase, charter state, accepted generation, blockers, next move, and next owner gate.
-8. `final-readiness`: exact blueprint digest, `READY_FOR_BUILDER`, `BUILD_NOT_STARTED`, and no builder-launch authority.
+1. `PHASE-0-DISCOVERY`: provisional understanding, one to three adaptive questions, consequences of error, owner corrections, and no-charter/no-execution state.
+2. `PHASE-0-SPECIFICATION`: complete owner-visible candidate.
+3. `CHARTER`: exact copy of the approved candidate.
+4. `charter-lock`: discovery, candidate, and charter digests; approval reference; charter state; and no-execution boundary.
+5. `decision-pieces`: typed accepted decisions with evidence and charter binding.
+6. `integration-sweep`: content-bound accepted decision generation, required seam checks, and pass/fail evidence.
+7. `BUILD-SPEC`: content-bound integration generation and dependency-ordered cells with cumulative verification and protected surfaces.
+8. `STATUS`: phase, charter state, exact accepted generation, blockers, next move, and exact next owner gate.
+9. `final-readiness`: exact decision, integration, blueprint, and status digests; `READY_FOR_BUILDER`; `BUILD_NOT_STARTED`; and no builder-launch authority.
 
 Required tool capabilities: conversational refinement, authorized source inspection, bounded research, durable artifact writes, exact hashing, schema/structure validation, and readback. A builder launcher is deliberately absent from this skill's minimum capability set.
 

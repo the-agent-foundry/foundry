@@ -1,0 +1,28 @@
+{
+  "schema_version": "jigsaw-phase0-discovery.v1",
+  "fixture_id": "synthetic-jigsaw-v1",
+  "programme_id": "workshop-booking-planner",
+  "synthetic": true,
+  "phase0_state": "candidate_ready_for_owner_review",
+  "provisional_understanding": "Workshop staff need one internal booking schedule that prevents room collisions, preserves accepted state, and produces a printable weekly view without creating a public marketplace.",
+  "adaptive_questions": [
+    {
+      "question": "Should the first release accept bookings only from authenticated staff, or also from the public?",
+      "decision_impact": "Changes the audience, identity model, abuse surface, and acceptance criteria.",
+      "consequence_of_error": "Building public intake by assumption would widen scope and privacy risk; omitting it when required would make the product unusable."
+    },
+    {
+      "question": "Is preventing overlaps sufficient, or must accepted changes also carry a durable audit trail?",
+      "decision_impact": "Changes the state model, transaction boundary, and verification burden.",
+      "consequence_of_error": "A collision-safe system without required audit history would still fail the owner's trust requirement."
+    },
+    {
+      "question": "Does the weekly output need automated delivery, or is on-demand printable generation enough?",
+      "decision_impact": "Changes external-send authority, scheduler requirements, and operating burden.",
+      "consequence_of_error": "Assuming automated delivery would create an unnecessary live-send surface; omitting it if required would miss the intended workflow."
+    }
+  ],
+  "owner_correction_summary": "Keep the first release internal to staff, require an audit trail, and generate the weekly schedule on demand without automated delivery.",
+  "charter_created_during_conversation": false,
+  "execution_authority": false
+}

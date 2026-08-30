@@ -4,6 +4,7 @@
   "programme_id": "workshop-booking-planner",
   "synthetic": true,
   "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "decision_pieces_sha256_chunks": ["bc42631061e6c8a6", "3c28a7a519b9c138", "4c3f248ca61cb050", "b5996a3be3aac808"],
   "generation": 1,
   "status": "pass",
   "accepted_piece_ids": [

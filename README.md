@@ -54,12 +54,12 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full update history, [`MIGRATION.md`]
 - `principles/` : rank-ordered design principles and a template to write your own.
 - `gates/` : the hard checks that protect quality, security, and privacy. Includes the working sanitization gate that guards this very repo.
 - `security/` : tenant-scoped authorization patterns, machine-readable ACL examples, and egress-surface test matrices for multi-client agents.
-- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, model onboarding, skillification, and repo sanitization.
+- `skills/` : what a skill is, the canonical schema, a blank template, and expanded examples for tasks, documents, calls, briefings, research packets, writing, privacy routing, Question Storm, Auto-buildroom governance, progressive specification, model onboarding, skillification, and repo sanitization.
 - `agents/` : why specialists beat a generalist, the agent role-spec schema, model-calibrated engineering governance, the profile operating model, and ten expanded archetypes including engineer, finance control, and legal operator.
 - `tools/` : the tool-belt philosophy, a tool-spec schema, and example specs.
 - `model-selection/` : a maintained public model-candidate roster, exact-route private-overlay contract, route-aware cost/benefit method, prompting guide, specialist appendix, synthetic selection record, schemas, and freshness gates.
 - `disk-guardian/` : an executable macOS/APFS pressure guardian with bounded cache cleanup, closed Hermes retention contracts, dry-run/doctor workflows, receipts, adversarial tests, and generated launchd scheduling.
-- `examples/` : sanitized examples of research packets, build governance, model onboarding, matter-scoped legal operations, and a complete closed finance-control mission with digest-bound scope, provenance, actionable blockers, and mutation receipts.
+- `examples/` : sanitized examples of research packets, build governance, progressive specification with exact owner-approved binding and a build-not-started terminal state, model onboarding, matter-scoped legal operations, and a complete closed finance-control mission with digest-bound scope, provenance, actionable blockers, and mutation receipts.
 - `community/` : namespaced contributions from other founders, governed by an automated gate.
 - `CHANGELOG.md`, `MIGRATION.md`, `docs/release-process.md` : update history, breaking-change notes, and release notification process.
 - `SUPPORT.md`, `llms.txt`, `agent-support.yaml` : human-readable and machine-readable guidance for getting optional implementation help.
