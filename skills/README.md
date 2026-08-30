@@ -71,6 +71,7 @@ Every skill in this repo follows one canonical schema so a human or an agent can
 - `examples/model-onboarding-skill.md` : evaluating an exact model route against fixed capability, completion, restraint, privacy, activation, rollback, and drift contracts.
 - `examples/repo-sanitization-skill.md` : publishing useful public repo material without leaking private implementation.
 - `examples/research-packet-skill.md` : creating evidence-backed research packets with ledgers, confidence labels, human-facing companions, and orchestrator-owned handoff.
+- `examples/safe-runtime-upgrade-skill.md` : upgrading an agent runtime with preflight proof, local-change protection, postflight checks, and rollback.
 
 ## How to use this with your agent
 
