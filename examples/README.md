@@ -10,6 +10,7 @@ These are not private run records. They are shapes your own agent can copy into 
 - `auto-buildroom-v1/` : proposal-only build governance fixture: idea contract, approval review, build plan, QA receipt, trust report, and operator summary.
 - `engineering-governance-v2/` : frozen acceptance, direct/adjacent/machinery finding taxonomy, retained checkpoints, and parent follow-through.
 - `proportionate-execution-contract-v1/` : accepted-claim action admission, machinery-necessity proof, adjacent-finding parking, first-green stopping, and adversarial validation for completion-heavy models.
+- `progressive-specification-jigsaw-v1/` : conversational specification, exact approval binding, bounded decision pieces, integration sweep, dependency-ordered builder cells, and a mechanically separate build-not-started terminal state.
 - `model-onboarding-v1/` : exact-route source ledger, fixed evals, completion/restraint scoring, activation rehearsal, rollback, and drift detection.
 - `legal-operator-v1/` : matter-scoped legal-operator profile, request/handoff contracts, and safety plus over-conservatism evaluations.
 - `../model-selection/examples/` : synthetic workload selection record showing hard gates, accepted-outcome economics, fallback, and re-evaluation triggers.

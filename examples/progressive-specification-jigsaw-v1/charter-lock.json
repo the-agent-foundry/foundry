@@ -1,0 +1,21 @@
+{
+  "schema_version": "jigsaw-charter-lock.v1",
+  "fixture_id": "synthetic-jigsaw-v1",
+  "programme_id": "workshop-booking-planner",
+  "synthetic": true,
+  "phase0_discovery_path": "PHASE-0-DISCOVERY.json",
+  "phase0_discovery_sha256_chunks": ["64c6fb6bc0447cd2", "0be0fba1c9769e8b", "c14d1b2db29739ed", "29e9ca9806f0a753"],
+  "specification_path": "PHASE-0-SPECIFICATION.md",
+  "charter_path": "CHARTER.md",
+  "specification_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "charter_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+  "exact_byte_copy": true,
+  "owner_approval": {
+    "approval_ref": "synthetic-owner-approval-v1",
+    "approved_specification_sha256_chunks": ["7706c86ca6f479d1", "9bdfeacb7ddf4aa8", "cee2916177efaf51", "92882c660eb5c557"],
+    "approved": true
+  },
+  "charter_state": "locked",
+  "charter_created_during_conversation": false,
+  "execution_authority": false
+}
