@@ -39,25 +39,25 @@ def render(data: dict) -> str:
         "",
         "| Workload shape | Starting model candidate | Why |",
         "|---|---|---|",
-        "| Hardest long-horizon work | `openai/gpt-5.6-sol` or `anthropic/claude-fable-5` | Highest capability; use only when the job earns the premium |",
-        "| Balanced production agent | `openai/gpt-5.6-terra` or `anthropic/claude-sonnet-5` | Strong cost-capability balance |",
-        "| Cheap bounded worker | `openai/gpt-5.6-luna` or `google/gemini-3.5-flash-lite` | High-volume economics |",
-        "| Independent deep review | `anthropic/claude-opus-5` or `xai/grok-4.5` | Strong judgment or adversarial posture; prefer provider diversity from the builder |",
-        "| Fast grounded multimodal work | `google/gemini-3.6-flash` | Native grounding and multimodal strength |",
+        "| Hardest long-horizon work | `openai/gpt-6-astra` or `anthropic/claude-fable-5-1` | Editorial high-capability starting points; use only when the job earns the premium |",
+        "| Balanced production agent | `openai/gpt-6-sol` or `anthropic/claude-opus-5-5` | Editorial cost-capability starting points |",
+        "| Cheap bounded worker | `openai/gpt-6-luna` or `google/gemini-3.5-flash-lite` | Editorial high-volume economics |",
+        "| Independent deep review | `anthropic/claude-opus-5-5` or `xai/grok-4.7` | Editorial reviewer candidates; prefer provider diversity from the builder |",
+        "| Fast grounded multimodal work | `google/gemini-3.8-flash` | Editorial multimodal starting point; grounding is separately priced |",
         "| Bounded coding specialist | `xai/grok-build-0.1` | Coding-focused route with low published output cost |",
         "",
         "These are editorial starting points, not activation decisions.",
         "",
         "## Candidate table",
         "",
-        "| Model candidate | Status | Standard price: in / cached / write / out | Editorial best fit | Main caveat |",
-        "|---|---|---|---|---|",
+        "| Model candidate | Status | Standard price: in / cached / write / out | Price tier and caveat | Editorial best fit | Editorial weakness |",
+        "|---|---|---|---|---|---|",
     ]
     for candidate in data["candidates"]:
         p = candidate["prices"]
         price = " / ".join([money(p["input"]), money(p["cached_input"]), money(p["cache_write"]), money(p["output"])])
         lines.append(
-            f"| `{candidate['candidate_id']}` | {candidate['status']} | {price} | {compact(candidate['best_fit'])} | {compact(candidate['weaknesses'])} |"
+            f"| `{candidate['candidate_id']}` | {candidate['status']} | {price} | {p['notes']} | {compact(candidate['best_fit'])} | {compact(candidate['weaknesses'])} |"
         )
     lines.extend([
         "",
@@ -67,6 +67,8 @@ def render(data: dict) -> str:
         "- Subscription, OAuth, cloud-marketplace, router, and negotiated-contract routes need separate rows in your private overlay. Do not paste direct-API prices onto them and call it accounting.",
         "- `publicly_documented` does not mean enabled, entitled, validated, or approved in your environment.",
         "- Preview routes can change without the stability expected from generally available routes.",
+        "- `legacy` means still available in the cited catalogue, not retired. Google's 3.6 Flash is previous-generation **stable**, and xAI still lists 4.5 and 4.6; none of these statuses proves local entitlement.",
+        "- Google Flash 3.8/3.6 paid Standard promotional rates run through 2026-12-31, with higher published rates scheduled from 2027-01-01; OpenAI GPT-5.6 Sol promotional pricing is documented at least through 2026-11-21. Recheck before relying on future bills.",
         "- Suitability guidance is editorial unless an `observed` fixed evaluation is explicitly published.",
         "",
         "## Sources",

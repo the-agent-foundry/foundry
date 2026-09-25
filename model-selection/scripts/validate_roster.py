@@ -215,8 +215,10 @@ def validate_package(root: Path = ROOT, today: dt.date | None = None, overlay_pa
     sources = roster.get("sources", [])
     specialist_text = (root / "SPECIALIST-MODELS.md").read_text(encoding="utf-8")
     specialist_dates = re.findall(r"^\*\*Snapshot date:\*\* (\d{4}-\d{2}-\d{2})\.", specialist_text, flags=re.MULTILINE)
-    if not as_of or len(specialist_dates) != 1 or specialist_dates[0] != as_of.isoformat():
-        errors.append("specialist snapshot date must appear exactly once and match roster as_of")
+    # The separately priced specialist appendix is a dated historical snapshot;
+    # do not silently redate it when the language roster is refreshed.
+    if not as_of or len(specialist_dates) != 1 or specialist_dates[0] > as_of.isoformat():
+        errors.append("specialist snapshot date must appear exactly once and not follow roster as_of")
     source_ids = {source.get("source_id") for source in sources}
     if len(source_ids) != len(sources) or None in source_ids:
         errors.append("source IDs must be unique and non-null")
@@ -239,7 +241,7 @@ def validate_package(root: Path = ROOT, today: dt.date | None = None, overlay_pa
     candidate_ids = [candidate.get("candidate_id") for candidate in candidates]
     if len(candidate_ids) != len(set(candidate_ids)):
         errors.append("candidate IDs must be unique")
-    known_anthropic_ids = {"claude-fable-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5-20251001"}
+    known_anthropic_ids = {"claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5-20251001"}
     for candidate in candidates:
         candidate_id = candidate.get("candidate_id", "<missing>")
         expected_id = f"{str(candidate.get('provider', '')).lower()}/{candidate.get('model', '')}"

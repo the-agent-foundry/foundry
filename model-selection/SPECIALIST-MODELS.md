@@ -2,7 +2,7 @@
 
 The main roster is intentionally limited to agent-capable language-model candidates. Specialist models deserve separate decisions because their units, quality criteria, and operational risks differ.
 
-**Snapshot date:** 2026-08-11. This date must match `public-model-roster.json`; the package validator rejects drift. Prices and availability are public documentation snapshots, not local entitlement proof.
+**Snapshot date:** 2026-08-11. This separately dated historical appendix is not part of the September language-roster refresh; its prices and availability need their own current source check before use. The validator rejects a missing, duplicate, or future-to-roster appendix date. Public documentation snapshots are not local entitlement proof.
 
 ## Image and video examples
 

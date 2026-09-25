@@ -37,11 +37,47 @@ class ModelSelectionPackageTests(unittest.TestCase):
         path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
     def assert_error(self, expected: str, today: dt.date | None = None) -> None:
-        errors = VALIDATOR.validate_package(self.root, today=today or dt.date(2026, 8, 11))
+        errors = VALIDATOR.validate_package(self.root, today=today or dt.date(2026, 9, 25))
         self.assertTrue(any(expected in error for error in errors), errors)
 
     def test_canonical_package_passes(self) -> None:
-        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 8, 11)))
+        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 9, 25)))
+
+    def test_official_refresh_prices_and_predecessors(self) -> None:
+        roster = json.loads((self.root / "public-model-roster.json").read_text())
+        self.assertEqual(("2026.09.25", "2026-09-25", "2026-10-25"),
+                         (roster["roster_version"], roster["as_of"], roster["review_due_at"]))
+        rows = {row["candidate_id"]: row for row in roster["candidates"]}
+        expected = {
+            "openai/gpt-6-astra": (10, 1, 12.5, 50, "current"),
+            "openai/gpt-6-sol": (2, .2, 2.5, 10, "current"),
+            "openai/gpt-6-luna": (.1, .01, .125, .5, "current"),
+            "openai/gpt-5.6-sol": (4, .4, 5, 20, "current"),
+            "anthropic/claude-fable-5-1": (10, .25, 12.5, 50, "current"),
+            "anthropic/claude-fable-5": (10, 1, 12.5, 50, "legacy"),
+            "anthropic/claude-opus-5-5": (4, .2, 5, 20, "current"),
+            "anthropic/claude-opus-5": (5, .5, 6.25, 25, "legacy"),
+            "google/gemini-3.8-flash": (.75, .075, None, 3.75, "current"),
+            "google/gemini-3.6-flash": (.75, .075, None, 3.75, "current"),
+            "xai/grok-4.7": (2, .5, None, 6, "current"),
+            "xai/grok-4.6": (2, .5, None, 6, "current"),
+            "xai/grok-4.5": (2, .3, None, 6, "current"),
+        }
+        for candidate_id, fact in expected.items():
+            with self.subTest(candidate_id=candidate_id):
+                row = rows[candidate_id]
+                p = row["prices"]
+                self.assertEqual(fact, (p["input"], p["cached_input"], p["cache_write"], p["output"], row["status"]))
+                self.assertEqual({"identity_and_price": "official", "suitability": "editorial"}, row["evidence"])
+        self.assertEqual(len(rows), len(roster["candidates"]))
+
+    def test_rendered_prices_tier_and_editorial_parity(self) -> None:
+        text = (self.root / "MODEL-ROSTER.md").read_text()
+        self.assertIn("`google/gemini-3.8-flash` | current | $0.75 / $0.075 / n/a / $3.75", text)
+        self.assertIn("Standard paid promotional rates through 2026-12-31", text)
+        self.assertIn("`anthropic/claude-fable-5` | legacy", text)
+        self.assertIn("These are editorial starting points, not activation decisions.", text)
+        self.assertIn("`xai/grok-4.5` | current", text)
 
     def test_duplicate_candidate_fails(self) -> None:
         self.mutate_json("public-model-roster.json", lambda d: d["candidates"].append(copy.deepcopy(d["candidates"][0])))
@@ -71,7 +107,10 @@ class ModelSelectionPackageTests(unittest.TestCase):
         self.assert_error("unknown property 'secret_extra'")
 
     def test_anthropic_api_identity_fails(self) -> None:
-        self.mutate_json("public-model-roster.json", lambda d: d["candidates"][6].update({"candidate_id": "anthropic/claude-haiku-4.5", "model": "claude-haiku-4.5"}))
+        def mutate(data):
+            row = next(row for row in data["candidates"] if row["model"] == "claude-haiku-4-5-20251001")
+            row.update({"candidate_id": "anthropic/claude-haiku-4.5", "model": "claude-haiku-4.5"})
+        self.mutate_json("public-model-roster.json", mutate)
         self.assert_error("undocumented Anthropic API model ID")
 
     def test_private_path_fails(self) -> None:
@@ -92,11 +131,11 @@ class ModelSelectionPackageTests(unittest.TestCase):
         self.assert_error("expected const False")
 
     def test_stale_window_over_31_days_fails(self) -> None:
-        self.mutate_json("public-model-roster.json", lambda d: d.update({"review_due_at": "2026-10-11"}))
+        self.mutate_json("public-model-roster.json", lambda d: d.update({"review_due_at": "2026-10-27"}))
         self.assert_error("review window must be 31 days or less")
 
     def test_overdue_roster_fails(self) -> None:
-        self.assert_error("roster is overdue", today=dt.date(2026, 9, 12))
+        self.assert_error("roster is overdue", today=dt.date(2026, 10, 26))
 
     def test_stale_source_fails(self) -> None:
         self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-06-01"}))
@@ -168,24 +207,24 @@ class ModelSelectionPackageTests(unittest.TestCase):
 
     def test_future_roster_date_fails(self) -> None:
         def mutate(data: dict) -> None:
-            data["as_of"] = "2026-08-12"
-            data["review_due_at"] = "2026-09-11"
+            data["as_of"] = "2026-09-26"
+            data["review_due_at"] = "2026-10-25"
         self.mutate_json("public-model-roster.json", mutate)
         self.assert_error("roster as_of cannot be in the future")
 
     def test_future_source_date_fails(self) -> None:
-        self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-08-12"}))
+        self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-09-26"}))
         self.assert_error("source accessed_at cannot be in the future")
 
     def test_specialist_snapshot_drift_fails(self) -> None:
         path = self.root / "SPECIALIST-MODELS.md"
-        path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-08-10."))
-        self.assert_error("specialist snapshot date must appear exactly once and match roster as_of")
+        path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-09-26."))
+        self.assert_error("specialist snapshot date must appear exactly once and not follow roster as_of")
 
     def test_specialist_snapshot_duplicate_fails(self) -> None:
         path = self.root / "SPECIALIST-MODELS.md"
         path.write_text(path.read_text() + "\n**Snapshot date:** 2026-08-11.\n")
-        self.assert_error("specialist snapshot date must appear exactly once and match roster as_of")
+        self.assert_error("specialist snapshot date must appear exactly once and not follow roster as_of")
 
     def test_non_finite_number_fails(self) -> None:
         self.mutate_json("examples/selection-record.example.json", lambda d: d["candidates"][0].update({"quality_score": math.nan}))
@@ -196,7 +235,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["routes"][0].update({"provider": "xAI", "model_id": "grok-4.5"})
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 8, 11), overlay_path=path)
+        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 9, 25), overlay_path=path)
         self.assertTrue(any("exact route provider/model must match public candidate" in error for error in errors), errors)
 
     def test_external_overlay_duplicate_id_fails(self) -> None:
@@ -206,7 +245,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["routes"].append(duplicate)
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 8, 11), overlay_path=path)
+        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 9, 25), overlay_path=path)
         self.assertTrue(any("overlay route IDs must be unique" in error for error in errors), errors)
 
     def test_external_overlay_accepts_private_notice(self) -> None:
@@ -214,7 +253,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["notice"] = "PRIVATE EXACT-ROUTE OVERLAY"
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 8, 11), overlay_path=path))
+        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 9, 25), overlay_path=path))
 
 
 if __name__ == "__main__":
