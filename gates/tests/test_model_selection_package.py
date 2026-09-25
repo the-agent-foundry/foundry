@@ -221,6 +221,11 @@ class ModelSelectionPackageTests(unittest.TestCase):
         path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-09-26."))
         self.assert_error("specialist snapshot date must appear exactly once and not follow roster as_of")
 
+    def test_specialist_snapshot_invalid_calendar_date_fails(self) -> None:
+        path = self.root / "SPECIALIST-MODELS.md"
+        path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-02-31."))
+        self.assert_error("specialist snapshot date must appear exactly once and not follow roster as_of")
+
     def test_specialist_snapshot_duplicate_fails(self) -> None:
         path = self.root / "SPECIALIST-MODELS.md"
         path.write_text(path.read_text() + "\n**Snapshot date:** 2026-08-11.\n")

@@ -217,7 +217,11 @@ def validate_package(root: Path = ROOT, today: dt.date | None = None, overlay_pa
     specialist_dates = re.findall(r"^\*\*Snapshot date:\*\* (\d{4}-\d{2}-\d{2})\.", specialist_text, flags=re.MULTILINE)
     # The separately priced specialist appendix is a dated historical snapshot;
     # do not silently redate it when the language roster is refreshed.
-    if not as_of or len(specialist_dates) != 1 or specialist_dates[0] > as_of.isoformat():
+    try:
+        specialist_date = dt.date.fromisoformat(specialist_dates[0]) if len(specialist_dates) == 1 else None
+    except ValueError:
+        specialist_date = None
+    if not as_of or specialist_date is None or specialist_date > as_of:
         errors.append("specialist snapshot date must appear exactly once and not follow roster as_of")
     source_ids = {source.get("source_id") for source in sources}
     if len(source_ids) != len(sources) or None in source_ids:
