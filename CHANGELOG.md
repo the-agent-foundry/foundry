@@ -4,6 +4,17 @@ All notable public updates to The Agent Foundry are tracked here.
 
 This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 
+## 2026.10.13
+
+### Updated
+- Refreshed the public model-candidate roster from official provider sources: added GPT-6.1 Sol, Claude Sonnet 5.5, and Claude Haiku 5.5.
+- Updated editorial shortlists and clarified Haiku long-context pricing and fallback-cache costs. Preserved predecessor identities and their own prices.
+- Snapshot: October 13, 2026. Next review due: November 13, 2026, or earlier after a material provider event. The specialist appendix remains explicitly historical.
+
+### Verification and migration
+- 183 tests passed; roster validation, rendering parity, sanitization, and independent review completed.
+- No breaking changes or migration required. Public catalogue entries do not activate or validate local model routes.
+
 ## Unreleased
 
 ### Added
