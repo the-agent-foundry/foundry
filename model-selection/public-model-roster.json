@@ -125,10 +125,10 @@
     },
     {
       "candidate_id": "anthropic/claude-haiku-5-5", "provider": "Anthropic", "model": "claude-haiku-5-5", "distribution_surface": "first_party_api", "status": "current", "access_state": "publicly_documented", "validation_state": "not_validated_by_agent_foundry", "billing_basis": "metered_tokens",
-      "prices": {"input": 0.1, "cached_input": 0.01, "cache_write": 0.125, "output": 0.5, "notes": "Standard prompts <=100k tokens; >100k: $0.50/$0.05/$0.625/$2.50 for full request, including cached input. Five-minute write; one-hour write $0.20 short/$1 long. US-only inference adds 10%."},
+      "prices": {"input": 0.1, "cached_input": 0.01, "cache_write": 0.125, "output": 0.5, "notes": "Standard prompts <=100k tokens (prompt length includes cache reads and cache writes); >100k: input/cache-read/cache-write/output $0.50/$0.05/$0.625/$2.50 for the full request, including cache reads and cache writes. Five-minute write; one-hour write $0.20 short/$1 long. US-only inference adds 10%."},
       "best_fit": ["high-volume classification and extraction", "latency-sensitive bounded agents"],
       "strengths": ["current low-cost Haiku candidate", "low short-context list price"],
-      "weaknesses": ["higher rates above 100k prompt tokens", "HTTP 200 refusal needs client-side fallback; no server-side fallback or fallback credit", "hard reasoning and exact-route suitability untested"],
+      "weaknesses": ["higher rates above 100k prompt tokens", "HTTP 200 refusal needs client-side fallback; no server-side fallback or fallback credit; client-side fallback pays the full cost of writing the fallback model's prompt cache", "hard reasoning and exact-route suitability untested"],
       "prompting_family": "claude", "evidence": {"identity_and_price": "official", "suitability": "editorial"}, "source_ids": ["anthropic-pricing", "anthropic-models", "anthropic-refusals"]
     },
     {

@@ -94,9 +94,29 @@ class ModelSelectionPackageTests(unittest.TestCase):
         self.assertIn("`anthropic/claude-sonnet-5` | legacy | $2 / $0.2 / $2.5 / $10", text)
         self.assertIn("`anthropic/claude-haiku-5-5` | current | $0.1 / $0.01 / $0.125 / $0.5", text)
         self.assertIn("`anthropic/claude-haiku-4-5-20251001` | legacy | $1 / $0.1 / $1.25 / $5", text)
-        self.assertIn(">100k: $0.50/$0.05/$0.625/$2.50 for full request, including cached input", text)
+        self.assertIn(">100k: input/cache-read/cache-write/output $0.50/$0.05/$0.625/$2.50 for the full request, including cache reads and cache writes", text)
         self.assertIn("no server-side refusal fallback or fallback credit", text)
         self.assertIn("Sonnet 5.5 and Haiku 5.5 classifier refusals are normal HTTP 200 responses", text)
+
+    def test_haiku_whole_request_pricing_and_fallback_cache_cost(self) -> None:
+        roster = json.loads((self.root / "public-model-roster.json").read_text())
+        haiku = next(row for row in roster["candidates"]
+                     if row["candidate_id"] == "anthropic/claude-haiku-5-5")
+        text = (self.root / "MODEL-ROSTER.md").read_text()
+        caveat = next(line for line in text.splitlines()
+                      if line.startswith("- Claude Haiku 5.5's low rates"))
+        notes = haiku["prices"]["notes"]
+        self.assertIn("<=100k tokens (prompt length includes cache reads and cache writes)", notes)
+        self.assertIn(">100k: input/cache-read/cache-write/output $0.50/$0.05/$0.625/$2.50", notes)
+        self.assertIn("for the full request, including cache reads and cache writes", notes)
+        self.assertIn(notes, text)
+        self.assertIn("up to 100k prompt tokens (prompt length includes cache reads and cache writes)", caveat)
+        self.assertIn("higher input/cache-read/cache-write/output tier ($0.50/$0.05/$0.625/$2.50)", caveat)
+        self.assertIn("for the full request, including cache reads and cache writes", caveat)
+        fallback_cost = "client-side fallback pays the full cost of writing the fallback model's prompt cache"
+        self.assertTrue(any(fallback_cost in weakness for weakness in haiku["weaknesses"]))
+        self.assertIn(fallback_cost, caveat)
+        self.assertIn("no server-side refusal fallback or fallback credit", caveat)
 
     def test_shortlist_uses_refreshed_candidates_without_retiring_predecessors(self) -> None:
         roster = json.loads((self.root / "public-model-roster.json").read_text())
