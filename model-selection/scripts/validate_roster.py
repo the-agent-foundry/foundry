@@ -245,7 +245,7 @@ def validate_package(root: Path = ROOT, today: dt.date | None = None, overlay_pa
     candidate_ids = [candidate.get("candidate_id") for candidate in candidates]
     if len(candidate_ids) != len(set(candidate_ids)):
         errors.append("candidate IDs must be unique")
-    known_anthropic_ids = {"claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5-20251001"}
+    known_anthropic_ids = {"claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5", "claude-sonnet-5", "claude-haiku-5-5", "claude-haiku-4-5-20251001"}
     for candidate in candidates:
         candidate_id = candidate.get("candidate_id", "<missing>")
         expected_id = f"{str(candidate.get('provider', '')).lower()}/{candidate.get('model', '')}"
