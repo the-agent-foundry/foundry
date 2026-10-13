@@ -1,8 +1,8 @@
 # Public model-candidate roster
 
-**Snapshot:** 2026-09-25
+**Snapshot:** 2026-10-13
 
-**Review due:** 2026-10-25
+**Review due:** 2026-11-13
 
 **Prices:** USD per 1M tokens unless noted
 
@@ -15,8 +15,8 @@
 | Workload shape | Starting model candidate | Why |
 |---|---|---|
 | Hardest long-horizon work | `openai/gpt-6-astra` or `anthropic/claude-fable-5-1` | Editorial high-capability starting points; use only when the job earns the premium |
-| Balanced production agent | `openai/gpt-6-sol` or `anthropic/claude-opus-5-5` | Editorial cost-capability starting points |
-| Cheap bounded worker | `openai/gpt-6-luna` or `google/gemini-3.5-flash-lite` | Editorial high-volume economics |
+| Balanced production agent | `openai/gpt-6.1-sol` or `anthropic/claude-sonnet-5-5` | Editorial cost-capability starting points |
+| Cheap bounded worker | `openai/gpt-6-luna`, `anthropic/claude-haiku-5-5`, or `google/gemini-3.5-flash-lite` | Editorial high-volume economics; Haiku rates increase above 100k prompt tokens |
 | Independent deep review | `anthropic/claude-opus-5-5` or `xai/grok-4.7` | Editorial reviewer candidates; prefer provider diversity from the builder |
 | Fast grounded multimodal work | `google/gemini-3.8-flash` | Editorial multimodal starting point; grounding is separately priced |
 | Bounded coding specialist | `xai/grok-build-0.1` | Coding-focused route with low published output cost |
@@ -28,7 +28,8 @@ These are editorial starting points, not activation decisions.
 | Model candidate | Status | Standard price: in / cached / write / out | Price tier and caveat | Editorial best fit | Editorial weakness |
 |---|---|---|---|---|---|
 | `openai/gpt-6-astra` | current | $10 / $1 / $12.5 / $50 | Flagship Standard short context; >272k input tokens: 2x input/cache and 1.5x output for full request. | ambiguous high-stakes deliverables; complex agentic work | premium token price; local suitability and entitlement untested |
-| `openai/gpt-6-sol` | current | $2 / $0.2 / $2.5 / $10 | Flagship Standard short context; long context, Fast mode and residency can cost more. | everyday coding and writing; balanced agentic work | still requires exact-route evaluation; tool fees and long context can dominate |
+| `openai/gpt-6.1-sol` | current | $2 / $0.1 / $2.5 / $10 | Standard up to 272k input tokens; >272k: $4/$0.20/$5/$15 for full request. Fast/Ultrafast and residency cost more. | balanced production agents; complex coding and synthesis where cost matters | exact-route suitability and entitlement untested; long context and tools can dominate cost |
+| `openai/gpt-6-sol` | current | $2 / $0.2 / $2.5 / $10 | Still listed predecessor; Standard short context. >272k input tokens: 2x input/cache and 1.5x output for full request; Fast and residency cost more. | everyday coding and writing; balanced agentic work | still requires exact-route evaluation; tool fees and long context can dominate |
 | `openai/gpt-6-luna` | current | $0.1 / $0.01 / $0.125 / $0.5 | Flagship Standard short context; long context, Fast mode and residency can cost more. | bounded classification; frequent scoped automations | lower ceiling for ambiguous work; retries and tools can erase savings |
 | `openai/gpt-5.6-sol` | current | $4 / $0.4 / $5 / $20 | Cyber models, standard short context; promotional pricing at least through 2026-11-21. >272k input tokens: 2x input, 1.5x output for full request. | complex professional work; large codebase reasoning; high-stakes synthesis | expensive for routine or high-volume tasks; long-context and service-tier multipliers can dominate cost |
 | `openai/gpt-5.6-terra` | current | $2 / $0.2 / $2.5 / $12 | Standard short context; >272k input tokens: 2x input and 1.5x output for full request; cache writes 1.25x input. | balanced daily agents; production coding and analysis; moderate-volume professional workflows | not the cheapest route for bounded extraction; still needs workload-specific completion and restraint evaluation |
@@ -37,8 +38,10 @@ These are editorial starting points, not activation decisions.
 | `anthropic/claude-fable-5` | legacy | $10 / $1 / $12.5 / $50 | Legacy, still available. Five-minute cache-write price shown; one-hour writes cost more. | maximum-capability autonomous knowledge work; long-horizon coding; capability-critical research | higher cache read price than Fable 5.1; safety classifiers may return refusals as HTTP 200 and require explicit fallback handling; covered-model 30-day retention absent special authorization |
 | `anthropic/claude-opus-5-5` | current | $4 / $0.2 / $5 / $20 | Five-minute cache write; one-hour write $8. Fast and US-only inference cost more. | general-purpose Claude agent; independent deep review | HTTP 200 classifier refusal needs handling; exact-route tool and restraint behavior untested |
 | `anthropic/claude-opus-5` | legacy | $5 / $0.5 / $6.25 / $25 | Legacy, still available. Five-minute cache write; fast mode and US-only inference add premiums. | deep reasoning and review; complex agentic coding; independent high-stakes critique | can be verbose or expand narrow tasks without a tight contract; premium cost for routine execution |
-| `anthropic/claude-sonnet-5` | current | $2 / $0.2 / $2.5 / $10 | Five-minute cache-write price shown. | everyday production agents; general coding; balanced Claude workloads | not the maximum reasoning tier; route-specific tool and restraint behavior still requires evaluation |
-| `anthropic/claude-haiku-4-5-20251001` | current | $1 / $0.1 / $1.25 / $5 | Five-minute cache-write price shown. | fast lightweight agents; repetitive transformations; latency-sensitive bounded work | lower ceiling on hard reasoning; often more expensive than the cheapest cross-provider small models |
+| `anthropic/claude-sonnet-5-5` | current | $2 / $0.1 / $2.5 / $10 | Five-minute cache write; one-hour write $4. Standard rates across 1M context; US-only inference adds 10%. | balanced Claude production agents; latency-conscious coding and tool workflows | HTTP 200 classifier refusal needs handling; exact-route tool and restraint behavior untested |
+| `anthropic/claude-sonnet-5` | legacy | $2 / $0.2 / $2.5 / $10 | Legacy, still available. Five-minute cache write; one-hour write $4. $2/$10 is now standard, not introductory pricing. | everyday production agents; general coding; balanced Claude workloads | not the maximum reasoning tier; route-specific tool and restraint behavior still requires evaluation |
+| `anthropic/claude-haiku-5-5` | current | $0.1 / $0.01 / $0.125 / $0.5 | Standard prompts <=100k tokens; >100k: $0.50/$0.05/$0.625/$2.50 for full request, including cached input. Five-minute write; one-hour write $0.20 short/$1 long. US-only inference adds 10%. | high-volume classification and extraction; latency-sensitive bounded agents | higher rates above 100k prompt tokens; HTTP 200 refusal needs client-side fallback; no server-side fallback or fallback credit; hard reasoning and exact-route suitability untested |
+| `anthropic/claude-haiku-4-5-20251001` | legacy | $1 / $0.1 / $1.25 / $5 | Legacy, still available. Five-minute cache write; one-hour write $2. | fast lightweight agents; repetitive transformations; latency-sensitive bounded work | lower ceiling on hard reasoning; often more expensive than the cheapest cross-provider small models |
 | `google/gemini-3.8-flash` | current | $0.75 / $0.075 / n/a / $3.75 | Standard paid promotional rates through 2026-12-31; scheduled $1.50/$0.15/$7.50 from 2027-01-01. Cache storage and grounding separate. | fast multimodal agents; search-grounded and coding workflows | grounding and storage charges require budgeting; free and paid data-use terms differ |
 | `google/gemini-3.6-flash` | current | $0.75 / $0.075 / n/a / $3.75 | Previous-generation stable, not shut down. Standard paid promotional rates through 2026-12-31; scheduled $1.50/$0.15/$7.50 from 2027-01-01. Cache storage and grounding separate. | fast frontier multimodal work; search-grounded agents; coding and web workflows | tool and grounding charges can exceed token cost; free and paid tiers have materially different privacy and feature posture |
 | `google/gemini-3.1-pro-preview` | preview | $2 / $0.2 / n/a / $12 | Standard prompts up to 200k tokens; longer prompts cost more. Preview routes can change. | deep multimodal reasoning; technical analysis; agentic coding evaluations | preview stability risk; long-context and grounding costs require explicit modeling |
@@ -55,22 +58,23 @@ These are editorial starting points, not activation decisions.
 - Subscription, OAuth, cloud-marketplace, router, and negotiated-contract routes need separate rows in your private overlay. Do not paste direct-API prices onto them and call it accounting.
 - `publicly_documented` does not mean enabled, entitled, validated, or approved in your environment.
 - Preview routes can change without the stability expected from generally available routes.
-- `legacy` means still available in the cited catalogue, not retired. Google's 3.6 Flash is previous-generation **stable**, and xAI still lists 4.5 and 4.6; none of these statuses proves local entitlement.
+- `legacy` means still available in the cited catalogue, not retired. Claude Sonnet 5 and Haiku 4.5 join Fable 5 and Opus 5 as legacy candidates. OpenAI still lists GPT-6 Sol at its own prices; Google's 3.6 Flash is previous-generation **stable**, and xAI still lists 4.5 and 4.6. None of these statuses proves local entitlement.
+- Claude Haiku 5.5's low rates apply only up to 100k prompt tokens, including cache reads/writes; longer prompts use the higher tier for the full request. Sonnet 5.5 and Haiku 5.5 classifier refusals are normal HTTP 200 responses, not successful task completion. Haiku 5.5 has no server-side refusal fallback or fallback credit; budget authorized client-side retries separately.
 - Google Flash 3.8/3.6 paid Standard promotional rates run through 2026-12-31, with higher published rates scheduled from 2027-01-01; OpenAI GPT-5.6 Sol promotional pricing is documented at least through 2026-11-21. Recheck before relying on future bills.
 - Suitability guidance is editorial unless an `observed` fixed evaluation is explicitly published.
 
 ## Sources
 
-- [OpenAI: openai-pricing](https://developers.openai.com/api/docs/pricing) - accessed 2026-09-25
-- [OpenAI: openai-selection](https://developers.openai.com/api/docs/guides/model-selection) - accessed 2026-09-25
-- [Anthropic: anthropic-pricing](https://platform.claude.com/docs/en/about-claude/pricing.md) - accessed 2026-09-25
-- [Anthropic: anthropic-models](https://platform.claude.com/docs/en/models/overview.md) - accessed 2026-09-25
-- [Anthropic: anthropic-refusals](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback) - accessed 2026-09-25
-- [Anthropic: anthropic-retention](https://platform.claude.com/docs/en/manage-claude/api-and-data-retention) - accessed 2026-09-25
-- [Google: gemini-pricing](https://ai.google.dev/gemini-api/docs/pricing) - accessed 2026-09-25
-- [Google: gemini-models](https://ai.google.dev/gemini-api/docs/models) - accessed 2026-09-25
-- [xAI: xai-pricing](https://docs.x.ai/developers/pricing) - accessed 2026-09-25
-- [xAI: xai-models](https://docs.x.ai/developers/models) - accessed 2026-09-25
+- [OpenAI: openai-pricing](https://developers.openai.com/api/docs/pricing.md) - accessed 2026-10-13
+- [OpenAI: openai-selection](https://developers.openai.com/api/docs/guides/model-selection) - accessed 2026-10-13
+- [Anthropic: anthropic-pricing](https://platform.claude.com/docs/en/about-claude/pricing.md) - accessed 2026-10-13
+- [Anthropic: anthropic-models](https://platform.claude.com/docs/en/models/overview.md) - accessed 2026-10-13
+- [Anthropic: anthropic-refusals](https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback) - accessed 2026-10-13
+- [Anthropic: anthropic-retention](https://platform.claude.com/docs/en/manage-claude/api-and-data-retention) - accessed 2026-10-13
+- [Google: gemini-pricing](https://ai.google.dev/gemini-api/docs/pricing) - accessed 2026-10-13
+- [Google: gemini-models](https://ai.google.dev/gemini-api/docs/models) - accessed 2026-10-13
+- [xAI: xai-pricing](https://docs.x.ai/developers/pricing) - accessed 2026-10-13
+- [xAI: xai-models](https://docs.x.ai/developers/models) - accessed 2026-10-13
 
 ## How to use this roster
 
