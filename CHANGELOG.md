@@ -4,6 +4,16 @@ All notable public updates to The Agent Foundry are tracked here.
 
 This repo uses date-based release tags for public update batches: `YYYY.MM.DD`.
 
+## 2026.11.13
+
+### Updated
+- Rechecked the selected model-candidate roster against official OpenAI, Anthropic, Google, and xAI documentation. Snapshot: November 13, 2026. Next review due: December 14, 2026; the specialist appendix remains historical.
+- Added publicly documented, locally unvalidated GPT-6.1 Terra at $1 / $0.05 / $1.25 / $5 per million input / cached input / 30-minute cache-write / output tokens. Its full-request long-context multipliers and Responses API tool-calling requirement are explicit.
+- Corrected the GPT-5.6 Sol promotion end date to November 30, 2026 in both roster data and rendered caveats. Clarified OpenAI cache-write retention and GPT-5.6 long-context cache rates; marked retained Fable 5.1 as active legacy and removed outdated latest-model wording for it and Gemini 3.8 Flash.
+
+### Migration
+- No breaking changes or migration required. Predecessors and their own prices remain listed; suitability is editorial, not local entitlement, validation, or activation.
+
 ## 2026.10.13
 
 ### Updated

@@ -38,24 +38,25 @@ class ModelSelectionPackageTests(unittest.TestCase):
         path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
     def assert_error(self, expected: str, today: dt.date | None = None) -> None:
-        errors = VALIDATOR.validate_package(self.root, today=today or dt.date(2026, 10, 13))
+        errors = VALIDATOR.validate_package(self.root, today=today or dt.date(2026, 11, 13))
         self.assertTrue(any(expected in error for error in errors), errors)
 
     def test_canonical_package_passes(self) -> None:
-        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 10, 13)))
+        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 11, 13)))
 
     def test_official_refresh_prices_and_predecessors(self) -> None:
         roster = json.loads((self.root / "public-model-roster.json").read_text())
-        self.assertEqual(("2026.10.13", "2026-10-13", "2026-11-13"),
+        self.assertEqual(("2026.11.13", "2026-11-13", "2026-12-14"),
                          (roster["roster_version"], roster["as_of"], roster["review_due_at"]))
         rows = {row["candidate_id"]: row for row in roster["candidates"]}
         expected = {
             "openai/gpt-6-astra": (10, 1, 12.5, 50, "current"),
             "openai/gpt-6.1-sol": (2, .1, 2.5, 10, "current"),
+            "openai/gpt-6.1-terra": (1, .05, 1.25, 5, "current"),
             "openai/gpt-6-sol": (2, .2, 2.5, 10, "current"),
             "openai/gpt-6-luna": (.1, .01, .125, .5, "current"),
             "openai/gpt-5.6-sol": (4, .4, 5, 20, "current"),
-            "anthropic/claude-fable-5-1": (10, .25, 12.5, 50, "current"),
+            "anthropic/claude-fable-5-1": (10, .25, 12.5, 50, "legacy"),
             "anthropic/claude-fable-5": (10, 1, 12.5, 50, "legacy"),
             "anthropic/claude-opus-5-5": (4, .2, 5, 20, "current"),
             "anthropic/claude-opus-5": (5, .5, 6.25, 25, "legacy"),
@@ -76,19 +77,38 @@ class ModelSelectionPackageTests(unittest.TestCase):
                 self.assertEqual(fact, (p["input"], p["cached_input"], p["cache_write"], p["output"], row["status"]))
                 self.assertEqual({"identity_and_price": "official", "suitability": "editorial"}, row["evidence"])
         self.assertEqual(len(rows), len(roster["candidates"]))
-        self.assertTrue(all(source["accessed_at"] == "2026-10-13" for source in roster["sources"]))
+        self.assertTrue(all(source["accessed_at"] == "2026-11-13" for source in roster["sources"]))
         self.assertTrue(all(row["access_state"] == "publicly_documented" and
                             row["validation_state"] == "not_validated_by_agent_foundry"
                             for row in rows.values()))
+        terra = rows["openai/gpt-6.1-terra"]
+        self.assertIn("openai-terra", terra["source_ids"])
+        terra_source = next(source for source in roster["sources"] if source["source_id"] == "openai-terra")
+        self.assertEqual("https://developers.openai.com/api/docs/models/gpt-6.1-terra", terra_source["url"])
+        self.assertIn("30-minute cache write shown (12-hour write $2.50)", terra["prices"]["notes"])
+        self.assertIn(">272k: 2x input/cache and 1.5x output for the full request", terra["prices"]["notes"])
+        self.assertIn("Tool calling requires the Responses API", terra["prices"]["notes"])
+        self.assertIn("exact-route suitability and entitlement untested", terra["weaknesses"])
+        self.assertIn("promotional pricing until 2026-11-30", rows["openai/gpt-5.6-sol"]["prices"]["notes"])
+        self.assertNotIn("2026-11-21", json.dumps(roster))
+        self.assertNotIn("latest Fable model", rows["anthropic/claude-fable-5-1"]["strengths"])
+        self.assertNotIn("latest stable Flash model", rows["google/gemini-3.8-flash"]["strengths"])
 
     def test_rendered_prices_tier_and_editorial_parity(self) -> None:
         text = (self.root / "MODEL-ROSTER.md").read_text()
         self.assertIn("`google/gemini-3.8-flash` | current | $0.75 / $0.075 / n/a / $3.75", text)
         self.assertIn("Standard paid promotional rates through 2026-12-31", text)
         self.assertIn("`anthropic/claude-fable-5` | legacy", text)
+        self.assertIn("`anthropic/claude-fable-5-1` | legacy | $10 / $0.25 / $12.5 / $50", text)
         self.assertIn("These are editorial starting points, not activation decisions.", text)
         self.assertIn("`xai/grok-4.5` | current", text)
         self.assertIn("`openai/gpt-6.1-sol` | current | $2 / $0.1 / $2.5 / $10", text)
+        self.assertIn("`openai/gpt-6.1-terra` | current | $1 / $0.05 / $1.25 / $5", text)
+        self.assertIn("30-minute cache write shown (12-hour write $2.50)", text)
+        self.assertIn(">272k: 2x input/cache and 1.5x output for the full request", text)
+        self.assertIn("Tool calling requires the Responses API", text)
+        self.assertIn("OpenAI GPT-5.6 Sol promotional pricing is documented until 2026-11-30", text)
+        self.assertNotIn("2026-11-21", text)
         self.assertIn("`openai/gpt-6-sol` | current | $2 / $0.2 / $2.5 / $10", text)
         self.assertIn("`anthropic/claude-sonnet-5-5` | current | $2 / $0.1 / $2.5 / $10", text)
         self.assertIn("`anthropic/claude-sonnet-5` | legacy | $2 / $0.2 / $2.5 / $10", text)
@@ -189,11 +209,11 @@ class ModelSelectionPackageTests(unittest.TestCase):
         self.assert_error("expected const False")
 
     def test_stale_window_over_31_days_fails(self) -> None:
-        self.mutate_json("public-model-roster.json", lambda d: d.update({"review_due_at": "2026-11-15"}))
+        self.mutate_json("public-model-roster.json", lambda d: d.update({"review_due_at": "2026-12-16"}))
         self.assert_error("review window must be 31 days or less")
 
     def test_overdue_roster_fails(self) -> None:
-        self.assert_error("roster is overdue", today=dt.date(2026, 11, 14))
+        self.assert_error("roster is overdue", today=dt.date(2026, 12, 15))
 
     def test_stale_source_fails(self) -> None:
         self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-06-01"}))
@@ -265,18 +285,18 @@ class ModelSelectionPackageTests(unittest.TestCase):
 
     def test_future_roster_date_fails(self) -> None:
         def mutate(data: dict) -> None:
-            data["as_of"] = "2026-10-14"
-            data["review_due_at"] = "2026-11-13"
+            data["as_of"] = "2026-11-14"
+            data["review_due_at"] = "2026-12-14"
         self.mutate_json("public-model-roster.json", mutate)
         self.assert_error("roster as_of cannot be in the future")
 
     def test_future_source_date_fails(self) -> None:
-        self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-10-14"}))
+        self.mutate_json("public-model-roster.json", lambda d: d["sources"][0].update({"accessed_at": "2026-11-14"}))
         self.assert_error("source accessed_at cannot be in the future")
 
     def test_specialist_snapshot_drift_fails(self) -> None:
         path = self.root / "SPECIALIST-MODELS.md"
-        path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-10-14."))
+        path.write_text(path.read_text().replace("**Snapshot date:** 2026-08-11.", "**Snapshot date:** 2026-11-14."))
         self.assert_error("specialist snapshot date must appear exactly once and not follow roster as_of")
 
     def test_specialist_snapshot_invalid_calendar_date_fails(self) -> None:
@@ -298,7 +318,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["routes"][0].update({"provider": "xAI", "model_id": "grok-4.5"})
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 10, 13), overlay_path=path)
+        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 11, 13), overlay_path=path)
         self.assertTrue(any("exact route provider/model must match public candidate" in error for error in errors), errors)
 
     def test_external_overlay_duplicate_id_fails(self) -> None:
@@ -308,7 +328,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["routes"].append(duplicate)
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 10, 13), overlay_path=path)
+        errors = VALIDATOR.validate_package(self.root, today=dt.date(2026, 11, 13), overlay_path=path)
         self.assertTrue(any("overlay route IDs must be unique" in error for error in errors), errors)
 
     def test_external_overlay_accepts_private_notice(self) -> None:
@@ -316,7 +336,7 @@ class ModelSelectionPackageTests(unittest.TestCase):
         overlay["notice"] = "PRIVATE EXACT-ROUTE OVERLAY"
         path = self.root / "private-overlay.json"
         path.write_text(json.dumps(overlay))
-        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 10, 13), overlay_path=path))
+        self.assertEqual([], VALIDATOR.validate_package(self.root, today=dt.date(2026, 11, 13), overlay_path=path))
 
 
 if __name__ == "__main__":
